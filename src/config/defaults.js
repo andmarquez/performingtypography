@@ -51,7 +51,10 @@ export const DEFAULT_GRAPHICS = {
   ripples: true,
   shapes: true,
   glowColor: '',
+  showImportedSvgs: true,
 };
+
+export const DEFAULT_IMPORTED_SVGS = [];
 
 export const DEFAULT_TYPOGRAPHY = {
   autoCycle: true,
@@ -71,6 +74,7 @@ export const DEFAULT_SETTINGS = {
   typography: DEFAULT_TYPOGRAPHY,
   beatStyles: DEFAULT_BEAT_STYLES,
   graphics: DEFAULT_GRAPHICS,
+  importedSvgs: DEFAULT_IMPORTED_SVGS,
 };
 
 export const STORAGE_KEY = 'concert-kinetic-settings-v1';

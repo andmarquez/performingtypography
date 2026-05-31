@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InteractiveGraphics from './components/InteractiveGraphics.jsx';
+import ImportedSvgLayer from './components/ImportedSvgLayer.jsx';
 import CustomizePanel from './components/CustomizePanel.jsx';
 import {
   applyBeatStyle,
@@ -520,6 +521,10 @@ export default function App() {
           ref={graphicsRef}
           active={hasStarted && settings.graphics.enabled}
           config={settings.graphics}
+        />
+        <ImportedSvgLayer
+          items={settings.importedSvgs}
+          enabled={settings.graphics.enabled && settings.graphics.showImportedSvgs}
         />
         {settings.graphics.enabled && settings.graphics.shapes ? (
           <div className="graphic-shapes" aria-hidden="true">

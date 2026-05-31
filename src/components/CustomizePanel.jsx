@@ -1,24 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   DEFAULT_WORDS,
   FONT_OPTIONS,
   parseWordsText,
   wordsToText,
 } from '../config/defaults.js';
+import {
+  importSvgFile,
+  MAX_IMPORTED_SVGS,
+  removeImportedSvg,
+  updateImportedSvg,
+} from '../lib/svgImport.js';
 
 const TABS = [
   { id: 'words', label: 'Text' },
   { id: 'type', label: 'Fonts' },
   { id: 'fx', label: 'Graphics' },
+  { id: 'svg', label: 'SVG' },
 ];
 
 export default function CustomizePanel({ open, settings, onClose, onChange, onReset }) {
   const [tab, setTab] = useState('words');
   const [wordsDraft, setWordsDraft] = useState(wordsToText(settings.words));
+  const [svgError, setSvgError] = useState('');
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (open) {
       setWordsDraft(wordsToText(settings.words));
+      setSvgError('');
     }
   }, [open, settings.words]);
 
@@ -26,7 +36,7 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
     return null;
   }
 
-  const { typography, graphics } = settings;
+  const { typography, graphics, importedSvgs } = settings;
   const fixed = typography.fixedStyle;
   const selectedFontId =
     FONT_OPTIONS.find((option) => option.family === fixed.family)?.id ?? FONT_OPTIONS[0].id;
@@ -34,6 +44,31 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
   const commitWords = () => {
     const parsed = parseWordsText(wordsDraft);
     onChange({ words: parsed.length ? parsed : DEFAULT_WORDS });
+  };
+
+  const handleSvgImport = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      setSvgError('');
+      const imported = await importSvgFile(file, importedSvgs.length);
+      onChange({ importedSvgs: [...importedSvgs, imported] });
+    } catch (importError) {
+      setSvgError(importError?.message || 'Could not import SVG.');
+    }
+  };
+
+  const patchSvg = (id, patch) => {
+    onChange({ importedSvgs: updateImportedSvg(importedSvgs, id, patch) });
+  };
+
+  const deleteSvg = (id) => {
+    onChange({ importedSvgs: removeImportedSvg(importedSvgs, id) });
   };
 
   return (
@@ -276,6 +311,17 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
                 Floating shapes
               </label>
 
+              <label className="customize-toggle">
+                <input
+                  type="checkbox"
+                  checked={graphics.showImportedSvgs !== false}
+                  onChange={(event) =>
+                    onChange({ graphics: { showImportedSvgs: event.target.checked } })
+                  }
+                />
+                Imported SVG graphics
+              </label>
+
               <label className="customize-label" htmlFor="particles-range">
                 Particle intensity {Math.round(graphics.particles * 100)}%
               </label>
@@ -311,6 +357,158 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
               >
                 Use typography glow
               </button>
+            </section>
+          ) : null}
+
+          {tab === 'svg' ? (
+            <section className="customize-section">
+              <p className="customize-hint">
+                Import up to {MAX_IMPORTED_SVGS} .svg files. They appear over the camera feed and
+                react to beats when pulse is enabled.
+              </p>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".svg,image/svg+xml"
+                className="customize-file-input"
+                onChange={handleSvgImport}
+              />
+              <button
+                type="button"
+                className="customize-action"
+                disabled={importedSvgs.length >= MAX_IMPORTED_SVGS}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Import .svg file
+              </button>
+
+              {svgError ? <p className="customize-error">{svgError}</p> : null}
+
+              {importedSvgs.length ? (
+                <ul className="svg-import-list">
+                  {importedSvgs.map((item) => (
+                    <li key={item.id} className="svg-import-item">
+                      <div className="svg-import-preview" aria-hidden="true">
+                        <div dangerouslySetInnerHTML={{ __html: item.markup }} />
+                      </div>
+
+                      <div className="svg-import-controls">
+                        <div className="svg-import-header">
+                          <span className="svg-import-name">{item.name}</span>
+                          <button
+                            type="button"
+                            className="svg-import-delete"
+                            onClick={() => deleteSvg(item.id)}
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <label className="customize-toggle">
+                          <input
+                            type="checkbox"
+                            checked={item.visible}
+                            onChange={(event) =>
+                              patchSvg(item.id, { visible: event.target.checked })
+                            }
+                          />
+                          Visible
+                        </label>
+
+                        <label className="customize-toggle">
+                          <input
+                            type="checkbox"
+                            checked={item.beatPulse}
+                            onChange={(event) =>
+                              patchSvg(item.id, { beatPulse: event.target.checked })
+                            }
+                          />
+                          Beat pulse
+                        </label>
+
+                        <label className="customize-label" htmlFor={`svg-x-${item.id}`}>
+                          Horizontal {Math.round(item.x)}%
+                        </label>
+                        <input
+                          id={`svg-x-${item.id}`}
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={item.x}
+                          onChange={(event) =>
+                            patchSvg(item.id, { x: Number(event.target.value) })
+                          }
+                        />
+
+                        <label className="customize-label" htmlFor={`svg-y-${item.id}`}>
+                          Vertical {Math.round(item.y)}%
+                        </label>
+                        <input
+                          id={`svg-y-${item.id}`}
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={item.y}
+                          onChange={(event) =>
+                            patchSvg(item.id, { y: Number(event.target.value) })
+                          }
+                        />
+
+                        <label className="customize-label" htmlFor={`svg-scale-${item.id}`}>
+                          Scale {item.scale.toFixed(2)}×
+                        </label>
+                        <input
+                          id={`svg-scale-${item.id}`}
+                          type="range"
+                          min="0.2"
+                          max="2.5"
+                          step="0.05"
+                          value={item.scale}
+                          onChange={(event) =>
+                            patchSvg(item.id, { scale: Number(event.target.value) })
+                          }
+                        />
+
+                        <label className="customize-label" htmlFor={`svg-rotation-${item.id}`}>
+                          Rotation {Math.round(item.rotation)}°
+                        </label>
+                        <input
+                          id={`svg-rotation-${item.id}`}
+                          type="range"
+                          min="-180"
+                          max="180"
+                          step="1"
+                          value={item.rotation}
+                          onChange={(event) =>
+                            patchSvg(item.id, { rotation: Number(event.target.value) })
+                          }
+                        />
+
+                        <label className="customize-label" htmlFor={`svg-opacity-${item.id}`}>
+                          Opacity {Math.round(item.opacity * 100)}%
+                        </label>
+                        <input
+                          id={`svg-opacity-${item.id}`}
+                          type="range"
+                          min="0.1"
+                          max="1"
+                          step="0.02"
+                          value={item.opacity}
+                          onChange={(event) =>
+                            patchSvg(item.id, { opacity: Number(event.target.value) })
+                          }
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="customize-hint">No SVG graphics yet. Import one to get started.</p>
+              )}
             </section>
           ) : null}
         </div>
