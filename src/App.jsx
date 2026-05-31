@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InteractiveGraphics from './components/InteractiveGraphics.jsx';
-
-const WORDS = ['LUX', 'MOTOMAMI', 'SAOKO', 'DESPECHÁ', 'DIVINA', 'DIOS ES UNA MUJER'];
+import CustomizePanel from './components/CustomizePanel.jsx';
+import {
+  applyBeatStyle,
+  resolveActiveStyle,
+  resolveGlow,
+} from './config/defaults.js';
+import { useSettings } from './hooks/useSettings.js';
 
 const MODES = [
   { id: 'pulse', label: 'Pulse with audio' },
@@ -15,153 +20,6 @@ const LONG_PRESS_MS = 560;
 const SWIPE_DISTANCE = 44;
 const BEAT_COOLDOWN_MS = 155;
 const BASS_HISTORY_SIZE = 36;
-
-const BEAT_STYLES = [
-  {
-    label: 'Impact',
-    family: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif',
-    color: '#ffffff',
-    glow: '#ff183d',
-    weight: 900,
-    size: 1,
-    spacing: '-0.08em',
-  },
-  {
-    label: 'Bebas Red',
-    family: '"Bebas Neue", Impact, sans-serif',
-    color: '#ff183d',
-    glow: '#ffffff',
-    weight: 400,
-    size: 1.14,
-    spacing: '0.04em',
-  },
-  {
-    label: 'Anton Gold',
-    family: 'Anton, Impact, sans-serif',
-    color: '#ffd400',
-    glow: '#ff4d00',
-    weight: 400,
-    size: 1.08,
-    spacing: '0.02em',
-  },
-  {
-    label: 'Archivo',
-    family: '"Archivo Black", Impact, sans-serif',
-    color: '#ffffff',
-    glow: '#00e5ff',
-    weight: 400,
-    size: 0.92,
-    spacing: '-0.04em',
-  },
-  {
-    label: 'Bungee',
-    family: 'Bungee, Impact, sans-serif',
-    color: '#00ffcc',
-    glow: '#ff00aa',
-    weight: 400,
-    size: 0.88,
-    spacing: '0.06em',
-  },
-  {
-    label: 'Monoton',
-    family: 'Monoton, Impact, cursive',
-    color: '#ff6bff',
-    glow: '#ffffff',
-    weight: 400,
-    size: 0.78,
-    spacing: '0.12em',
-  },
-  {
-    label: 'Oswald Thin',
-    family: '"Oswald", Impact, sans-serif',
-    color: '#ffffff',
-    glow: '#ff183d',
-    weight: 500,
-    size: 1.22,
-    spacing: '0.14em',
-  },
-  {
-    label: 'Black Ops',
-    family: '"Black Ops One", Impact, sans-serif',
-    color: '#c8ff00',
-    glow: '#ff183d',
-    weight: 400,
-    size: 0.96,
-    spacing: '-0.02em',
-  },
-  {
-    label: 'Rubik Mono',
-    family: '"Rubik Mono One", Impact, monospace',
-    color: '#ffffff',
-    glow: '#ff183d',
-    weight: 400,
-    size: 0.82,
-    spacing: '-0.06em',
-  },
-  {
-    label: 'Staatliches',
-    family: 'Staatliches, Impact, sans-serif',
-    color: '#ff314f',
-    glow: '#ffffff',
-    weight: 400,
-    size: 1.18,
-    spacing: '0.08em',
-  },
-  {
-    label: 'Syne',
-    family: 'Syne, Impact, sans-serif',
-    color: '#ffffff',
-    glow: '#7c3aed',
-    weight: 800,
-    size: 1.06,
-    spacing: '-0.1em',
-  },
-  {
-    label: 'Righteous',
-    family: 'Righteous, Impact, sans-serif',
-    color: '#ff9500',
-    glow: '#ffffff',
-    weight: 400,
-    size: 1,
-    spacing: '0.03em',
-  },
-  {
-    label: 'Ultra',
-    family: 'Ultra, Impact, serif',
-    color: '#ffffff',
-    glow: '#00ff66',
-    weight: 400,
-    size: 0.9,
-    spacing: '0.01em',
-  },
-  {
-    label: 'Passero',
-    family: '"Passero One", Impact, serif',
-    color: '#ff4081',
-    glow: '#ffe600',
-    weight: 400,
-    size: 1.12,
-    spacing: '0.05em',
-  },
-  {
-    label: 'Wallpoet',
-    family: 'Wallpoet, Impact, cursive',
-    color: '#e0e0ff',
-    glow: '#ff183d',
-    weight: 400,
-    size: 1.04,
-    spacing: '0.1em',
-  },
-];
-
-function applyBeatStyle(style, updateFrameVariable) {
-  updateFrameVariable('--beat-font', style.family);
-  updateFrameVariable('--beat-color', style.color);
-  updateFrameVariable('--beat-glow', style.glow);
-  updateFrameVariable('--beat-weight', String(style.weight));
-  updateFrameVariable('--beat-size', String(style.size));
-  updateFrameVariable('--beat-spacing', style.spacing);
-}
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -222,7 +80,9 @@ function getGlyphVector(index, total) {
 }
 
 export default function App() {
+  const { settings, updateSettings, resetSettings } = useSettings();
   const [hasStarted, setHasStarted] = useState(false);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
   const [status, setStatus] = useState('Ready for camera, mic, and motion.');
   const [error, setError] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
@@ -256,15 +116,21 @@ export default function App() {
   const styleIndexRef = useRef(0);
   const lastUiAudioUpdateRef = useRef(0);
   const lastShakeRef = useRef(0);
+  const settingsRef = useRef(settings);
 
-  const currentWord = WORDS[wordIndex];
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
+
+  const words = settings.words;
+  const currentWord = words[wordIndex % words.length] ?? words[0];
   const currentMode = MODES[modeIndex];
-  const currentStyle = BEAT_STYLES[styleIndex];
+  const currentStyle = resolveActiveStyle(settings, styleIndex);
   const glyphs = useMemo(() => Array.from(currentWord), [currentWord]);
 
   const nextWord = useCallback(() => {
-    setWordIndex((index) => (index + 1) % WORDS.length);
-  }, []);
+    setWordIndex((index) => (index + 1) % words.length);
+  }, [words.length]);
 
   const changeMode = useCallback((direction = 1) => {
     setModeIndex((index) => (index + direction + MODES.length) % MODES.length);
@@ -274,7 +140,8 @@ export default function App() {
     setExplosionKey((key) => key + 1);
     setIsExploding(true);
     const frame = frameRef.current;
-    if (frame) {
+    const gfx = settingsRef.current.graphics;
+    if (frame && gfx.enabled) {
       const rect = frame.getBoundingClientRect();
       graphicsRef.current?.burst(rect.width * 0.5, rect.height * 0.42);
       graphicsRef.current?.pulseBeat();
@@ -331,23 +198,36 @@ export default function App() {
       if (isBeat) {
         lastBeatTimeRef.current = now;
         beatFlashRef.current = 1;
-        styleIndexRef.current = (styleIndexRef.current + 1) % BEAT_STYLES.length;
-        applyBeatStyle(BEAT_STYLES[styleIndexRef.current], updateFrameVariable);
-        setStyleIndex(styleIndexRef.current);
-        graphicsRef.current?.pulseBeat();
+        const cfg = settingsRef.current;
+        const styles = cfg.beatStyles;
+
+        if (cfg.typography.autoCycle) {
+          styleIndexRef.current = (styleIndexRef.current + 1) % styles.length;
+          setStyleIndex(styleIndexRef.current);
+        }
+
+        const style = resolveActiveStyle(cfg, styleIndexRef.current);
+        applyBeatStyle(style, updateFrameVariable);
+        if (cfg.graphics.enabled) {
+          graphicsRef.current?.pulseBeat();
+        }
       } else {
         beatFlashRef.current *= 0.68;
       }
 
-      const style = BEAT_STYLES[styleIndexRef.current];
-      graphicsRef.current?.setMetrics({
-        bass: smoothedBassRef.current,
-        mid: smoothedMidRef.current,
-        high: smoothedHighRef.current,
-        beatFlash: beatFlashRef.current,
-        glow: style.glow,
-        color: style.color,
-      });
+      const cfg = settingsRef.current;
+      const style = resolveActiveStyle(cfg, styleIndexRef.current);
+      const glow = resolveGlow(cfg, style);
+      if (cfg.graphics.enabled) {
+        graphicsRef.current?.setMetrics({
+          bass: smoothedBassRef.current,
+          mid: smoothedMidRef.current,
+          high: smoothedHighRef.current,
+          beatFlash: beatFlashRef.current,
+          glow,
+          color: style.color,
+        });
+      }
 
       updateFrameVariable('--audio', smoothedAudioRef.current.toFixed(3));
       updateFrameVariable('--bass', smoothedBassRef.current.toFixed(3));
@@ -445,8 +325,10 @@ export default function App() {
         animationFrameRef.current = requestAnimationFrame(analyzeAudio);
       }
 
-      applyBeatStyle(BEAT_STYLES[0], updateFrameVariable);
+      applyBeatStyle(resolveActiveStyle(settingsRef.current, 0), updateFrameVariable);
       styleIndexRef.current = 0;
+      setStyleIndex(0);
+      setWordIndex(0);
       bassHistoryRef.current = [];
       lastBeatTimeRef.current = 0;
       beatFlashRef.current = 0;
@@ -461,13 +343,25 @@ export default function App() {
 
   const addTouchGraphic = useCallback((clientX, clientY, strength = 1) => {
     const frame = frameRef.current;
-    if (!frame) {
+    const gfx = settingsRef.current.graphics;
+    if (!frame || !gfx.enabled || gfx.ripples === false) {
       return;
     }
 
     const rect = frame.getBoundingClientRect();
     graphicsRef.current?.addRipple(clientX - rect.left, clientY - rect.top, strength);
   }, []);
+
+  useEffect(() => {
+    const style = resolveActiveStyle(settings, styleIndexRef.current);
+    applyBeatStyle(style, updateFrameVariable);
+  }, [settings, updateFrameVariable]);
+
+  useEffect(() => {
+    if (wordIndex >= words.length) {
+      setWordIndex(0);
+    }
+  }, [wordIndex, words.length]);
 
   const handlePointerDown = useCallback(
     (event) => {
@@ -480,7 +374,8 @@ export default function App() {
         touchRef.current.longPressFired = true;
         triggerExplosion();
         const frame = frameRef.current;
-        if (frame) {
+        const gfx = settingsRef.current.graphics;
+        if (frame && gfx.enabled) {
           const rect = frame.getBoundingClientRect();
           graphicsRef.current?.burst(
             event.clientX - rect.left,
@@ -571,12 +466,34 @@ export default function App() {
 
   return (
     <main className="app">
+      <button
+        type="button"
+        className="customize-fab"
+        aria-label="Customize text, fonts, and graphics"
+        onClick={() => setCustomizeOpen(true)}
+      >
+        Customize
+      </button>
+
+      <CustomizePanel
+        open={customizeOpen}
+        settings={settings}
+        onClose={() => setCustomizeOpen(false)}
+        onChange={updateSettings}
+        onReset={() => {
+          resetSettings();
+          setWordIndex(0);
+          setStyleIndex(0);
+          styleIndexRef.current = 0;
+        }}
+      />
+
       <section
         ref={frameRef}
-        className={`phone-frame mode-${currentMode.id} ${isExploding ? 'is-exploding' : ''}`}
-        onPointerDown={hasStarted ? handlePointerDown : undefined}
-        onPointerUp={hasStarted ? handlePointerUp : undefined}
-        onPointerCancel={hasStarted ? handlePointerCancel : undefined}
+        className={`phone-frame mode-${currentMode.id} ${isExploding ? 'is-exploding' : ''} ${settings.graphics.shapes ? 'has-shapes' : ''}`}
+        onPointerDown={hasStarted && !customizeOpen ? handlePointerDown : undefined}
+        onPointerUp={hasStarted && !customizeOpen ? handlePointerUp : undefined}
+        onPointerCancel={hasStarted && !customizeOpen ? handlePointerCancel : undefined}
         style={{
           '--audio': audioLevel,
           '--bass': 0,
@@ -599,12 +516,18 @@ export default function App() {
         <div className="camera-fallback" />
         <div className="shade" />
         <div className="grain" />
-        <InteractiveGraphics ref={graphicsRef} active={hasStarted} />
-        <div className="graphic-shapes" aria-hidden="true">
-          <span className="shape shape-a" />
-          <span className="shape shape-b" />
-          <span className="shape shape-c" />
-        </div>
+        <InteractiveGraphics
+          ref={graphicsRef}
+          active={hasStarted && settings.graphics.enabled}
+          config={settings.graphics}
+        />
+        {settings.graphics.enabled && settings.graphics.shapes ? (
+          <div className="graphic-shapes" aria-hidden="true">
+            <span className="shape shape-a" />
+            <span className="shape shape-b" />
+            <span className="shape shape-c" />
+          </div>
+        ) : null}
 
         {!hasStarted ? (
           <div className="start-panel">
@@ -617,6 +540,9 @@ export default function App() {
             <button className="start-button" type="button" onClick={startExperience}>
               Start Experience
             </button>
+            <button type="button" className="customize-inline" onClick={() => setCustomizeOpen(true)}>
+              Customize text, fonts &amp; graphics
+            </button>
             <p className="status">{status}</p>
             {error ? <p className="error">{error}</p> : null}
           </div>
@@ -628,7 +554,7 @@ export default function App() {
                 <span className="style-tag" style={{ '--tag-color': currentStyle.color }}>
                   {currentStyle.label}
                 </span>
-                <span>{String(wordIndex + 1).padStart(2, '0')}/{WORDS.length}</span>
+                <span>{String(wordIndex + 1).padStart(2, '0')}/{words.length}</span>
               </span>
             </div>
 
@@ -660,7 +586,7 @@ export default function App() {
             </div>
 
             <div className="instruction-card">
-              Tap ripples · Beats flip type &amp; graphics · Hold to explode
+              Tap words · Beats sync type &amp; FX · Customize button top-right
             </div>
 
             <div className="hud bottom" aria-hidden="true">

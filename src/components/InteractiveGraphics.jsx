@@ -26,8 +26,9 @@ function spawnParticle(pool, width, height, bass, glow, burst = false) {
   });
 }
 
-const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, ref) {
+const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active, config }, ref) {
   const canvasRef = useRef(null);
+  const configRef = useRef(config ?? {});
   const metricsRef = useRef({
     bass: 0,
     mid: 0,
@@ -42,11 +43,18 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
   const barsRef = useRef(Array.from({ length: BAR_COUNT }, () => 0));
   const animationRef = useRef(null);
 
+  useEffect(() => {
+    configRef.current = config ?? {};
+  }, [config]);
+
   useImperativeHandle(ref, () => ({
     setMetrics(metrics) {
       metricsRef.current = { ...metricsRef.current, ...metrics };
     },
     addRipple(x, y, strength = 1) {
+      if (configRef.current.ripples === false) {
+        return;
+      }
       ripplesRef.current.push({ x, y, radius: 8, life: 1, strength });
       if (ripplesRef.current.length > MAX_RIPPLES) {
         ripplesRef.current.shift();
@@ -58,23 +66,28 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
         return;
       }
 
+      const cfg = configRef.current;
       const { bass, glow } = metricsRef.current;
       const rect = canvas.getBoundingClientRect();
+      const intensity = cfg.particles ?? 1;
 
-      ringsRef.current.push({
-        x: rect.width * 0.5,
-        y: rect.height * 0.42,
-        radius: 20,
-        life: 1,
-        glow,
-        width: 2 + bass * 3,
-      });
+      if (cfg.rings !== false) {
+        ringsRef.current.push({
+          x: rect.width * 0.5,
+          y: rect.height * 0.42,
+          radius: 20,
+          life: 1,
+          glow,
+          width: 2 + bass * 3,
+        });
 
-      if (ringsRef.current.length > MAX_RINGS) {
-        ringsRef.current.shift();
+        if (ringsRef.current.length > MAX_RINGS) {
+          ringsRef.current.shift();
+        }
       }
 
-      for (let i = 0; i < 14; i += 1) {
+      const burstCount = Math.round(14 * intensity);
+      for (let i = 0; i < burstCount; i += 1) {
         if (particlesRef.current.length < MAX_PARTICLES) {
           spawnParticle(particlesRef.current, rect.width, rect.height, bass, glow, true);
         }
@@ -82,7 +95,9 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
     },
     burst(x, y) {
       const { bass, glow } = metricsRef.current;
-      for (let i = 0; i < 24; i += 1) {
+      const intensity = configRef.current.particles ?? 1;
+      const burstCount = Math.round(24 * intensity);
+      for (let i = 0; i < burstCount; i += 1) {
         if (particlesRef.current.length >= MAX_PARTICLES) {
           break;
         }
@@ -141,6 +156,9 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
 
       const { width, height } = parent.getBoundingClientRect();
       const { bass, mid, high, beatFlash, glow, color } = metricsRef.current;
+      const cfg = configRef.current;
+      const particleIntensity = cfg.particles ?? 1;
+      const maxParticles = Math.round(MAX_PARTICLES * particleIntensity);
 
       ctx.clearRect(0, 0, width, height);
 
@@ -148,47 +166,50 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
       const cy = height * 0.42;
       const orbitRadius = Math.min(width, height) * (0.28 + bass * 0.08);
 
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(time * 0.00035 + bass * 0.4);
-      ctx.strokeStyle = `${glow}55`;
-      ctx.lineWidth = 1 + bass * 2;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, orbitRadius, orbitRadius * 0.62, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.rotate(1.2);
-      ctx.strokeStyle = `${color}33`;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, orbitRadius * 0.78, orbitRadius * 0.48, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-
-      for (let i = 0; i < BAR_COUNT; i += 1) {
-        const target = 0.15 + bass * 0.55 + Math.sin(time * 0.004 + i * 0.45) * mid * 0.25 + high * 0.15;
-        barsRef.current[i] = barsRef.current[i] * 0.72 + target * 0.28;
-        const angle = (i / BAR_COUNT) * Math.PI * 2 - Math.PI / 2;
-        const inner = orbitRadius * 0.55;
-        const len = barsRef.current[i] * orbitRadius * 0.45;
-        const x1 = cx + Math.cos(angle) * inner;
-        const y1 = cy + Math.sin(angle) * inner;
-        const x2 = cx + Math.cos(angle) * (inner + len);
-        const y2 = cy + Math.sin(angle) * (inner + len);
-        ctx.strokeStyle = i % 2 === 0 ? `${glow}${Math.round(60 + barsRef.current[i] * 120).toString(16).padStart(2, '0')}` : `${color}44`;
-        ctx.lineWidth = 1.5 + beatFlash * 2;
+      if (cfg.spectrum !== false) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(time * 0.00035 + bass * 0.4);
+        ctx.strokeStyle = `${glow}55`;
+        ctx.lineWidth = 1 + bass * 2;
         ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
+        ctx.ellipse(0, 0, orbitRadius, orbitRadius * 0.62, 0, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.rotate(1.2);
+        ctx.strokeStyle = `${color}33`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, orbitRadius * 0.78, orbitRadius * 0.48, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        for (let i = 0; i < BAR_COUNT; i += 1) {
+          const target = 0.15 + bass * 0.55 + Math.sin(time * 0.004 + i * 0.45) * mid * 0.25 + high * 0.15;
+          barsRef.current[i] = barsRef.current[i] * 0.72 + target * 0.28;
+          const angle = (i / BAR_COUNT) * Math.PI * 2 - Math.PI / 2;
+          const inner = orbitRadius * 0.55;
+          const len = barsRef.current[i] * orbitRadius * 0.45;
+          const x1 = cx + Math.cos(angle) * inner;
+          const y1 = cy + Math.sin(angle) * inner;
+          const x2 = cx + Math.cos(angle) * (inner + len);
+          const y2 = cy + Math.sin(angle) * (inner + len);
+          ctx.strokeStyle = i % 2 === 0 ? `${glow}${Math.round(60 + barsRef.current[i] * 120).toString(16).padStart(2, '0')}` : `${color}44`;
+          ctx.lineWidth = 1.5 + beatFlash * 2;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        }
       }
 
-      if (time - lastSpawn > 120 - bass * 60) {
+      if (particleIntensity > 0 && time - lastSpawn > 120 - bass * 60) {
         lastSpawn = time;
-        if (particlesRef.current.length < MAX_PARTICLES - 2) {
+        if (particlesRef.current.length < maxParticles - 2) {
           spawnParticle(particlesRef.current, width, height, bass, glow, false);
         }
       }
 
-      particlesRef.current = particlesRef.current.filter((particle) => {
+      if (particleIntensity > 0) {
+        particlesRef.current = particlesRef.current.filter((particle) => {
         particle.x += particle.vx * (0.8 + bass * 0.6);
         particle.y += particle.vy * (0.8 + bass * 0.6);
         particle.vy += 0.02;
@@ -204,8 +225,12 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
         ctx.fill();
         return true;
       });
+      } else {
+        particlesRef.current = [];
+      }
 
-      ringsRef.current = ringsRef.current.filter((ring) => {
+      if (cfg.rings !== false) {
+        ringsRef.current = ringsRef.current.filter((ring) => {
         ring.radius += 2.5 + bass * 6 + beatFlash * 4;
         ring.life -= 0.018;
 
@@ -220,8 +245,12 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
         ctx.stroke();
         return true;
       });
+      } else {
+        ringsRef.current = [];
+      }
 
-      ripplesRef.current = ripplesRef.current.filter((ripple) => {
+      if (cfg.ripples !== false) {
+        ripplesRef.current = ripplesRef.current.filter((ripple) => {
         ripple.radius += 3 + bass * 5;
         ripple.life -= 0.025;
 
@@ -236,8 +265,11 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
         ctx.stroke();
         return true;
       });
+      } else {
+        ripplesRef.current = [];
+      }
 
-      if (beatFlash > 0.15) {
+      if (beatFlash > 0.15 && cfg.spectrum !== false) {
         const gradient = ctx.createRadialGradient(cx, cy, 10, cx, cy, orbitRadius * 1.2);
         gradient.addColorStop(0, `${glow}${Math.round(beatFlash * 90).toString(16).padStart(2, '0')}`);
         gradient.addColorStop(1, 'transparent');
@@ -259,7 +291,7 @@ const InteractiveGraphics = forwardRef(function InteractiveGraphics({ active }, 
       ripplesRef.current = [];
       ringsRef.current = [];
     };
-  }, [active]);
+  }, [active, config]);
 
   return (
     <canvas
