@@ -573,6 +573,9 @@ export default function App() {
             <button className="start-button" type="button" onClick={startExperience}>
               Start Experience
             </button>
+            <a className="ghost-link" href="/lyrics">
+              Try lyrics mode (experimental) →
+            </a>
             <p className="status">{status}</p>
             {error ? <p className="error">{error}</p> : null}
           </div>
