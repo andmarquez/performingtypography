@@ -478,6 +478,128 @@ textarea {
   }
 }
 
+.ghost-link,
+.bottom-link {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.ghost-link {
+  align-self: flex-start;
+}
+
+.bottom-link {
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+
+.lyrics-app .song-title {
+  position: absolute;
+  z-index: 4;
+  top: calc(max(2.4rem, env(safe-area-inset-top)) + 0.5rem);
+  right: max(1rem, env(safe-area-inset-right));
+  left: max(1rem, env(safe-area-inset-left));
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.lyrics-stage {
+  inset: 14% 0 28%;
+}
+
+.lyrics-word {
+  font-size: calc(clamp(2rem, 10vw, 5.2rem) * var(--beat-size));
+  line-height: 0.85;
+  max-width: 95%;
+}
+
+.lyrics-controls {
+  position: absolute;
+  z-index: 5;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(max(6.8rem, env(safe-area-inset-bottom)) + 4.6rem);
+  left: max(1rem, env(safe-area-inset-left));
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip-button,
+.lyrics-search button {
+  min-height: 2.2rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chip-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.2rem;
+  padding: 0 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lyrics-search {
+  position: absolute;
+  z-index: 5;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(max(6.8rem, env(safe-area-inset-bottom)) + 2.8rem);
+  left: max(1rem, env(safe-area-inset-left));
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+}
+
+.lyrics-search input {
+  min-height: 2.2rem;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.42);
+  font-size: 0.78rem;
+}
+
+.lyrics-search input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.identify-status {
+  position: absolute;
+  z-index: 5;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(max(6.8rem, env(safe-area-inset-bottom)) + 1.4rem);
+  left: max(1rem, env(safe-area-inset-left));
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

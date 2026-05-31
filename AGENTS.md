@@ -19,6 +19,17 @@ cat .phone-url
 - `vite.config.js` sets `server.allowedHosts: true` so tunnel hostnames work.
 - Fallback tunnels (localtunnel, tunnelmole) are optional; Cloudflare is canonical for this project.
 
+### Routes
+
+| Path | Mode |
+|------|------|
+| `/` | Classic kinetic typography (unchanged) |
+| `/lyrics` | Experimental lyrics mode — song ID + LRCLIB lyrics |
+
+Phone URLs: append `/lyrics` to the Cloudflare tunnel base, e.g. `https://….trycloudflare.com/lyrics`.
+
+Lyrics mode uses Vite proxies (`/api/lrclib`, `/api/audd`). Optional `VITE_AUDD_API_TOKEN` in `.env` enables auto song detection; manual search works without it.
+
 ### Branch note
 
 `main` currently contains only a placeholder README. The Concert Kinetic Typography Vite app lives on `cursor/concert-kinetic-typography-1da3` (or any branch that includes `package.json` and `src/`). Check out that branch before installing dependencies or running scripts.
