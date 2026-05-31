@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import InteractiveGraphics from './components/InteractiveGraphics.jsx';
 
 const WORDS = ['LUX', 'MOTOMAMI', 'SAOKO', 'DESPECHÁ', 'DIVINA', 'DIOS ES UNA MUJER'];
 
@@ -232,6 +233,7 @@ export default function App() {
   const [styleIndex, setStyleIndex] = useState(0);
 
   const frameRef = useRef(null);
+  const graphicsRef = useRef(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -271,6 +273,12 @@ export default function App() {
   const triggerExplosion = useCallback(() => {
     setExplosionKey((key) => key + 1);
     setIsExploding(true);
+    const frame = frameRef.current;
+    if (frame) {
+      const rect = frame.getBoundingClientRect();
+      graphicsRef.current?.burst(rect.width * 0.5, rect.height * 0.42);
+      graphicsRef.current?.pulseBeat();
+    }
     window.setTimeout(() => setIsExploding(false), 780);
   }, []);
 
@@ -326,9 +334,20 @@ export default function App() {
         styleIndexRef.current = (styleIndexRef.current + 1) % BEAT_STYLES.length;
         applyBeatStyle(BEAT_STYLES[styleIndexRef.current], updateFrameVariable);
         setStyleIndex(styleIndexRef.current);
+        graphicsRef.current?.pulseBeat();
       } else {
         beatFlashRef.current *= 0.68;
       }
+
+      const style = BEAT_STYLES[styleIndexRef.current];
+      graphicsRef.current?.setMetrics({
+        bass: smoothedBassRef.current,
+        mid: smoothedMidRef.current,
+        high: smoothedHighRef.current,
+        beatFlash: beatFlashRef.current,
+        glow: style.glow,
+        color: style.color,
+      });
 
       updateFrameVariable('--audio', smoothedAudioRef.current.toFixed(3));
       updateFrameVariable('--bass', smoothedBassRef.current.toFixed(3));
@@ -440,18 +459,37 @@ export default function App() {
     }
   }, [analyzeAudio, requestMotionAccess, updateFrameVariable]);
 
+  const addTouchGraphic = useCallback((clientX, clientY, strength = 1) => {
+    const frame = frameRef.current;
+    if (!frame) {
+      return;
+    }
+
+    const rect = frame.getBoundingClientRect();
+    graphicsRef.current?.addRipple(clientX - rect.left, clientY - rect.top, strength);
+  }, []);
+
   const handlePointerDown = useCallback(
     (event) => {
       touchRef.current.x = event.clientX;
       touchRef.current.y = event.clientY;
       touchRef.current.longPressFired = false;
+      addTouchGraphic(event.clientX, event.clientY, 0.85);
       window.clearTimeout(touchRef.current.longPressTimer);
       touchRef.current.longPressTimer = window.setTimeout(() => {
         touchRef.current.longPressFired = true;
         triggerExplosion();
+        const frame = frameRef.current;
+        if (frame) {
+          const rect = frame.getBoundingClientRect();
+          graphicsRef.current?.burst(
+            event.clientX - rect.left,
+            event.clientY - rect.top,
+          );
+        }
       }, LONG_PRESS_MS);
     },
-    [triggerExplosion],
+    [addTouchGraphic, triggerExplosion],
   );
 
   const handlePointerUp = useCallback(
@@ -561,6 +599,12 @@ export default function App() {
         <div className="camera-fallback" />
         <div className="shade" />
         <div className="grain" />
+        <InteractiveGraphics ref={graphicsRef} active={hasStarted} />
+        <div className="graphic-shapes" aria-hidden="true">
+          <span className="shape shape-a" />
+          <span className="shape shape-b" />
+          <span className="shape shape-c" />
+        </div>
 
         {!hasStarted ? (
           <div className="start-panel">
@@ -616,7 +660,7 @@ export default function App() {
             </div>
 
             <div className="instruction-card">
-              Tap to change word. Each beat flips font, color, weight &amp; size.
+              Tap ripples · Beats flip type &amp; graphics · Hold to explode
             </div>
 
             <div className="hud bottom" aria-hidden="true">

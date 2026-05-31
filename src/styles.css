@@ -118,12 +118,82 @@ textarea {
     repeating-linear-gradient(90deg, transparent 0 2px, rgba(255, 0, 34, 0.08) 2px 3px);
 }
 
+.interactive-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.graphic-shapes {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.shape {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--beat-glow) 45%, transparent);
+  opacity: calc(0.25 + var(--bass) * 0.45);
+  mix-blend-mode: screen;
+  transition: transform 80ms linear, opacity 80ms linear;
+}
+
+.shape-a {
+  top: 18%;
+  left: 8%;
+  width: calc(3rem + var(--mid) * 4rem);
+  height: calc(3rem + var(--mid) * 4rem);
+  border-radius: 50%;
+  transform:
+    translate3d(calc(var(--tilt-x) * 12px), calc(var(--tilt-y) * 10px), 0)
+    rotate(calc(var(--motion) * 40deg))
+    scale(calc(1 + var(--beat-flash) * 0.35));
+}
+
+.shape-b {
+  right: 6%;
+  bottom: 28%;
+  width: calc(2rem + var(--high) * 5rem);
+  height: calc(5rem + var(--bass) * 6rem);
+  border-radius: 999px;
+  transform:
+    translate3d(calc(var(--tilt-x) * -16px), calc(var(--tilt-y) * 8px), 0)
+    skewY(calc(var(--bass) * -12deg))
+    scale(calc(1 + var(--beat-flash) * 0.2));
+}
+
+.shape-c {
+  top: 42%;
+  left: 50%;
+  width: calc(8rem + var(--bass) * 10rem);
+  height: calc(8rem + var(--bass) * 10rem);
+  border-radius: 50%;
+  border-color: color-mix(in srgb, var(--beat-color) 35%, transparent);
+  transform:
+    translate3d(calc(-50% + var(--tilt-x) * 20px), calc(-50% + var(--tilt-y) * 16px), 0)
+    scale(calc(0.85 + var(--audio) * 0.25 + var(--beat-flash) * 0.15));
+}
+
+.is-beat-hit .shape-c {
+  opacity: calc(0.45 + var(--beat-flash) * 0.5);
+}
+
+.is-exploding .shape-a,
+.is-exploding .shape-b,
+.is-exploding .shape-c {
+  opacity: 0.85;
+  transform: scale(calc(1.2 + var(--beat-flash) * 0.4));
+}
+
 .start-panel,
 .hud,
 .type-stage,
 .instruction-card {
   position: absolute;
-  z-index: 4;
+  z-index: 6;
 }
 
 .start-panel {
@@ -280,6 +350,7 @@ textarea {
   padding: 1.1rem;
   pointer-events: none;
   perspective: 850px;
+  z-index: 5;
 }
 
 .kinetic-word {
@@ -308,10 +379,15 @@ textarea {
     scale(calc(1 + var(--bass) * 0.28 + var(--mid) * 0.08 + var(--motion) * 0.04 + var(--beat-flash) * 0.2));
   transition: transform 35ms linear, filter 35ms linear, color 0ms, font-size 0ms, font-weight 0ms;
   will-change: transform, filter, color;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 calc(8px + var(--beat-flash) * 20px) var(--beat-glow));
 }
 
 .is-beat-hit .kinetic-word {
-  filter: contrast(calc(1.12 + var(--beat-flash) * 0.45)) saturate(calc(1.15 + var(--beat-flash) * 0.55));
+  filter:
+    contrast(calc(1.12 + var(--beat-flash) * 0.45))
+    saturate(calc(1.15 + var(--beat-flash) * 0.55))
+    drop-shadow(0 0 calc(12px + var(--beat-flash) * 28px) var(--beat-glow));
 }
 
 .glyph {
