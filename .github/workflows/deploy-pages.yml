@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - cursor/interactive-graphics-7a2b
   workflow_dispatch:
 
 permissions:

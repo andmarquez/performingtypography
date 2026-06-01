@@ -30,15 +30,17 @@ phone motion when available, and overlays animated editorial typography.
 
 The app can be hosted on **GitHub Pages** so you always have the same HTTPS link on your phone — no dev server or Cloudflare tunnel required.
 
-**Live URL (after setup):** [https://andmarquez.github.io/performingtypography/](https://andmarquez.github.io/performingtypography/)
+**Live URL:** [https://andmarquez.github.io/performingtypography/](https://andmarquez.github.io/performingtypography/)
 
-### One-time setup (repo owner)
+The site deploys automatically when changes are pushed to **`main`**. GitHub Pages only allows deploys from that branch in this repo.
 
-1. Open **GitHub → performingtypography → Settings → Pages**
-2. Under **Build and deployment**, set **Source** to **GitHub Actions**
-3. Push to `main` or `cursor/interactive-graphics-7a2b` — the workflow builds and deploys automatically
+### One-time setup (already done if the link above works)
 
-Every push to those branches updates the live site within a few minutes. Bookmark the URL on your phone; camera and mic work over HTTPS.
+1. **GitHub → performingtypography → Settings → Pages**
+2. **Source:** GitHub Actions
+3. Push to **`main`** — the workflow builds and deploys in ~1 minute
+
+Bookmark the URL on your phone. Camera and mic work over HTTPS without a dev tunnel.
 
 For local development with hot reload, use `npm run dev` and optionally `npm run phone:tunnel` (temporary URL while your computer is running).
 

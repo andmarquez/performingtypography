@@ -10,7 +10,7 @@ Guidance for AI agents working in this repository.
 
 - **https://andmarquez.github.io/performingtypography/**
 
-Deploys automatically via `.github/workflows/deploy-pages.yml` on push to `main` or `cursor/interactive-graphics-7a2b`. Requires repo **Settings → Pages → Source: GitHub Actions** (one-time owner setup).
+Deploys automatically via `.github/workflows/deploy-pages.yml` on push to **`main`** only (GitHub Pages branch policy). Requires **Settings → Pages → Source: GitHub Actions**.
 
 Use this for phone access that does not depend on a running dev server or Cloudflare quick tunnel.
 
