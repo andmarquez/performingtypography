@@ -540,7 +540,6 @@ export default function App() {
             status={status}
             error={error}
             onStart={startExperience}
-            onCustomize={() => setCustomizeOpen(true)}
           />
         ) : (
           <>

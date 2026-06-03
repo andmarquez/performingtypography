@@ -1,13 +1,7 @@
-Export from Rosi.fig (Figma) — artboards Home-1, Home-2, Home-3
+Optional pixel-perfect assets from Rosi.fig:
 
-1. Open Rosi.fig in Figma (desktop or web).
-2. Select frame "Home-1" → Export → PNG @2x → save as:
-   home-1.png
-3. Repeat for Home-2 → home-2.png and Home-3 → home-3.png
-4. Copy all three files into this folder (public/splash/).
+- Export "LUX" logo as SVG → replace src/components/splash/LuxMark.jsx
+- Export profile illustration as SVG → replace src/components/splash/ProfileMark.jsx
+- Or export full frames as home-1.png, home-2.png, home-3.png and switch SplashScreen to image mode
 
-Optional: use WebP instead — rename in src/components/SplashScreen.jsx if needed.
-
-Frame size: match phone (e.g. 1080×1920 @2x). The app scales with object-fit: cover.
-
-After adding files, run npm run dev or push to main for GitHub Pages.
+The live splash uses coded layouts matching Home-1 (cream), Home-2 (#ff441a), Home-3 (black).
