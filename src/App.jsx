@@ -577,26 +577,6 @@ export default function App() {
           />
         ) : (
           <>
-            <div className="hud top">
-              <span>{currentMode.label}</span>
-              {showTextOverlay ? (
-                <span className="hud-meta">
-                  <span className="style-tag" style={{ '--tag-color': currentStyle.color }}>
-                    {currentStyle.label}
-                  </span>
-                  <span>
-                    {String(wordIndex + 1).padStart(2, '0')}/{words.length}
-                  </span>
-                </span>
-              ) : (
-                <span className="hud-meta">
-                  <span className="style-tag" style={{ '--tag-color': currentStyle.color }}>
-                    {currentStyle.label}
-                  </span>
-                </span>
-              )}
-            </div>
-
             {showTextOverlay ? (
               <div className="type-stage" key={`${currentWord}-${explosionKey}`}>
                 <div className="kinetic-word" aria-live="polite" aria-label={currentWord}>
@@ -633,12 +613,6 @@ export default function App() {
                 disabled={customizeOpen}
               />
             ) : null}
-
-            <div className="instruction-card">
-              {showTextOverlay
-                ? 'Tap words · Swipe modes · Art tabs below'
-                : 'Pick art tab · Swipe modes · Beats sync artwork'}
-            </div>
 
             <div className="hud bottom" aria-hidden="true">
               <span className="meter meter-bass">

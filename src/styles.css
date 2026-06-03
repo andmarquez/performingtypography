@@ -755,7 +755,7 @@ textarea {
   z-index: 7;
   left: max(0.65rem, calc(env(safe-area-inset-left) + 0.25rem));
   right: max(0.65rem, calc(env(safe-area-inset-right) + 0.25rem));
-  bottom: calc(max(3.1rem, env(safe-area-inset-bottom) + 0.65rem) + 4.35rem);
+  bottom: calc(max(1.35rem, env(safe-area-inset-bottom) + 0.55rem) + 2.75rem);
   display: flex;
   gap: 0.35rem;
   overflow-x: auto;
@@ -798,11 +798,8 @@ textarea {
   opacity: 0.45;
 }
 
-.phone-frame.is-live .instruction-card {
-  right: max(1.2rem, calc(env(safe-area-inset-right) + 0.4rem));
-  left: max(1.2rem, calc(env(safe-area-inset-left) + 0.4rem));
-  bottom: calc(max(3.35rem, env(safe-area-inset-bottom) + 0.85rem) + 2.35rem);
-  padding: 0.95rem 1.05rem;
+.phone-frame.is-live .experience-art-tabs {
+  bottom: calc(max(1.35rem, env(safe-area-inset-bottom) + 0.55rem) + 2.85rem);
 }
 
 @keyframes editorial-breathe {
