@@ -278,8 +278,7 @@ textarea {
   position: absolute;
   inset: 0;
   opacity: 0;
-  will-change: opacity;
-  animation: splash-crossfade 24s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  animation: splash-cut 24s infinite linear;
 }
 
 .splash-slide:nth-child(1) {
@@ -297,27 +296,13 @@ textarea {
   animation-delay: -16s;
 }
 
-@keyframes splash-crossfade {
-  0% {
-    opacity: 0;
-  }
-
-  6% {
-    opacity: 0;
-  }
-
-  20% {
+@keyframes splash-cut {
+  0%,
+  33.32% {
     opacity: 1;
   }
 
-  32% {
-    opacity: 1;
-  }
-
-  46% {
-    opacity: 0;
-  }
-
+  33.33%,
   100% {
     opacity: 0;
   }
