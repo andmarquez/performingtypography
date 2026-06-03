@@ -1,15 +1,21 @@
 import { createImportedSvg, sanitizeSvgMarkup } from './svgImport.js';
+import { enhanceExperienceMarkup, getExperienceTheme } from './svgEnhance.js';
 
 const BASE = import.meta.env.BASE_URL;
 
-export function createExperienceSvg(name, markup, index = 0) {
+export function createExperienceSvg(name, markup, index = 0, filename = '') {
+  const theme = getExperienceTheme(filename || `${name}.svg`);
+
   return {
     ...createImportedSvg(name, markup, index),
     source: 'experience',
+    slug: theme.slug,
+    experienceClass: theme.experienceClass,
+    fullScreen: theme.fullScreen,
     x: 50,
-    y: 50,
-    scale: 1,
-    opacity: 0.95,
+    y: 48,
+    scale: 1.05,
+    opacity: 1,
     beatPulse: true,
     visible: true,
   };
@@ -42,9 +48,10 @@ export async function loadExperienceAssets() {
         }
 
         const raw = await response.text();
-        const markup = sanitizeSvgMarkup(raw);
+        const sanitized = sanitizeSvgMarkup(raw);
+        const markup = enhanceExperienceMarkup(sanitized, filename);
         const name = filename.replace(/\.svg$/i, '');
-        return createExperienceSvg(name, markup, index);
+        return createExperienceSvg(name, markup, index, filename);
       }),
     );
 

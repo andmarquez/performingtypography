@@ -244,6 +244,125 @@ textarea {
   height: min(82dvh, 40rem);
 }
 
+.imported-svg-item.is-experience-full {
+  width: 108%;
+  height: 108%;
+  max-width: none;
+  max-height: none;
+  opacity: calc(0.92 + var(--bass) * 0.08);
+  mix-blend-mode: screen;
+  filter: drop-shadow(
+    0 0 calc(10px + var(--bass) * 28px)
+    color-mix(in srgb, var(--beat-glow) 70%, transparent)
+  );
+}
+
+.imported-svg-item.is-experience-full.is-beat-reactive {
+  transform:
+    translate(-50%, -50%)
+    translate3d(calc(var(--tilt-x) * 14px), calc(var(--tilt-y) * 10px), 0)
+    scale(calc(var(--svg-scale) * (1 + var(--bass) * 0.08 + var(--beat-flash) * 0.1)))
+    rotate(calc(var(--svg-rotation) + var(--tilt-x) * 6deg));
+}
+
+/* —— Saoko experience —— */
+.experience-saoko .experience-svg-root {
+  overflow: visible;
+}
+
+.experience-saoko .saoko-illustration {
+  transform-origin: 50% 55%;
+  animation: saoko-illustration-drift 7s ease-in-out infinite;
+}
+
+@keyframes saoko-illustration-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(calc(-8px - var(--bass) * 14px));
+  }
+}
+
+.experience-saoko .saoko-illustration .experience-path {
+  fill: color-mix(in srgb, var(--beat-color) 28%, #ffffff);
+  opacity: calc(0.82 + var(--mid) * 0.18);
+  transition: fill 140ms linear, opacity 100ms linear;
+}
+
+.experience-saoko .saoko-title-top,
+.experience-saoko .saoko-title-mid {
+  transform-origin: 50% 50%;
+  transition: transform 100ms linear;
+}
+
+.experience-saoko .saoko-title-top .experience-path,
+.experience-saoko .saoko-title-mid .experience-path {
+  fill: var(--beat-color);
+  filter: drop-shadow(
+    0 0 calc(4px + var(--beat-flash) * 22px + var(--bass) * 12px)
+    var(--beat-glow)
+  );
+  transition: fill 90ms linear;
+}
+
+.experience-saoko .saoko-detail .experience-path,
+.experience-saoko .saoko-header .experience-path {
+  fill: color-mix(in srgb, var(--beat-glow) 55%, #ffffff);
+  opacity: calc(0.7 + var(--high) * 0.3);
+}
+
+.is-beat-hit .experience-saoko .saoko-title-top,
+.is-beat-hit .experience-saoko .saoko-title-mid {
+  animation: saoko-title-pop 0.35s ease-out;
+}
+
+@keyframes saoko-title-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(calc(1.04 + var(--beat-flash) * 0.08));
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.is-beat-hit .experience-saoko .saoko-illustration {
+  animation: saoko-illustration-hit 0.45s ease-out, saoko-illustration-drift 7s ease-in-out infinite;
+}
+
+@keyframes saoko-illustration-hit {
+  0% {
+    filter: brightness(1);
+  }
+
+  35% {
+    filter: brightness(calc(1.35 + var(--beat-flash) * 0.4));
+  }
+
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.is-exploding .experience-saoko.is-experience-full {
+  transform:
+    translate(-50%, -50%)
+    scale(calc(var(--svg-scale) * (1.18 + var(--beat-flash) * 0.25)))
+    rotate(calc(var(--svg-rotation) + 8deg));
+  opacity: 1;
+}
+
+.phone-frame.is-exploding .experience-saoko .saoko-illustration .experience-path {
+  fill: color-mix(in srgb, var(--beat-glow) 45%, var(--beat-color));
+}
+
 .imported-svg-item.is-experience .imported-svg-markup svg {
   color: var(--beat-color);
 }

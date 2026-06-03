@@ -14,7 +14,7 @@ export default function ImportedSvgLayer({ items, enabled }) {
       {visibleItems.map((item) => (
         <div
           key={item.id}
-          className={`imported-svg-item ${item.beatPulse ? 'is-beat-reactive' : ''} ${item.source === 'experience' ? 'is-experience' : ''}`}
+          className={`imported-svg-item ${item.beatPulse ? 'is-beat-reactive' : ''} ${item.source === 'experience' ? 'is-experience' : ''} ${item.fullScreen ? 'is-experience-full' : ''} ${item.experienceClass || ''}`}
           style={{
             '--svg-x': item.x,
             '--svg-y': item.y,
@@ -23,7 +23,10 @@ export default function ImportedSvgLayer({ items, enabled }) {
             '--svg-opacity': item.opacity,
           }}
         >
-          <div className="imported-svg-markup" dangerouslySetInnerHTML={{ __html: item.markup }} />
+          <div
+            className={`imported-svg-markup ${item.experienceClass || ''}`}
+            dangerouslySetInnerHTML={{ __html: item.markup }}
+          />
         </div>
       ))}
     </div>
