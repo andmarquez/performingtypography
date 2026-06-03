@@ -235,6 +235,7 @@ textarea {
 }
 
 .imported-svg-item.is-experience {
+  --experience-y-nudge: -50px;
   width: min(96vw, 100%);
   height: min(82dvh, 40rem);
 }
@@ -363,7 +364,7 @@ textarea {
 }
 
 .is-exploding .experience-art.is-experience-full.is-upright {
-  transform: translate(-50%, -50%)
+  transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
     scale(calc(var(--svg-scale) * (1.12 + var(--beat-flash) * 0.2)));
   opacity: 1;
 }
