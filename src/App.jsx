@@ -621,7 +621,7 @@ export default function App() {
               <span className="meter meter-mid">
                 <span />
               </span>
-              <span>Beat sync · Swipe modes</span>
+              <span>Beat sync · ANDSIOSA</span>
             </div>
           </>
         )}

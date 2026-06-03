@@ -1,6 +1,6 @@
 :root {
   color: #ffffff;
-  background: #050505;
+  background: #000000;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -22,7 +22,7 @@ body,
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: #050505;
+  background: #000000;
 }
 
 button,
@@ -37,9 +37,7 @@ textarea {
   height: 100dvh;
   min-height: 100vh;
   place-items: center;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(167, 0, 22, 0.18), transparent 34rem),
-    #050505;
+  background: #000000;
 }
 
 .phone-frame {
@@ -65,7 +63,7 @@ textarea {
   overflow: hidden;
   isolation: isolate;
   aspect-ratio: 9 / 16;
-  background: #050505;
+  background: #000000;
   box-shadow: 0 0 80px rgba(0, 0, 0, 0.72);
   touch-action: none;
   user-select: none;
@@ -94,10 +92,7 @@ textarea {
 
 .camera-fallback {
   z-index: -1;
-  background:
-    linear-gradient(150deg, rgba(180, 0, 24, 0.36), transparent 36%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08), transparent 44%),
-    #080808;
+  background: #000000;
 }
 
 .shade {
@@ -115,7 +110,7 @@ textarea {
   pointer-events: none;
   background-image:
     repeating-radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.8) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(90deg, transparent 0 2px, rgba(255, 0, 34, 0.08) 2px 3px);
+    repeating-linear-gradient(90deg, transparent 0 2px, rgba(255, 255, 255, 0.04) 2px 3px);
 }
 
 .interactive-canvas {
@@ -434,7 +429,7 @@ textarea {
 }
 
 .splash-slide:nth-child(3) {
-  background: #050505;
+  background: #000000;
   animation-delay: -2s;
 }
 
