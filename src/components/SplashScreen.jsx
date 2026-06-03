@@ -1,7 +1,7 @@
 const BASE = import.meta.env.BASE_URL;
 
 const SLIDES = [
-  { id: 'home-1', src: `${BASE}splash/home-1.png` },
+  { id: 'home-4', src: `${BASE}splash/home-4.png` },
   { id: 'home-2', src: `${BASE}splash/home-2.png` },
   { id: 'home-3', src: `${BASE}splash/home-3.png` },
 ];

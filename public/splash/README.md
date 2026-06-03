@@ -1,15 +1,15 @@
 # Put your splash images here
 
-Drop these three files in **this folder**:
+Add your three Figma frames as PNG and save here:
 
-- `home-1.png` (Figma artboard **Home-1**)
-- `home-2.png` (Figma artboard **Home-2**)
-- `home-3.png` (Figma artboard **Home-3**)
+- `home-4.png` (replaces Home-1)
+- `home-2.png`
+- `home-3.png`
 
 Full path in the project:
 
 ```text
-performingtypography/public/splash/home-1.png
+performingtypography/public/splash/home-4.png
 performingtypography/public/splash/home-2.png
 performingtypography/public/splash/home-3.png
 ```

@@ -31,7 +31,7 @@ phone motion when available, and overlays animated editorial typography.
 Add your Figma exports here:
 
 ```text
-public/splash/home-1.png
+public/splash/home-4.png
 public/splash/home-2.png
 public/splash/home-3.png
 ```
