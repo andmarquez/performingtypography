@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InteractiveGraphics from './components/InteractiveGraphics.jsx';
 import ImportedSvgLayer from './components/ImportedSvgLayer.jsx';
+import SplashScreen from './components/SplashScreen.jsx';
 import CustomizePanel from './components/CustomizePanel.jsx';
 import {
   applyBeatStyle,
@@ -535,22 +536,12 @@ export default function App() {
         ) : null}
 
         {!hasStarted ? (
-          <div className="start-panel">
-            <p className="eyebrow">Concert Kinetic Typography</p>
-            <h1>Turn the room into moving type.</h1>
-            <p>
-              Camera, microphone, and motion access start after a tap so this works on
-              mobile browsers.
-            </p>
-            <button className="start-button" type="button" onClick={startExperience}>
-              Start Experience
-            </button>
-            <button type="button" className="customize-inline" onClick={() => setCustomizeOpen(true)}>
-              Customize text, fonts &amp; graphics
-            </button>
-            <p className="status">{status}</p>
-            {error ? <p className="error">{error}</p> : null}
-          </div>
+          <SplashScreen
+            status={status}
+            error={error}
+            onStart={startExperience}
+            onCustomize={() => setCustomizeOpen(true)}
+          />
         ) : (
           <>
             <div className="hud top">
