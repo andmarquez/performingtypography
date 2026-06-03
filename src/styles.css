@@ -239,6 +239,15 @@ textarea {
     rotate(calc(var(--svg-rotation) + 12deg));
 }
 
+.imported-svg-item.is-experience {
+  width: min(96vw, 100%);
+  height: min(82dvh, 40rem);
+}
+
+.imported-svg-item.is-experience .imported-svg-markup svg {
+  color: var(--beat-color);
+}
+
 .imported-svg-markup,
 .imported-svg-markup svg {
   display: block;

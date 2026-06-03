@@ -9,6 +9,7 @@ import {
   resolveGlow,
 } from './config/defaults.js';
 import { useSettings } from './hooks/useSettings.js';
+import { useExperienceAssets } from './hooks/useExperienceAssets.js';
 
 const MODES = [
   { id: 'pulse', label: 'Pulse with audio' },
@@ -129,6 +130,12 @@ export default function App() {
   const currentMode = MODES[modeIndex];
   const currentStyle = resolveActiveStyle(settings, styleIndex);
   const glyphs = useMemo(() => Array.from(currentWord), [currentWord]);
+  const showSvgLayer = settings.graphics.enabled && settings.graphics.showImportedSvgs;
+  const experienceSvgs = useExperienceAssets(hasStarted && showSvgLayer);
+  const svgLayerItems = useMemo(
+    () => [...experienceSvgs, ...settings.importedSvgs],
+    [experienceSvgs, settings.importedSvgs],
+  );
 
   const nextWord = useCallback(() => {
     setWordIndex((index) => (index + 1) % words.length);
@@ -524,8 +531,8 @@ export default function App() {
           config={settings.graphics}
         />
         <ImportedSvgLayer
-          items={settings.importedSvgs}
-          enabled={settings.graphics.enabled && settings.graphics.showImportedSvgs}
+          items={svgLayerItems}
+          enabled={showSvgLayer}
         />
         {settings.graphics.enabled && settings.graphics.shapes ? (
           <div className="graphic-shapes" aria-hidden="true">

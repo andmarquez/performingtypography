@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "description": "Mobile-first React Vite kinetic typography concert app",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "build:pages": "vite build && cp dist/index.html dist/404.html",
+    "dev": "npm run experience:manifest && vite --host 0.0.0.0",
+    "build": "npm run experience:manifest && vite build",
+    "build:pages": "npm run experience:manifest && vite build && cp dist/index.html dist/404.html",
+    "experience:manifest": "node scripts/generate-experience-manifest.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "phone:tunnel": "bash scripts/phone-tunnel.sh"
   },

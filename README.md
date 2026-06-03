@@ -39,6 +39,18 @@ public/splash/home-3.png
 In the repo file tree: open the **`public`** folder (project root, next to `src`) → **`splash`**.  
 See `public/splash/README.md` for details.
 
+## Experience SVG screens
+
+Add interactive Figma SVG screens here:
+
+```text
+public/experience/your-screen.svg
+```
+
+Then run `npm run experience:manifest` (runs automatically on `npm run dev` / `npm run build`).
+
+See `public/experience/README.md` for export tips. Files load on top of the camera feed and react to beats.
+
 ## Live website (permanent)
 
 The app can be hosted on **GitHub Pages** so you always have the same HTTPS link on your phone — no dev server or Cloudflare tunnel required.

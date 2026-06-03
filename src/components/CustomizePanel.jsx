@@ -364,7 +364,8 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
             <section className="customize-section">
               <p className="customize-hint">
                 Import up to {MAX_IMPORTED_SVGS} .svg files. They appear over the camera feed and
-                react to beats when pulse is enabled.
+                react to beats when pulse is enabled. Or add files to{' '}
+                <code>public/experience/</code> in the repo (see README there).
               </p>
 
               <input

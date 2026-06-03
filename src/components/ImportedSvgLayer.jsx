@@ -14,7 +14,7 @@ export default function ImportedSvgLayer({ items, enabled }) {
       {visibleItems.map((item) => (
         <div
           key={item.id}
-          className={`imported-svg-item ${item.beatPulse ? 'is-beat-reactive' : ''}`}
+          className={`imported-svg-item ${item.beatPulse ? 'is-beat-reactive' : ''} ${item.source === 'experience' ? 'is-experience' : ''}`}
           style={{
             '--svg-x': item.x,
             '--svg-y': item.y,
