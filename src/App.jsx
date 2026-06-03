@@ -523,8 +523,10 @@ export default function App() {
 
       <CameraCapturePanel
         open={captureOpen}
+        frameRef={frameRef}
         videoRef={videoRef}
         streamRef={streamRef}
+        graphicsRef={graphicsRef}
         onClose={() => setCaptureOpen(false)}
       />
 

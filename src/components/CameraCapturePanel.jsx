@@ -2,21 +2,23 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   buildPhotoFilename,
   buildVideoFilename,
-  capturePhotoFromVideo,
-  createVideoRecorder,
+  captureCompositePhoto,
   saveBlobToDevice,
-} from '../lib/mediaCapture.js';
+  startCompositeRecording,
+} from '../lib/compositeCapture.js';
 
 export default function CameraCapturePanel({
   open,
+  frameRef,
   videoRef,
   streamRef,
+  graphicsRef,
   onClose,
 }) {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
-  const recorderRef = useRef(null);
+  const recordingRef = useRef(null);
   const chunksRef = useRef([]);
   const mimeTypeRef = useRef('');
 
@@ -28,10 +30,8 @@ export default function CameraCapturePanel({
   }, [open]);
 
   const stopRecording = useCallback(() => {
-    const recorder = recorderRef.current;
-    if (recorder && recorder.state !== 'inactive') {
-      recorder.stop();
-    }
+    recordingRef.current?.stop();
+    recordingRef.current = null;
   }, []);
 
   useEffect(() => {
@@ -45,20 +45,27 @@ export default function CameraCapturePanel({
     };
   }, [open, stopRecording]);
 
+  const getGraphicsCanvas = () => graphicsRef.current?.getCanvas?.() ?? null;
+
   const handlePhoto = async () => {
+    const frame = frameRef.current;
     const video = videoRef.current;
     const stream = streamRef.current;
 
-    if (!video || !stream) {
+    if (!frame || !video || !stream) {
       setMessage('Start the experience first to use the camera.');
       return;
     }
 
     setIsBusy(true);
-    setMessage('Capturing photo…');
+    setMessage('Capturing screen with artwork…');
 
     try {
-      const blob = await capturePhotoFromVideo(video);
+      const blob = await captureCompositePhoto({
+        frameEl: frame,
+        videoEl: video,
+        graphicsCanvas: getGraphicsCanvas(),
+      });
       const result = await saveBlobToDevice(blob, buildPhotoFilename());
 
       if (result.method === 'cancelled') {
@@ -66,7 +73,7 @@ export default function CameraCapturePanel({
       } else if (result.method === 'share') {
         setMessage('Choose Save Image in the share sheet to store on your phone.');
       } else {
-        setMessage('Photo saved. Check Downloads or your Photos app.');
+        setMessage('Photo saved with camera + artwork.');
       }
     } catch (captureError) {
       setMessage(captureError?.message || 'Could not save photo.');
@@ -76,9 +83,11 @@ export default function CameraCapturePanel({
   };
 
   const handleToggleRecord = async () => {
+    const frame = frameRef.current;
+    const video = videoRef.current;
     const stream = streamRef.current;
 
-    if (!stream) {
+    if (!frame || !video || !stream) {
       setMessage('Start the experience first to use the camera.');
       return;
     }
@@ -88,24 +97,26 @@ export default function CameraCapturePanel({
       return;
     }
 
-    if (typeof MediaRecorder === 'undefined') {
-      setMessage('Video recording is not supported in this browser.');
-      return;
-    }
-
     setIsBusy(true);
     setMessage('Starting recording…');
 
     try {
       chunksRef.current = [];
-      const { recorder, mimeType } = createVideoRecorder(stream, (chunk) => {
-        chunksRef.current.push(chunk);
+
+      const session = await startCompositeRecording({
+        frameEl: frame,
+        videoEl: video,
+        graphicsCanvas: getGraphicsCanvas(),
+        audioStream: stream,
+        onData: (chunk) => {
+          chunksRef.current.push(chunk);
+        },
       });
 
-      mimeTypeRef.current = mimeType;
-      recorderRef.current = recorder;
+      mimeTypeRef.current = session.mimeType;
+      recordingRef.current = session;
 
-      recorder.addEventListener(
+      session.recorder.addEventListener(
         'stop',
         async () => {
           setIsRecording(false);
@@ -130,25 +141,25 @@ export default function CameraCapturePanel({
             } else if (result.method === 'share') {
               setMessage('Choose Save Video in the share sheet to store on your phone.');
             } else {
-              setMessage('Video saved. Check Downloads or your Photos app.');
+              setMessage('Video saved with camera, beats, and artwork.');
             }
           } catch (saveError) {
             setMessage(saveError?.message || 'Could not save video.');
           } finally {
             setIsBusy(false);
-            recorderRef.current = null;
+            recordingRef.current = null;
           }
         },
         { once: true },
       );
 
-      recorder.start(1000);
+      session.recorder.start(1000);
       setIsRecording(true);
-      setMessage('Recording… Tap Stop when finished.');
+      setMessage('Recording screen + artwork… Tap Stop when finished.');
     } catch (recordError) {
       setMessage(recordError?.message || 'Could not start recording.');
       setIsRecording(false);
-      recorderRef.current = null;
+      recordingRef.current = null;
     } finally {
       setIsBusy(false);
     }
@@ -175,8 +186,8 @@ export default function CameraCapturePanel({
         </header>
 
         <p className="capture-hint">
-          Uses your live camera feed. On iPhone, use the share sheet and tap Save Photo or Save
-          Video to add to your library.
+          Saves what you see: live camera, beat graphics, and SVG artwork together. On iPhone, use
+          the share sheet and tap Save Photo or Save Video.
         </p>
 
         <div className="capture-actions">
