@@ -615,15 +615,15 @@ export default function App() {
             ) : null}
 
             <div className="hud bottom" aria-hidden="true">
-              <div className="hud-meters">
+              <div className="hud-bottom-end">
                 <span className="meter meter-bass">
                   <span />
                 </span>
                 <span className="meter meter-mid">
                   <span />
                 </span>
+                <span className="hud-brand">ANDSIOSA</span>
               </div>
-              <span className="hud-brand">ANDSIOSA</span>
             </div>
           </>
         )}
