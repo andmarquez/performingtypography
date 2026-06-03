@@ -14,6 +14,7 @@ export function getExperienceTheme(filename) {
       slug: 'saoko',
       experienceClass: 'experience-saoko',
       fullScreen: true,
+      lockUpright: true,
     };
   }
 
@@ -21,6 +22,7 @@ export function getExperienceTheme(filename) {
     slug,
     experienceClass: 'experience-generic',
     fullScreen: false,
+    lockUpright: false,
   };
 }
 

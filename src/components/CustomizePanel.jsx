@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  DEFAULT_WORDS,
   FONT_OPTIONS,
+  PRESET_WORDS,
   parseWordsText,
   wordsToText,
 } from '../config/defaults.js';
@@ -43,8 +43,10 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
 
   const commitWords = () => {
     const parsed = parseWordsText(wordsDraft);
-    onChange({ words: parsed.length ? parsed : DEFAULT_WORDS });
+    onChange({ words: parsed });
   };
+
+  const showOverlay = typography.showOverlay;
 
   const handleSvgImport = async (event) => {
     const file = event.target.files?.[0];
@@ -105,27 +107,63 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
         <div className="customize-body">
           {tab === 'words' ? (
             <section className="customize-section">
-              <label className="customize-label" htmlFor="words-input">
-                Words &amp; phrases
+              <label className="customize-toggle">
+                <input
+                  type="checkbox"
+                  checked={showOverlay}
+                  onChange={(event) =>
+                    onChange({ typography: { showOverlay: event.target.checked } })
+                  }
+                />
+                Show kinetic text overlay
               </label>
-              <p className="customize-hint">One line per tap. Shown in uppercase on screen.</p>
-              <textarea
-                id="words-input"
-                className="customize-textarea"
-                value={wordsDraft}
-                onChange={(event) => setWordsDraft(event.target.value)}
-                onBlur={commitWords}
-                rows={8}
-                placeholder={'LUX\nMOTOMAMI\nYOUR TEXT'}
-              />
-              <button type="button" className="customize-action" onClick={commitWords}>
-                Apply text
-              </button>
+
+              <p className="customize-hint">
+                Off by default — your SVG artwork (e.g. Saoko) is the focus. Turn on to add
+                optional words over the camera.
+              </p>
+
+              {showOverlay ? (
+                <>
+                  <label className="customize-label" htmlFor="words-input">
+                    Words &amp; phrases
+                  </label>
+                  <p className="customize-hint">One line per tap. Shown in uppercase on screen.</p>
+                  <textarea
+                    id="words-input"
+                    className="customize-textarea"
+                    value={wordsDraft}
+                    onChange={(event) => setWordsDraft(event.target.value)}
+                    onBlur={commitWords}
+                    rows={8}
+                    placeholder={PRESET_WORDS.join('\n')}
+                  />
+                  <button type="button" className="customize-action" onClick={commitWords}>
+                    Apply text
+                  </button>
+                  <button
+                    type="button"
+                    className="customize-link"
+                    onClick={() => {
+                      setWordsDraft(PRESET_WORDS.join('\n'));
+                      onChange({ words: PRESET_WORDS });
+                    }}
+                  >
+                    Load preset words
+                  </button>
+                </>
+              ) : null}
             </section>
           ) : null}
 
           {tab === 'type' ? (
             <section className="customize-section">
+              {!showOverlay ? (
+                <p className="customize-hint">
+                  Enable <strong>Show kinetic text overlay</strong> on the Text tab to use these
+                  font settings. Beat colors still drive your SVG artwork.
+                </p>
+              ) : null}
               <label className="customize-toggle">
                 <input
                   type="checkbox"

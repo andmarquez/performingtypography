@@ -1,4 +1,4 @@
-export const DEFAULT_WORDS = [
+export const PRESET_WORDS = [
   'LUX',
   'MOTOMAMI',
   'SAOKO',
@@ -6,6 +6,8 @@ export const DEFAULT_WORDS = [
   'DIVINA',
   'DIOS ES UNA MUJER',
 ];
+
+export const DEFAULT_WORDS = [];
 
 export const FONT_OPTIONS = [
   { id: 'impact', label: 'Impact', family: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif' },
@@ -57,6 +59,7 @@ export const DEFAULT_GRAPHICS = {
 export const DEFAULT_IMPORTED_SVGS = [];
 
 export const DEFAULT_TYPOGRAPHY = {
+  showOverlay: false,
   autoCycle: true,
   fixedStyle: {
     label: 'Custom',

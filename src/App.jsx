@@ -126,10 +126,14 @@ export default function App() {
   }, [settings]);
 
   const words = settings.words;
-  const currentWord = words[wordIndex % words.length] ?? words[0];
+  const showTextOverlay = settings.typography.showOverlay && words.length > 0;
+  const currentWord = showTextOverlay ? words[wordIndex % words.length] : '';
   const currentMode = MODES[modeIndex];
   const currentStyle = resolveActiveStyle(settings, styleIndex);
-  const glyphs = useMemo(() => Array.from(currentWord), [currentWord]);
+  const glyphs = useMemo(
+    () => (showTextOverlay ? Array.from(currentWord) : []),
+    [currentWord, showTextOverlay],
+  );
   const showSvgLayer = settings.graphics.enabled && settings.graphics.showImportedSvgs;
   const experienceSvgs = useExperienceAssets(hasStarted && showSvgLayer);
   const svgLayerItems = useMemo(
@@ -138,8 +142,11 @@ export default function App() {
   );
 
   const nextWord = useCallback(() => {
-    setWordIndex((index) => (index + 1) % words.length);
-  }, [words.length]);
+    if (!settingsRef.current.typography.showOverlay || !settingsRef.current.words.length) {
+      return;
+    }
+    setWordIndex((index) => (index + 1) % settingsRef.current.words.length);
+  }, []);
 
   const changeMode = useCallback((direction = 1) => {
     setModeIndex((index) => (index + direction + MODES.length) % MODES.length);
@@ -412,7 +419,9 @@ export default function App() {
         return;
       }
 
-      nextWord();
+      if (settingsRef.current.typography.showOverlay && settingsRef.current.words.length) {
+        nextWord();
+      }
     },
     [changeMode, nextWord],
   );
@@ -475,14 +484,16 @@ export default function App() {
 
   return (
     <main className="app">
-      <button
-        type="button"
-        className="customize-fab"
-        aria-label="Customize text, fonts, and graphics"
-        onClick={() => setCustomizeOpen(true)}
-      >
-        Customize
-      </button>
+      {hasStarted ? (
+        <button
+          type="button"
+          className="customize-fab"
+          aria-label="Customize text, fonts, and graphics"
+          onClick={() => setCustomizeOpen(true)}
+        >
+          Customize
+        </button>
+      ) : null}
 
       <CustomizePanel
         open={customizeOpen}
@@ -552,43 +563,57 @@ export default function App() {
           <>
             <div className="hud top">
               <span>{currentMode.label}</span>
-              <span className="hud-meta">
-                <span className="style-tag" style={{ '--tag-color': currentStyle.color }}>
-                  {currentStyle.label}
+              {showTextOverlay ? (
+                <span className="hud-meta">
+                  <span className="style-tag" style={{ '--tag-color': currentStyle.color }}>
+                    {currentStyle.label}
+                  </span>
+                  <span>
+                    {String(wordIndex + 1).padStart(2, '0')}/{words.length}
+                  </span>
                 </span>
-                <span>{String(wordIndex + 1).padStart(2, '0')}/{words.length}</span>
-              </span>
+              ) : (
+                <span className="hud-meta">
+                  <span className="style-tag" style={{ '--tag-color': currentStyle.color }}>
+                    {currentStyle.label}
+                  </span>
+                </span>
+              )}
             </div>
 
-            <div className="type-stage" key={`${currentWord}-${explosionKey}`}>
-              <div className="kinetic-word" aria-live="polite" aria-label={currentWord}>
-                {glyphs.map((glyph, index) => {
-                  const vector = getGlyphVector(index, glyphs.length);
-                  return (
-                    <span
-                      className={glyph === ' ' ? 'glyph space' : 'glyph'}
-                      key={`${glyph}-${index}`}
-                      style={{
-                        '--i': index,
-                        '--blast-x': vector.x,
-                        '--blast-y': vector.y,
-                        '--blast-r': vector.r,
-                        '--orbit-r': vector.orbitR,
-                        '--alt': index % 2 === 0 ? -1 : 1,
-                        '--glitch-x': (index % 3) - 1,
-                        '--wave': Math.sin(index * 0.82).toFixed(3),
-                        '--wave-r': `${((index % 5) - 2) * 2.5}deg`,
-                      }}
-                    >
-                      {glyph === ' ' ? '\u00a0' : glyph}
-                    </span>
-                  );
-                })}
+            {showTextOverlay ? (
+              <div className="type-stage" key={`${currentWord}-${explosionKey}`}>
+                <div className="kinetic-word" aria-live="polite" aria-label={currentWord}>
+                  {glyphs.map((glyph, index) => {
+                    const vector = getGlyphVector(index, glyphs.length);
+                    return (
+                      <span
+                        className={glyph === ' ' ? 'glyph space' : 'glyph'}
+                        key={`${glyph}-${index}`}
+                        style={{
+                          '--i': index,
+                          '--blast-x': vector.x,
+                          '--blast-y': vector.y,
+                          '--blast-r': vector.r,
+                          '--orbit-r': vector.orbitR,
+                          '--alt': index % 2 === 0 ? -1 : 1,
+                          '--glitch-x': (index % 3) - 1,
+                          '--wave': Math.sin(index * 0.82).toFixed(3),
+                          '--wave-r': `${((index % 5) - 2) * 2.5}deg`,
+                        }}
+                      >
+                        {glyph === ' ' ? '\u00a0' : glyph}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            ) : null}
 
             <div className="instruction-card">
-              Tap words · Beats sync type &amp; FX · Customize button top-right
+              {showTextOverlay
+                ? 'Tap words · Swipe modes · Customize top-right'
+                : 'Swipe modes · Beats sync artwork · Customize top-right'}
             </div>
 
             <div className="hud bottom" aria-hidden="true">

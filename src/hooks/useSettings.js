@@ -26,7 +26,7 @@ function normalizeSettings(raw) {
     : DEFAULT_SETTINGS.importedSvgs;
 
   return {
-    words: Array.isArray(raw?.words) && raw.words.length ? raw.words : DEFAULT_SETTINGS.words,
+    words: Array.isArray(raw?.words) ? raw.words : DEFAULT_SETTINGS.words,
     beatStyles:
       Array.isArray(raw?.beatStyles) && raw.beatStyles.length
         ? raw.beatStyles
@@ -34,6 +34,10 @@ function normalizeSettings(raw) {
     typography: {
       ...DEFAULT_SETTINGS.typography,
       ...raw?.typography,
+      showOverlay:
+        typeof raw?.typography?.showOverlay === 'boolean'
+          ? raw.typography.showOverlay
+          : Array.isArray(raw?.words) && raw.words.length > 0,
       fixedStyle: {
         ...DEFAULT_SETTINGS.typography.fixedStyle,
         ...raw?.typography?.fixedStyle,

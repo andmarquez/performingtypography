@@ -245,8 +245,8 @@ textarea {
 }
 
 .imported-svg-item.is-experience-full {
-  width: 108%;
-  height: 108%;
+  width: 100%;
+  height: 100%;
   max-width: none;
   max-height: none;
   opacity: calc(0.92 + var(--bass) * 0.08);
@@ -257,7 +257,22 @@ textarea {
   );
 }
 
-.imported-svg-item.is-experience-full.is-beat-reactive {
+.imported-svg-item.is-experience-full.is-upright,
+.imported-svg-item.is-experience-full.is-upright.is-beat-reactive {
+  transform: translate(-50%, -50%) scale(var(--svg-scale));
+}
+
+.imported-svg-item.is-experience-full.is-upright.is-beat-reactive {
+  transform: translate(-50%, -50%)
+    scale(calc(var(--svg-scale) * (1 + var(--bass) * 0.06 + var(--beat-flash) * 0.08)));
+}
+
+.is-exploding .imported-svg-item.is-experience-full.is-upright {
+  transform: translate(-50%, -50%)
+    scale(calc(var(--svg-scale) * (1.12 + var(--beat-flash) * 0.2)));
+}
+
+.imported-svg-item.is-experience-full.is-beat-reactive:not(.is-upright) {
   transform:
     translate(-50%, -50%)
     translate3d(calc(var(--tilt-x) * 14px), calc(var(--tilt-y) * 10px), 0)
@@ -351,11 +366,9 @@ textarea {
   }
 }
 
-.is-exploding .experience-saoko.is-experience-full {
-  transform:
-    translate(-50%, -50%)
-    scale(calc(var(--svg-scale) * (1.18 + var(--beat-flash) * 0.25)))
-    rotate(calc(var(--svg-rotation) + 8deg));
+.is-exploding .experience-saoko.is-experience-full.is-upright {
+  transform: translate(-50%, -50%)
+    scale(calc(var(--svg-scale) * (1.12 + var(--beat-flash) * 0.2)));
   opacity: 1;
 }
 

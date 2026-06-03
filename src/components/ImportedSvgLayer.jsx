@@ -14,12 +14,12 @@ export default function ImportedSvgLayer({ items, enabled }) {
       {visibleItems.map((item) => (
         <div
           key={item.id}
-          className={`imported-svg-item ${item.beatPulse ? 'is-beat-reactive' : ''} ${item.source === 'experience' ? 'is-experience' : ''} ${item.fullScreen ? 'is-experience-full' : ''} ${item.experienceClass || ''}`}
+          className={`imported-svg-item ${item.beatPulse ? 'is-beat-reactive' : ''} ${item.source === 'experience' ? 'is-experience' : ''} ${item.fullScreen ? 'is-experience-full' : ''} ${item.lockUpright ? 'is-upright' : ''} ${item.experienceClass || ''}`}
           style={{
             '--svg-x': item.x,
             '--svg-y': item.y,
             '--svg-scale': item.scale,
-            '--svg-rotation': `${item.rotation}deg`,
+            '--svg-rotation': item.lockUpright ? '0deg' : `${item.rotation}deg`,
             '--svg-opacity': item.opacity,
           }}
         >
