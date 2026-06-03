@@ -917,21 +917,24 @@ textarea {
   z-index: 30;
   top: max(0.75rem, env(safe-area-inset-top));
   left: max(0.75rem, env(safe-area-inset-left));
-  width: max-content;
-  max-width: calc(100% - 1.5rem);
-  min-height: 2.25rem;
-  padding: 0.35rem 0.85rem;
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
   overflow: visible;
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
   color: #fff;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(10px);
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.customize-fab-icon {
+  display: block;
+  width: 1.05rem;
+  height: 1.05rem;
 }
 
 .phone-frame.is-live .customize-fab {
