@@ -570,7 +570,7 @@ textarea {
 }
 
 .phone-frame.is-live .hud.bottom {
-  bottom: max(1.35rem, calc(env(safe-area-inset-bottom) + 0.55rem));
+  bottom: calc(max(0.7rem, env(safe-area-inset-bottom) + 0.35rem) + 3.05rem);
   padding-right: max(0.35rem, env(safe-area-inset-right));
 }
 
@@ -799,10 +799,6 @@ textarea {
 
 .experience-art-tabs button:disabled {
   opacity: 0.45;
-}
-
-.phone-frame.is-live .experience-art-tabs {
-  bottom: calc(max(1.35rem, env(safe-area-inset-bottom) + 0.55rem) + 2.85rem);
 }
 
 @keyframes editorial-breathe {
