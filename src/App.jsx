@@ -94,7 +94,6 @@ export default function App() {
   const [modeIndex, setModeIndex] = useState(0);
   const [explosionKey, setExplosionKey] = useState(0);
   const [isExploding, setIsExploding] = useState(false);
-  const [audioLevel, setAudioLevel] = useState(0);
   const [styleIndex, setStyleIndex] = useState(0);
 
   const frameRef = useRef(null);
@@ -119,7 +118,6 @@ export default function App() {
   const bassHistoryRef = useRef([]);
   const lastBeatTimeRef = useRef(0);
   const styleIndexRef = useRef(0);
-  const lastUiAudioUpdateRef = useRef(0);
   const lastShakeRef = useRef(0);
   const settingsRef = useRef(settings);
 
@@ -260,7 +258,7 @@ export default function App() {
           graphicsRef.current?.pulseBeat();
         }
       } else {
-        beatFlashRef.current *= 0.68;
+        beatFlashRef.current *= 0.72;
       }
 
       const cfg = settingsRef.current;
@@ -282,12 +280,7 @@ export default function App() {
       updateFrameVariable('--mid', smoothedMidRef.current.toFixed(3));
       updateFrameVariable('--high', smoothedHighRef.current.toFixed(3));
       updateFrameVariable('--beat-flash', beatFlashRef.current.toFixed(3));
-      frameRef.current?.classList.toggle('is-beat-hit', beatFlashRef.current > 0.28);
-
-      if (now - lastUiAudioUpdateRef.current > 90) {
-        lastUiAudioUpdateRef.current = now;
-        setAudioLevel(smoothedAudioRef.current);
-      }
+      frameRef.current?.classList.toggle('is-beat-hit', beatFlashRef.current > 0.22);
     }
 
     animationFrameRef.current = requestAnimationFrame(analyzeAudio);
@@ -380,6 +373,11 @@ export default function App() {
       bassHistoryRef.current = [];
       lastBeatTimeRef.current = 0;
       beatFlashRef.current = 0;
+      updateFrameVariable('--audio', '0');
+      updateFrameVariable('--bass', '0');
+      updateFrameVariable('--mid', '0');
+      updateFrameVariable('--high', '0');
+      updateFrameVariable('--beat-flash', '0');
 
       setHasStarted(true);
       setStatus('Live. Let the music move the type.');
@@ -401,9 +399,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const style = resolveActiveStyle(settings, styleIndexRef.current);
+    const style = resolveActiveStyle(settings, styleIndex);
     applyBeatStyle(style, updateFrameVariable);
-  }, [settings, updateFrameVariable]);
+  }, [settings, styleIndex, updateFrameVariable]);
 
   useEffect(() => {
     if (wordIndex >= words.length) {
@@ -538,20 +536,12 @@ export default function App() {
         onPointerUp={hasStarted && !customizeOpen ? handlePointerUp : undefined}
         onPointerCancel={hasStarted && !customizeOpen ? handlePointerCancel : undefined}
         style={{
-          '--audio': audioLevel,
-          '--bass': 0,
-          '--mid': 0,
-          '--high': 0,
-          '--beat-flash': 0,
           '--beat-font': currentStyle.family,
           '--beat-color': currentStyle.color,
           '--beat-glow': currentStyle.glow,
           '--beat-weight': currentStyle.weight,
           '--beat-size': currentStyle.size,
           '--beat-spacing': currentStyle.spacing,
-          '--tilt-x': 0,
-          '--tilt-y': 0,
-          '--motion': 0,
         }}
         aria-label="Concert kinetic typography experience"
       >

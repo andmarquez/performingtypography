@@ -349,7 +349,11 @@ textarea {
 }
 
 .is-beat-hit .experience-art .experience-tone-a.experience-path,
-.is-beat-hit .experience-art .experience-tone-a.experience-shape {
+.is-beat-hit .experience-art .experience-tone-a.experience-shape,
+.is-beat-hit .experience-art .experience-art-illustration .experience-tone-a.experience-path,
+.is-beat-hit .experience-art .experience-art-illustration .experience-tone-a.experience-shape,
+.is-beat-hit .experience-art .experience-art-title-top .experience-tone-a.experience-path,
+.is-beat-hit .experience-art .experience-art-title-mid .experience-tone-a.experience-path {
   fill: var(--beat-color);
   filter: drop-shadow(
     0 0 calc(8px + var(--beat-flash) * 28px)
@@ -358,7 +362,11 @@ textarea {
 }
 
 .is-beat-hit .experience-art .experience-tone-b.experience-path,
-.is-beat-hit .experience-art .experience-tone-b.experience-shape {
+.is-beat-hit .experience-art .experience-tone-b.experience-shape,
+.is-beat-hit .experience-art .experience-art-illustration .experience-tone-b.experience-path,
+.is-beat-hit .experience-art .experience-art-illustration .experience-tone-b.experience-shape,
+.is-beat-hit .experience-art .experience-art-title-top .experience-tone-b.experience-path,
+.is-beat-hit .experience-art .experience-art-title-mid .experience-tone-b.experience-path {
   fill: var(--beat-glow);
   filter: drop-shadow(
     0 0 calc(10px + var(--beat-flash) * 32px)
