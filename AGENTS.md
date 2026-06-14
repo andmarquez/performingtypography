@@ -31,7 +31,7 @@ cat .phone-url
 
 ### Branch note
 
-`main` currently contains only a placeholder README. The Concert Kinetic Typography Vite app lives on `cursor/concert-kinetic-typography-1da3` (or any branch that includes `package.json` and `src/`). Check out that branch before installing dependencies or running scripts.
+The full Concert Kinetic Typography Vite app is on **`main`** (`package.json`, `src/`, `public/experience/`). No branch checkout is required for normal development.
 
 ### Services
 
@@ -80,10 +80,11 @@ On real phones, use HTTPS or localhost; see `README.md` for mobile Safari notes.
 2. Open http://127.0.0.1:5173/
 3. Start experience (with fake media flags in CI/cloud if needed)
 4. Tap the stage — word index in the HUD should advance when kinetic text overlay is enabled
-5. **Customize → Art** — switch experience SVG (Saoko, Despechá, Berghain, Bizcochito, Perla); selection persists in `localStorage` (`experience.activeSlug`)
+5. **Art tabs** (bottom, scroll horizontally) — should list all screens from `public/experience/screen-labels.json` (13 configured; only screens with a matching `.svg` on disk are tappable). Switch between available artwork (e.g. Saoko → Despechá); selection persists in `localStorage` (`experience.activeSlug`).
 
 ### Experience assets
 
-- Drop SVGs in `public/experience/`; run `npm run experience:manifest` (also runs on `npm run dev` / `build`).
+- Drop SVGs in `public/experience/` using the exact filenames in `public/experience/screen-labels.json`.
+- Run `npm run experience:manifest` (also runs on `npm run dev` / `build`). The manifest lists every configured screen; missing files appear as disabled tabs until uploaded.
 - Splash PNGs live in `public/splash/` (`home-4`, `home-2`, `home-3`). After updating images, bump `SPLASH_ASSET_VERSION` in `src/components/SplashScreen.jsx` so phones bypass cache.
 - In-experience HUD / Customize FAB use `.is-live` safe-area padding; splash stays edge-to-edge.
