@@ -1,10 +1,37 @@
 {
   "files": [
+    "Saoko.svg",
+    "Despecha.svg",
     "Berghain.svg",
     "Bizcochito.svg",
-    "Despecha.svg",
-    "Perla.svg",
-    "Saoko.svg"
+    "Perla.svg"
   ],
-  "generatedAt": "2026-06-03T05:42:32.889Z"
+  "screens": [
+    {
+      "slug": "saoko",
+      "label": "Saoko",
+      "filename": "Saoko.svg"
+    },
+    {
+      "slug": "despecha",
+      "label": "Despechá",
+      "filename": "Despecha.svg"
+    },
+    {
+      "slug": "berghain",
+      "label": "Berghain",
+      "filename": "Berghain.svg"
+    },
+    {
+      "slug": "bizcochito",
+      "label": "Bizcochito",
+      "filename": "Bizcochito.svg"
+    },
+    {
+      "slug": "perla",
+      "label": "Perla",
+      "filename": "Perla.svg"
+    }
+  ],
+  "generatedAt": "2026-06-14T13:47:18.306Z"
 }

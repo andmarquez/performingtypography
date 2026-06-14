@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 import {
   DEFAULT_EXPERIENCE,
   DEFAULT_SETTINGS,
-  EXPERIENCE_SCREENS,
   STORAGE_KEY,
 } from '../config/defaults.js';
 import { isBuiltInExperienceName } from '../lib/experienceAssets.js';
@@ -34,11 +33,11 @@ function normalizeSettings(raw) {
         .filter((item) => !isBuiltInExperienceName(item.name))
     : DEFAULT_SETTINGS.importedSvgs;
 
-  const knownSlugs = new Set(EXPERIENCE_SCREENS.map((screen) => screen.slug));
   const activeSlugRaw = raw?.experience?.activeSlug ?? DEFAULT_EXPERIENCE.activeSlug;
-  const activeSlug = knownSlugs.has(activeSlugRaw)
-    ? activeSlugRaw
-    : DEFAULT_EXPERIENCE.activeSlug;
+  const activeSlug =
+    typeof activeSlugRaw === 'string' && activeSlugRaw.trim()
+      ? activeSlugRaw.trim()
+      : DEFAULT_EXPERIENCE.activeSlug;
 
   return {
     words: Array.isArray(raw?.words) ? raw.words : DEFAULT_SETTINGS.words,

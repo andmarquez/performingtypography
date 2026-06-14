@@ -11,6 +11,7 @@ import {
 } from './config/defaults.js';
 import { useSettings } from './hooks/useSettings.js';
 import { useExperienceAssets } from './hooks/useExperienceAssets.js';
+import { useExperienceScreens } from './hooks/useExperienceScreens.js';
 
 const MODES = [
   { id: 'pulse', label: 'Pulse with audio' },
@@ -136,6 +137,7 @@ export default function App() {
     [currentWord, showTextOverlay],
   );
   const showSvgLayer = settings.graphics.enabled && settings.graphics.showImportedSvgs;
+  const experienceScreens = useExperienceScreens(true);
   const activeExperienceSlug = settings.experience?.activeSlug ?? 'saoko';
   const activeExperienceSvg = useExperienceAssets(
     hasStarted && showSvgLayer,
@@ -154,6 +156,17 @@ export default function App() {
     },
     [updateSettings],
   );
+
+  useEffect(() => {
+    if (!experienceScreens.length) {
+      return;
+    }
+
+    const knownSlugs = new Set(experienceScreens.map((screen) => screen.slug));
+    if (!knownSlugs.has(activeExperienceSlug)) {
+      updateSettings({ experience: { activeSlug: experienceScreens[0].slug } });
+    }
+  }, [experienceScreens, activeExperienceSlug, updateSettings]);
 
   const nextWord = useCallback(() => {
     if (!settingsRef.current.typography.showOverlay || !settingsRef.current.words.length) {
@@ -501,6 +514,7 @@ export default function App() {
       <CustomizePanel
         open={customizeOpen}
         settings={settings}
+        screens={experienceScreens}
         onClose={() => setCustomizeOpen(false)}
         onChange={updateSettings}
         onReset={() => {
@@ -618,6 +632,7 @@ export default function App() {
 
             {showSvgLayer ? (
               <ExperienceArtTabs
+                screens={experienceScreens}
                 activeSlug={activeExperienceSlug}
                 onSelect={selectExperienceArt}
                 disabled={customizeOpen}

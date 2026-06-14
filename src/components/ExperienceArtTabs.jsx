@@ -1,6 +1,8 @@
-import { EXPERIENCE_SCREENS } from '../config/defaults.js';
+export default function ExperienceArtTabs({ screens, activeSlug, onSelect, disabled }) {
+  if (!screens?.length) {
+    return null;
+  }
 
-export default function ExperienceArtTabs({ activeSlug, onSelect, disabled }) {
   return (
     <div
       className="experience-art-tabs"
@@ -9,7 +11,7 @@ export default function ExperienceArtTabs({ activeSlug, onSelect, disabled }) {
       onPointerDown={(event) => event.stopPropagation()}
       onClick={(event) => event.stopPropagation()}
     >
-      {EXPERIENCE_SCREENS.map((screen) => {
+      {screens.map((screen) => {
         const isActive = activeSlug === screen.slug;
 
         return (

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  EXPERIENCE_SCREENS,
   FONT_OPTIONS,
   PRESET_WORDS,
   parseWordsText,
@@ -23,7 +22,14 @@ const TABS = [
   { id: 'svg', label: 'SVG' },
 ];
 
-export default function CustomizePanel({ open, settings, onClose, onChange, onReset }) {
+export default function CustomizePanel({
+  open,
+  settings,
+  screens = [],
+  onClose,
+  onChange,
+  onReset,
+}) {
   const [tab, setTab] = useState('words');
   const [wordsDraft, setWordsDraft] = useState(wordsToText(settings.words));
   const [svgError, setSvgError] = useState('');
@@ -117,7 +123,7 @@ export default function CustomizePanel({ open, settings, onClose, onChange, onRe
                 interactions match Saoko for every screen.
               </p>
               <ul className="experience-art-picker" role="list">
-                {EXPERIENCE_SCREENS.map((screen) => {
+                {screens.map((screen) => {
                   const isActive = activeSlug === screen.slug;
                   const previewSrc = `${BASE}experience/${encodeURIComponent(screen.filename)}`;
 

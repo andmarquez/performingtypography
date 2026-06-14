@@ -1,19 +1,30 @@
-import { EXPERIENCE_SCREENS } from '../config/defaults.js';
+import { fetchExperienceManifest, getCachedExperienceScreens, slugFromFilename } from './experienceManifest.js';
 import { createImportedSvg, sanitizeSvgMarkup } from './svgImport.js';
 import { enhanceExperienceMarkup, getExperienceTheme } from './svgEnhance.js';
 
 const BASE = import.meta.env.BASE_URL;
 
-export function isBuiltInExperienceName(name) {
-  if (!name) {
+function normalizeName(name) {
+  return name.toLowerCase().replace(/\.svg$/i, '').trim();
+}
+
+function matchesScreen(screen, name) {
+  const normalized = normalizeName(name);
+  const fileStem = screen.filename.replace(/\.svg$/i, '').toLowerCase();
+  const slugFromName = slugFromFilename(/\.svg$/i.test(name) ? name : `${name}.svg`);
+  return (
+    screen.slug === normalized ||
+    screen.slug === slugFromName ||
+    fileStem === normalized
+  );
+}
+
+export function isBuiltInExperienceName(name, screens = getCachedExperienceScreens()) {
+  if (!name || !screens.length) {
     return false;
   }
 
-  const normalized = name.toLowerCase().replace(/\.svg$/i, '').trim();
-  return EXPERIENCE_SCREENS.some((screen) => {
-    const fileStem = screen.filename.replace(/\.svg$/i, '').toLowerCase();
-    return screen.slug === normalized || fileStem === normalized;
-  });
+  return screens.some((screen) => matchesScreen(screen, name));
 }
 
 export function createExperienceSvg(name, markup, filename = '') {
@@ -38,8 +49,9 @@ export function createExperienceSvg(name, markup, filename = '') {
 }
 
 export async function loadExperienceAsset(slug) {
-  const screen =
-    EXPERIENCE_SCREENS.find((item) => item.slug === slug) ?? EXPERIENCE_SCREENS[0];
+  const manifest = await fetchExperienceManifest();
+  const screens = manifest.screens ?? [];
+  const screen = screens.find((item) => item.slug === slug) ?? screens[0];
 
   if (!screen) {
     return null;
@@ -67,8 +79,8 @@ export async function loadExperienceAsset(slug) {
 
 /** @deprecated Loads every file — prefer loadExperienceAsset for one screen at a time. */
 export async function loadExperienceAssets() {
-  const loaded = await Promise.all(
-    EXPERIENCE_SCREENS.map((screen) => loadExperienceAsset(screen.slug)),
-  );
+  const manifest = await fetchExperienceManifest();
+  const screens = manifest.screens ?? [];
+  const loaded = await Promise.all(screens.map((screen) => loadExperienceAsset(screen.slug)));
   return loaded.filter(Boolean);
 }

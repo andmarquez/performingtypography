@@ -1,13 +1,7 @@
-export const EXPERIENCE_ART_SLUGS = [
-  'saoko',
-  'despecha',
-  'berghain',
-  'bizcochito',
-  'perla',
-];
+import { slugFromFilename } from './experienceManifest.js';
 
 export function getExperienceTheme(filename) {
-  const slug = filename.replace(/\.svg$/i, '').toLowerCase();
+  const slug = slugFromFilename(filename);
 
   return {
     slug,
