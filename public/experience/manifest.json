@@ -4,7 +4,15 @@
     "Despecha.svg",
     "Berghain.svg",
     "Bizcochito.svg",
-    "Perla.svg"
+    "Perla.svg",
+    "Voy a llevarte pa PR.svg",
+    "Baile inolvidable.svg",
+    "Hawaii.svg",
+    "Pitorro de coco.svg",
+    "Weltita.svg",
+    "Cafe con Ron.svg",
+    "Turista.svg",
+    "DtMF.svg"
   ],
   "screens": [
     {
@@ -47,57 +55,57 @@
       "label": "Voy a llevarte pa PR",
       "filename": "Voy a llevarte pa PR.svg",
       "assetFilename": "Voy a llevarte pa PR.svg",
-      "available": false
+      "available": true
     },
     {
       "slug": "baile-inolvidable",
       "label": "Baile inolvidable",
       "filename": "Baile inolvidable.svg",
       "assetFilename": "Baile inolvidable.svg",
-      "available": false
+      "available": true
     },
     {
       "slug": "hawaii",
       "label": "Hawaii",
       "filename": "Hawaii.svg",
       "assetFilename": "Hawaii.svg",
-      "available": false
+      "available": true
     },
     {
       "slug": "pitorro-de-coco",
       "label": "Pitorro de coco",
       "filename": "Pitorro de coco.svg",
       "assetFilename": "Pitorro de coco.svg",
-      "available": false
+      "available": true
     },
     {
       "slug": "weltita",
       "label": "Weltita",
       "filename": "Weltita.svg",
       "assetFilename": "Weltita.svg",
-      "available": false
+      "available": true
     },
     {
       "slug": "cafe-con-ron",
       "label": "Cafe con Ron",
       "filename": "Cafe con Ron.svg",
       "assetFilename": "Cafe con Ron.svg",
-      "available": false
+      "available": true
     },
     {
       "slug": "turista",
       "label": "Turista",
       "filename": "Turista.svg",
       "assetFilename": "Turista.svg",
-      "available": false
+      "available": true
     },
     {
       "slug": "dtmf",
       "label": "DtMF",
       "filename": "DtMF.svg",
       "assetFilename": "DtMF.svg",
-      "available": false
+      "available": true
     }
   ],
-  "generatedAt": "2026-06-14T13:52:44.529Z"
+  "generatedAt": "2026-06-14T13:59:38.298Z"
 }
