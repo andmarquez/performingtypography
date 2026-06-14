@@ -46,7 +46,47 @@ function assignExperienceLayerClasses(groups, svg) {
   });
 }
 
+function figmaClassTone(classList) {
+  const figmaClass = [...classList].find((className) => /^cls-\d+$/i.test(className));
+  if (!figmaClass) {
+    return null;
+  }
+
+  const toneIndex = Number.parseInt(figmaClass.replace(/\D/g, ''), 10);
+  if (Number.isNaN(toneIndex)) {
+    return null;
+  }
+
+  return toneIndex === 1 ? 'a' : 'b';
+}
+
+function assignDualToneClasses(svg) {
+  const shapes = [...svg.querySelectorAll(SHAPE_SELECTOR)];
+  const figmaTones = new Set(
+    shapes.map((shape) => figmaClassTone(shape.classList)).filter(Boolean),
+  );
+  const alternateByIndex = figmaTones.size < 2;
+  const indexByParent = new Map();
+
+  shapes.forEach((shape) => {
+    let tone = figmaClassTone(shape.classList);
+
+    if (alternateByIndex) {
+      const parentKey = shape.parentElement?.getAttribute('class') ?? '__root__';
+      const index = indexByParent.get(parentKey) ?? 0;
+      indexByParent.set(parentKey, index + 1);
+      tone = index % 2 === 0 ? 'a' : 'b';
+    } else if (!tone) {
+      tone = 'a';
+    }
+
+    shape.classList.add(tone === 'b' ? 'experience-tone-b' : 'experience-tone-a');
+  });
+}
+
 function normalizeExperienceShapes(svg) {
+  assignDualToneClasses(svg);
+
   svg.querySelectorAll(SHAPE_SELECTOR).forEach((shape) => {
     shape.removeAttribute('fill');
     shape.removeAttribute('stroke');
