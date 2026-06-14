@@ -425,6 +425,96 @@ textarea {
   fill: color-mix(in srgb, var(--beat-glow) 55%, var(--beat-color));
 }
 
+/* Stage tap gestures */
+.phone-frame.is-gesture-single .imported-svg-item.is-experience-full.is-upright {
+  animation: gesture-single-pop 0.34s ease-out;
+}
+
+.phone-frame.is-gesture-double .imported-svg-item.is-experience-full.is-upright {
+  animation: gesture-double-hit 0.42s ease-out;
+}
+
+.phone-frame.is-gesture-triple .imported-svg-item.is-experience-full.is-upright {
+  animation: gesture-triple-shift 0.4s ease-out;
+}
+
+.phone-frame.is-gesture-swipe,
+.phone-frame.is-gesture-swipe-up,
+.phone-frame.is-gesture-swipe-down {
+  animation: gesture-swipe-flash 0.28s ease-out;
+}
+
+@keyframes gesture-single-pop {
+  0% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(var(--svg-scale));
+  }
+
+  42% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(calc(var(--svg-scale) * 1.05));
+  }
+
+  100% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(var(--svg-scale));
+  }
+}
+
+@keyframes gesture-double-hit {
+  0% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(var(--svg-scale));
+    filter: brightness(1);
+  }
+
+  35% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(calc(var(--svg-scale) * 1.1));
+    filter: brightness(calc(1.25 + var(--beat-flash) * 0.35));
+  }
+
+  100% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(var(--svg-scale));
+    filter: brightness(1);
+  }
+}
+
+@keyframes gesture-triple-shift {
+  0% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(var(--svg-scale));
+    opacity: 1;
+  }
+
+  40% {
+    transform: translate(calc(-50% - 10px), calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(calc(var(--svg-scale) * 0.96));
+    opacity: 0.82;
+  }
+
+  100% {
+    transform: translate(-50%, calc(-50% + var(--experience-y-nudge, 0px)))
+      scale(var(--svg-scale));
+    opacity: 1;
+  }
+}
+
+@keyframes gesture-swipe-flash {
+  0% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.18);
+  }
+
+  100% {
+    filter: brightness(1);
+  }
+}
+
 .imported-svg-item.is-experience .imported-svg-markup svg {
   color: var(--beat-color);
 }
@@ -786,16 +876,17 @@ textarea {
 
 .instruction-card {
   right: max(1rem, env(safe-area-inset-right));
-  bottom: calc(max(3rem, env(safe-area-inset-bottom)) + 2.1rem);
+  bottom: calc(max(3rem, env(safe-area-inset-bottom)) + 4.6rem);
   left: max(1rem, env(safe-area-inset-left));
-  padding: 0.9rem 1rem;
+  padding: 0.65rem 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 1rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.72);
   background: rgba(0, 0, 0, 0.34);
   backdrop-filter: blur(12px);
-  font-size: 0.84rem;
+  font-size: 0.72rem;
   line-height: 1.35;
+  letter-spacing: 0.02em;
   pointer-events: none;
 }
 

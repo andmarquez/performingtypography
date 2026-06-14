@@ -12,6 +12,14 @@ import {
 import { useSettings } from './hooks/useSettings.js';
 import { useExperienceAssets } from './hooks/useExperienceAssets.js';
 import { useExperienceScreens } from './hooks/useExperienceScreens.js';
+import {
+  LONG_PRESS_MS,
+  MULTI_TAP_WINDOW_MS,
+  SWIPE_DISTANCE,
+  classifyPointerRelease,
+  isInteractiveOverlayTarget,
+  scheduleMultiTap,
+} from './lib/stageGestures.js';
 
 const MODES = [
   { id: 'pulse', label: 'Pulse with audio' },
@@ -21,8 +29,6 @@ const MODES = [
   { id: 'explosion', label: 'Explosion' },
 ];
 
-const LONG_PRESS_MS = 560;
-const SWIPE_DISTANCE = 44;
 const BEAT_COOLDOWN_MS = 155;
 const BASS_HISTORY_SIZE = 36;
 
@@ -95,6 +101,7 @@ export default function App() {
   const [explosionKey, setExplosionKey] = useState(0);
   const [isExploding, setIsExploding] = useState(false);
   const [styleIndex, setStyleIndex] = useState(0);
+  const [gestureCue, setGestureCue] = useState('');
 
   const frameRef = useRef(null);
   const graphicsRef = useRef(null);
@@ -109,7 +116,11 @@ export default function App() {
     y: 0,
     longPressTimer: null,
     longPressFired: false,
+    tapCount: 0,
+    tapTimer: null,
+    ignoreTarget: false,
   });
+  const gestureCueTimerRef = useRef(null);
   const smoothedAudioRef = useRef(0);
   const smoothedBassRef = useRef(0);
   const smoothedMidRef = useRef(0);
@@ -155,6 +166,37 @@ export default function App() {
     [updateSettings],
   );
 
+  const availableExperienceScreens = useMemo(
+    () => experienceScreens.filter((screen) => screen.available !== false),
+    [experienceScreens],
+  );
+
+  const stepExperienceArt = useCallback(
+    (direction = 1) => {
+      if (!availableExperienceScreens.length) {
+        return;
+      }
+
+      const currentIndex = availableExperienceScreens.findIndex(
+        (screen) => screen.slug === activeExperienceSlug,
+      );
+      const baseIndex = currentIndex >= 0 ? currentIndex : 0;
+      const nextIndex =
+        (baseIndex + direction + availableExperienceScreens.length) %
+        availableExperienceScreens.length;
+      selectExperienceArt(availableExperienceScreens[nextIndex].slug);
+    },
+    [activeExperienceSlug, availableExperienceScreens, selectExperienceArt],
+  );
+
+  const flashGestureCue = useCallback((cue) => {
+    setGestureCue(cue);
+    window.clearTimeout(gestureCueTimerRef.current);
+    gestureCueTimerRef.current = window.setTimeout(() => {
+      setGestureCue('');
+    }, cue === 'double' ? 420 : cue === 'triple' ? 480 : 320);
+  }, []);
+
   useEffect(() => {
     if (!experienceScreens.length) {
       return;
@@ -185,6 +227,7 @@ export default function App() {
   const triggerExplosion = useCallback(() => {
     setExplosionKey((key) => key + 1);
     setIsExploding(true);
+    flashGestureCue('hold');
     const frame = frameRef.current;
     const gfx = settingsRef.current.graphics;
     if (frame && gfx.enabled) {
@@ -193,7 +236,56 @@ export default function App() {
       graphicsRef.current?.pulseBeat();
     }
     window.setTimeout(() => setIsExploding(false), 780);
-  }, []);
+  }, [flashGestureCue]);
+
+  const triggerManualBeat = useCallback(
+    (clientX, clientY) => {
+      const cfg = settingsRef.current;
+      beatFlashRef.current = 1;
+      updateFrameVariable('--beat-flash', '1');
+      frameRef.current?.classList.add('is-beat-hit');
+
+      if (cfg.typography.autoCycle) {
+        const styles = cfg.beatStyles.length ? cfg.beatStyles : [];
+        if (styles.length) {
+          styleIndexRef.current = (styleIndexRef.current + 1) % styles.length;
+          setStyleIndex(styleIndexRef.current);
+        }
+      }
+
+      applyBeatStyle(resolveActiveStyle(cfg, styleIndexRef.current), updateFrameVariable);
+
+      const frame = frameRef.current;
+      const gfx = cfg.graphics;
+      if (frame && gfx.enabled) {
+        const rect = frame.getBoundingClientRect();
+        graphicsRef.current?.pulseBeat();
+        graphicsRef.current?.burst(clientX - rect.left, clientY - rect.top);
+      }
+
+      flashGestureCue('double');
+    },
+    [flashGestureCue, updateFrameVariable],
+  );
+
+  const triggerTapPulse = useCallback(
+    (clientX, clientY) => {
+      beatFlashRef.current = Math.max(beatFlashRef.current, 0.52);
+      updateFrameVariable('--beat-flash', beatFlashRef.current.toFixed(3));
+      frameRef.current?.classList.toggle('is-beat-hit', beatFlashRef.current > 0.22);
+
+      const frame = frameRef.current;
+      const gfx = settingsRef.current.graphics;
+      if (frame && gfx.enabled) {
+        const rect = frame.getBoundingClientRect();
+        graphicsRef.current?.addRipple(clientX - rect.left, clientY - rect.top, 1.15);
+        graphicsRef.current?.pulseBeat();
+      }
+
+      flashGestureCue('single');
+    },
+    [flashGestureCue, updateFrameVariable],
+  );
 
   const updateFrameVariable = useCallback((name, value) => {
     if (frameRef.current) {
@@ -411,10 +503,16 @@ export default function App() {
 
   const handlePointerDown = useCallback(
     (event) => {
+      if (isInteractiveOverlayTarget(event.target)) {
+        touchRef.current.ignoreTarget = true;
+        return;
+      }
+
+      touchRef.current.ignoreTarget = false;
       touchRef.current.x = event.clientX;
       touchRef.current.y = event.clientY;
       touchRef.current.longPressFired = false;
-      addTouchGraphic(event.clientX, event.clientY, 0.85);
+      addTouchGraphic(event.clientX, event.clientY, 0.65);
       window.clearTimeout(touchRef.current.longPressTimer);
       touchRef.current.longPressTimer = window.setTimeout(() => {
         touchRef.current.longPressFired = true;
@@ -433,9 +531,59 @@ export default function App() {
     [addTouchGraphic, triggerExplosion],
   );
 
+  const handleStageTap = useCallback(
+    (tapKind, clientX, clientY) => {
+      const cfg = settingsRef.current;
+      const hasWords = cfg.typography.showOverlay && cfg.words.length;
+
+      if (tapKind === 'single') {
+        if (hasWords) {
+          nextWord();
+        } else {
+          stepExperienceArt(1);
+        }
+        triggerTapPulse(clientX, clientY);
+        return;
+      }
+
+      if (tapKind === 'double') {
+        if (hasWords) {
+          stepExperienceArt(1);
+          triggerTapPulse(clientX, clientY);
+        } else {
+          triggerManualBeat(clientX, clientY);
+        }
+        return;
+      }
+
+      if (tapKind === 'triple') {
+        if (hasWords) {
+          triggerManualBeat(clientX, clientY);
+        } else {
+          stepExperienceArt(-1);
+          flashGestureCue('triple');
+          addTouchGraphic(clientX, clientY, 1.35);
+        }
+      }
+    },
+    [
+      addTouchGraphic,
+      flashGestureCue,
+      nextWord,
+      stepExperienceArt,
+      triggerManualBeat,
+      triggerTapPulse,
+    ],
+  );
+
   const handlePointerUp = useCallback(
     (event) => {
       window.clearTimeout(touchRef.current.longPressTimer);
+
+      if (touchRef.current.ignoreTarget) {
+        touchRef.current.ignoreTarget = false;
+        return;
+      }
 
       if (touchRef.current.longPressFired) {
         return;
@@ -443,21 +591,41 @@ export default function App() {
 
       const deltaX = event.clientX - touchRef.current.x;
       const deltaY = event.clientY - touchRef.current.y;
+      const gesture = classifyPointerRelease({ deltaX, deltaY, swipeDistance: SWIPE_DISTANCE });
 
-      if (Math.abs(deltaX) > SWIPE_DISTANCE && Math.abs(deltaX) > Math.abs(deltaY)) {
-        changeMode(deltaX > 0 ? 1 : -1);
+      if (gesture.type === 'swipe-horizontal') {
+        window.clearTimeout(touchRef.current.tapTimer);
+        touchRef.current.tapCount = 0;
+        changeMode(gesture.direction);
+        flashGestureCue('swipe');
         return;
       }
 
-      if (settingsRef.current.typography.showOverlay && settingsRef.current.words.length) {
-        nextWord();
+      if (gesture.type === 'swipe-vertical') {
+        window.clearTimeout(touchRef.current.tapTimer);
+        touchRef.current.tapCount = 0;
+        stepExperienceArt(gesture.direction > 0 ? -1 : 1);
+        flashGestureCue(gesture.direction > 0 ? 'swipe-down' : 'swipe-up');
+        addTouchGraphic(event.clientX, event.clientY, 1.1);
+        return;
+      }
+
+      if (gesture.type === 'tap') {
+        scheduleMultiTap(
+          (tapKind) => handleStageTap(tapKind, event.clientX, event.clientY),
+          touchRef.current,
+          MULTI_TAP_WINDOW_MS,
+        );
       }
     },
-    [changeMode, nextWord],
+    [addTouchGraphic, changeMode, flashGestureCue, handleStageTap, stepExperienceArt],
   );
 
   const handlePointerCancel = useCallback(() => {
     window.clearTimeout(touchRef.current.longPressTimer);
+    window.clearTimeout(touchRef.current.tapTimer);
+    touchRef.current.tapCount = 0;
+    touchRef.current.ignoreTarget = false;
   }, []);
 
   useEffect(() => {
@@ -501,6 +669,8 @@ export default function App() {
   useEffect(() => {
     return () => {
       window.clearTimeout(touchRef.current.longPressTimer);
+      window.clearTimeout(touchRef.current.tapTimer);
+      window.clearTimeout(gestureCueTimerRef.current);
 
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -531,7 +701,7 @@ export default function App() {
 
       <section
         ref={frameRef}
-        className={`phone-frame ${hasStarted ? 'is-live' : ''} mode-${currentMode.id} ${isExploding ? 'is-exploding' : ''} ${settings.graphics.shapes ? 'has-shapes' : ''}`}
+        className={`phone-frame ${hasStarted ? 'is-live' : ''} mode-${currentMode.id} ${isExploding ? 'is-exploding' : ''} ${settings.graphics.shapes ? 'has-shapes' : ''} ${gestureCue ? `is-gesture-${gestureCue}` : ''}`}
         onPointerDown={hasStarted && !customizeOpen ? handlePointerDown : undefined}
         onPointerUp={hasStarted && !customizeOpen ? handlePointerUp : undefined}
         onPointerCancel={hasStarted && !customizeOpen ? handlePointerCancel : undefined}
@@ -633,6 +803,12 @@ export default function App() {
                 disabled={customizeOpen}
               />
             ) : null}
+
+            <div className="instruction-card" aria-hidden="true">
+              {showTextOverlay
+                ? 'Tap word · Double next art · Triple beat · Swipe modes · Hold explode'
+                : 'Tap next art · Double beat · Triple back · Swipe modes · Hold explode'}
+            </div>
 
             <div className="hud bottom" aria-hidden="true">
               <span className="meter meter-bass">
