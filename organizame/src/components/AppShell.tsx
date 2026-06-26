@@ -1,0 +1,22 @@
+import type { ReactNode } from 'react';
+import { BottomNav } from './BottomNav';
+import { AndsiosaAssistant } from './AndsiosaAssistant';
+import { ReactionPopup } from './ReactionPopup';
+import { useApp } from '../store/appStore';
+
+interface AppShellProps {
+  children: ReactNode;
+}
+
+export function AppShell({ children }: AppShellProps) {
+  const { activeTab, setActiveTab } = useApp();
+
+  return (
+    <div className="min-h-dvh bg-cream">
+      <main className="mx-auto max-w-lg px-4 pb-28 pt-4 safe-top">{children}</main>
+      <AndsiosaAssistant />
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <ReactionPopup />
+    </div>
+  );
+}
