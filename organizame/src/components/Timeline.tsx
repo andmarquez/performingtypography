@@ -1,7 +1,14 @@
+import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import type { CalendarEvent, ScheduledBlock, Mode } from '../types';
 import { formatEventTime } from '../services/calendarService';
+import { useApp } from '../store/appStore';
+import {
+  TimelineItemEditSheet,
+  type TimelineEditItem,
+  type TimelineEditPayload,
+} from './TimelineItemEditSheet';
 
 interface TimelineProps {
   events: CalendarEvent[];
@@ -11,10 +18,14 @@ interface TimelineProps {
   freeLabel?: string;
 }
 
-export function Timeline({ events, scheduledBlocks, freeMinutes, freeLabel }: TimelineProps) {
-  const items = [
+export function Timeline({ events, scheduledBlocks, modes, freeMinutes, freeLabel }: TimelineProps) {
+  const { updateCalendarEvent, updateScheduledBlock, setAssistantMessage } = useApp();
+  const [editingItem, setEditingItem] = useState<TimelineEditItem | null>(null);
+
+  const items: TimelineEditItem[] = [
     ...events.map((e) => ({
-      id: e.id,
+      id: `event-${e.id}`,
+      sourceId: e.id,
       type: 'event' as const,
       title: e.title,
       start: e.start,
@@ -22,17 +33,39 @@ export function Timeline({ events, scheduledBlocks, freeMinutes, freeLabel }: Ti
       mode: e.mode,
     })),
     ...scheduledBlocks.map((b) => ({
-      id: b.id,
+      id: `task-${b.id}`,
+      sourceId: b.id,
       type: 'task' as const,
       title: b.taskName,
       start: b.start,
       end: b.end,
       mode: b.mode,
+      taskId: b.taskId,
     })),
   ].sort((a, b) => parseISO(a.start).getTime() - parseISO(b.start).getTime());
 
   const label =
     freeLabel ?? `${Math.floor(freeMinutes / 60)}h ${freeMinutes % 60}m free`;
+
+  const handleSave = (item: TimelineEditItem, updates: TimelineEditPayload) => {
+    if (item.type === 'event') {
+      updateCalendarEvent(item.sourceId, {
+        title: updates.title,
+        start: updates.start,
+        end: updates.end,
+        mode: updates.mode,
+      });
+    } else {
+      updateScheduledBlock(item.sourceId, {
+        taskName: updates.title,
+        start: updates.start,
+        end: updates.end,
+        mode: updates.mode,
+        durationMinutes: updates.durationMinutes,
+      }, item.taskId);
+    }
+    setAssistantMessage(`Updated "${updates.title}". Looking cleaner already.`);
+  };
 
   return (
     <div>
@@ -54,27 +87,44 @@ export function Timeline({ events, scheduledBlocks, freeMinutes, freeLabel }: Ti
       ) : (
         <div className="space-y-2">
           {items.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="card-surface rounded-[22px] p-4"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-medium text-sm text-ink">{item.title}</p>
-                    <p className="text-xs text-ink-secondary mt-0.5">
-                      {formatEventTime(item.start)} – {formatEventTime(item.end)}
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide text-ink-nav">
-                    {item.type}
-                  </span>
-                </div>
-              </motion.div>
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="card-surface rounded-[22px] p-4"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(item)}
+                  className="flex-1 min-w-0 text-left"
+                >
+                  <p className="font-medium text-sm text-ink">{item.title}</p>
+                  <p className="text-xs text-ink-secondary mt-0.5">
+                    {formatEventTime(item.start)} – {formatEventTime(item.end)}
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(item)}
+                  className="shrink-0 rounded-full bg-nav-active-bg px-3 py-1.5 text-[11px] font-semibold text-navy tracking-wide"
+                >
+                  Edit
+                </button>
+              </div>
+            </motion.div>
           ))}
         </div>
+      )}
+
+      {editingItem && (
+        <TimelineItemEditSheet
+          item={editingItem}
+          modes={modes}
+          onSave={handleSave}
+          onClose={() => setEditingItem(null)}
+        />
       )}
     </div>
   );

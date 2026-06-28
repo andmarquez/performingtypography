@@ -161,6 +161,14 @@ export const calendarService = {
       (e) => e.title === title && e.start === start,
     );
   },
+
+  updateEvent(id: string, updates: Partial<Pick<CalendarEvent, 'title' | 'start' | 'end' | 'mode'>>): CalendarEvent | undefined {
+    const idx = state.events.findIndex((e) => e.id === id);
+    if (idx < 0) return undefined;
+    state.events[idx] = { ...state.events[idx], ...updates };
+    saveState();
+    return state.events[idx];
+  },
 };
 
 export function formatEventTime(iso: string): string {

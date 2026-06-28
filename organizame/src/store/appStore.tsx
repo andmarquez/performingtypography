@@ -95,6 +95,15 @@ interface AppContextValue {
   setBrainDumpText: (text: string) => void;
   whatCanIDoNow: () => { task: Task | null; minutes: number; message: string };
   fixMyChaos: () => void;
+  updateCalendarEvent: (
+    id: string,
+    updates: Partial<Pick<CalendarEvent, 'title' | 'start' | 'end' | 'mode'>>,
+  ) => void;
+  updateScheduledBlock: (
+    id: string,
+    updates: Partial<ScheduledBlock>,
+    taskId?: string,
+  ) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -321,6 +330,47 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTimeout(() => setAndsiosaState('focused'), 1500);
   }, []);
 
+  const updateCalendarEvent = useCallback(
+    (id: string, updates: Partial<Pick<CalendarEvent, 'title' | 'start' | 'end' | 'mode'>>) => {
+      calendarService.updateEvent(id, updates);
+      setCalendarState(calendarService.getState());
+    },
+    [],
+  );
+
+  const updateScheduledBlock = useCallback(
+    (id: string, updates: Partial<ScheduledBlock>, taskId?: string) => {
+      setScheduledBlocks((blocks) =>
+        blocks.map((b) => (b.id === id ? { ...b, ...updates } : b)),
+      );
+      setScheduleResult((prev) =>
+        prev
+          ? {
+              ...prev,
+              scheduledBlocks: prev.scheduledBlocks.map((b) =>
+                b.id === id ? { ...b, ...updates } : b,
+              ),
+            }
+          : prev,
+      );
+      if (taskId) {
+        setTasks((prev) =>
+          prev.map((t) =>
+            t.id === taskId
+              ? {
+                  ...t,
+                  name: updates.taskName ?? t.name,
+                  category: updates.mode ?? t.category,
+                  durationMinutes: updates.durationMinutes ?? t.durationMinutes,
+                }
+              : t,
+          ),
+        );
+      }
+    },
+    [],
+  );
+
   const value: AppContextValue = {
     activeTab,
     setActiveTab,
@@ -362,6 +412,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setBrainDumpText,
     whatCanIDoNow,
     fixMyChaos,
+    updateCalendarEvent,
+    updateScheduledBlock,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
