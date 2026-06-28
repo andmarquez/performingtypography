@@ -9,7 +9,6 @@ interface WeekPlannerProps {
   events: CalendarEvent[];
   scheduledBlocks: ScheduledBlock[];
   modes: Mode[];
-  onRebalance: () => void;
   onDayClick?: (date: Date) => void;
   overloadedDays?: string[];
 }
@@ -18,7 +17,6 @@ export function WeekPlanner({
   events,
   scheduledBlocks,
   modes,
-  onRebalance,
   onDayClick,
   overloadedDays = [],
 }: WeekPlannerProps) {
@@ -26,18 +24,7 @@ export function WeekPlanner({
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <button
-          type="button"
-          onClick={onRebalance}
-          className="rounded-[22px] bg-coral px-4 py-2 text-sm font-medium text-white"
-        >
-          Rebalance my week
-        </button>
-      </div>
-
-      <div className="space-y-3">
+    <div className="space-y-3">
         {days.map((day, i) => {
           const dayKey = format(day, 'yyyy-MM-dd');
           const dayEvents = events.filter((e) => isSameDay(parseISO(e.start), day));
@@ -110,7 +97,6 @@ export function WeekPlanner({
             </motion.button>
           );
         })}
-      </div>
     </div>
   );
 }

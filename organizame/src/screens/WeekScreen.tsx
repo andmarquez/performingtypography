@@ -9,7 +9,6 @@ export function WeekScreen() {
     calendarEvents,
     scheduledBlocks,
     modes,
-    rebalanceMyWeek,
     scheduleResult,
     setActiveTab,
     monthPlan,
@@ -19,7 +18,7 @@ export function WeekScreen() {
 
   return (
     <div className="space-y-4 pb-4">
-      <ScreenHeader title="Calendar" subtitle="Your week at a glance. Rebalance when chaos wins." />
+      <ScreenHeader title="Calendar" subtitle="Your week at a glance." />
 
       <div className="flex gap-2">
         <button
@@ -47,7 +46,6 @@ export function WeekScreen() {
           events={calendarEvents}
           scheduledBlocks={scheduledBlocks}
           modes={modes}
-          onRebalance={rebalanceMyWeek}
           overloadedDays={scheduleResult?.overloadedDays ?? []}
           onDayClick={() => setActiveTab('today')}
         />
