@@ -80,7 +80,7 @@ export function OrganizameDumpHero({ value, onChange }: OrganizameDumpHeroProps)
             <button
               type="button"
               onClick={() => onChange(EXAMPLE)}
-              className="shrink-0 rounded-full bg-navy px-3 py-1.5 text-[11px] font-semibold text-white"
+              className="shrink-0 rounded-full bg-ink-muted px-3 py-1.5 text-[11px] font-semibold text-white"
             >
               Try example →
             </button>
