@@ -132,6 +132,7 @@ export function OrganizameScreen() {
       <PrimaryButton
         title="Make it possible"
         subtitle="Generate your schedule"
+        variant="coral"
         loading={andsiosaState === 'thinking'}
         loadingText="Thinking..."
         onClick={() => {
