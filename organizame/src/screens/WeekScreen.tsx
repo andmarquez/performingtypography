@@ -12,14 +12,16 @@ export function WeekScreen() {
     settings,
     addTaskToDay,
     scheduleResult,
-    monthPlan,
   } = useApp();
 
   const [view, setView] = useState<'week' | 'month'>('week');
 
   return (
     <div className="space-y-4 pb-4">
-      <ScreenHeader title="Calendar" subtitle="Your week at a glance." />
+      <ScreenHeader
+        title="Calendar"
+        subtitle={view === 'week' ? 'Your week at a glance.' : 'Your month at a glance.'}
+      />
 
       <div className="flex gap-2">
         <button
@@ -54,8 +56,12 @@ export function WeekScreen() {
         />
       ) : (
         <MonthPlanner
-          plan={monthPlan}
-          onWeekClick={() => setView('week')}
+          events={calendarEvents}
+          scheduledBlocks={scheduledBlocks}
+          modes={modes}
+          defaultModeId={settings.currentModeId}
+          bufferMinutes={settings.bufferMinutes}
+          overloadedDays={scheduleResult?.overloadedDays ?? []}
         />
       )}
     </div>
