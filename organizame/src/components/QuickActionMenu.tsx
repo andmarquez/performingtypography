@@ -12,13 +12,11 @@ const ACTIONS = [
   { id: 'voice', label: 'Add by voice', icon: '🎤', special: 'voice' as const },
   { id: 'reorganize', label: 'Reorganize my day', icon: '🔄', special: 'reorganize' as const },
   { id: 'realistic', label: 'What can I realistically do now?', icon: '⏱️', special: 'realistic' as const },
-  { id: 'gif', label: 'Upload reaction GIF', icon: '🎬', special: 'gif' as const },
 ];
 
 export function QuickActionMenu({ onClose }: QuickActionMenuProps) {
   const {
     setActiveTab,
-    setShowSettings,
     setAndsiosaState,
     setAssistantMessage,
     whatCanIDoNow,
@@ -51,9 +49,6 @@ export function QuickActionMenu({ onClose }: QuickActionMenuProps) {
         setTimeout(() => setAndsiosaState('idle'), 4000);
         break;
       }
-      case 'gif':
-        setShowSettings(true);
-        break;
     }
   };
 
