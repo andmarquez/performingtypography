@@ -1,12 +1,11 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '../store/appStore';
-import { BrainDumpInput } from '../components/BrainDumpInput';
+import { OrganizameDumpHero } from '../components/OrganizameDumpHero';
 import { TaskCard } from '../components/TaskCard';
 import { GeneratedPlan } from '../components/GeneratedPlan';
 import { parseBrainDump } from '../services/taskParser';
 import type { Period, Task } from '../types';
-import { ScreenHeader } from '../components/PageHeader';
 import { PrimaryButton } from '../components/PrimaryButton';
 
 const PERIODS: { id: Period; label: string }[] = [
@@ -87,12 +86,7 @@ export function OrganizameScreen() {
 
   return (
     <div className="space-y-5 pb-4">
-      <ScreenHeader
-        title="Dump"
-        subtitle="Paste everything you want to do. I'll tell you if it's humanly possible."
-      />
-
-      <BrainDumpInput value={brainDumpText} onChange={setBrainDumpText} />
+      <OrganizameDumpHero value={brainDumpText} onChange={setBrainDumpText} />
 
       <div>
         <p className="text-[11px] font-bold uppercase tracking-[0.55px] text-mode-label mb-2">
