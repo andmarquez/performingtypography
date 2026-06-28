@@ -1,5 +1,4 @@
 import { isSameDay, parseISO } from 'date-fns';
-import { motion } from 'framer-motion';
 import { useApp } from '../store/appStore';
 import { getModeById } from '../data/defaultModes';
 import { getFreeTimeToday } from '../services/schedulingEngine';
@@ -18,7 +17,6 @@ export function TodayScreen() {
     scheduledBlocks,
     fixMyChaos,
     setActiveTab,
-    assistantMessage,
   } = useApp();
 
   const today = new Date();
@@ -30,16 +28,6 @@ export function TodayScreen() {
   return (
     <div className="space-y-5 pb-4">
       <TodayHeader />
-
-      {assistantMessage && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="rounded-[22px] bg-white px-4 py-3 card-surface"
-        >
-          <p className="text-sm text-ink-secondary italic leading-relaxed">"{assistantMessage}"</p>
-        </motion.div>
-      )}
 
       <ModeBanner mode={currentMode} />
 

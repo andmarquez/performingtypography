@@ -3,7 +3,6 @@ import type { ScheduleResult } from '../types';
 import { formatDuration } from '../store/appStore';
 import { ScheduleBlock } from './ScheduleBlock';
 import type { Mode } from '../types';
-import { ASSETS } from '../design/tokens';
 
 interface GeneratedPlanProps {
   result: ScheduleResult;
@@ -11,34 +10,13 @@ interface GeneratedPlanProps {
   onAccept?: () => void;
 }
 
-const TONE_STYLES = {
-  success: 'bg-free-bg border-free-text/20',
-  warning: 'bg-orange-50 border-orange-300 animate-shake',
-  error: 'bg-red-50 border-red-300 animate-shake',
-  info: 'bg-mode-surface border-mode-label/20',
-};
-
 export function GeneratedPlan({ result, modes, onAccept }: GeneratedPlanProps) {
-  const tone = TONE_STYLES[result.assistantTone];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4"
     >
-      <div className={`rounded-[22px] border-l-4 p-4 ${tone}`}>
-        <div className="flex items-start gap-3">
-          <img src={ASSETS.mascot} alt="" className="h-12 w-12 object-contain shrink-0" />
-          <div>
-            <p className="text-base text-ink leading-snug">{result.message}</p>
-            <p className="text-sm text-ink-secondary mt-2">
-              {result.fits ? 'Schedule approved by math (barely).' : 'Math has spoken. Listen to it.'}
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-3 gap-2">
         <StatCard label="Available" value={formatDuration(result.totalAvailableMinutes)} />
         <StatCard label="Requested" value={formatDuration(result.totalRequestedMinutes)} />

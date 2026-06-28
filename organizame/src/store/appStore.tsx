@@ -211,7 +211,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       setTasks((t) => t.map((task) => (task.id === id ? { ...task, completed: true } : task)));
       setAndsiosaState('celebrating');
-      setAssistantMessage('You finished it? Honestly, iconic.');
       triggerReaction('task-complete');
       setTimeout(() => setAndsiosaState('idle'), 3000);
 
@@ -255,7 +254,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
         setScheduleResult(result);
         setScheduledBlocks(result.scheduledBlocks);
-        setAssistantMessage(result.message);
         if (result.trigger) triggerReaction(result.trigger, result.message);
         setAndsiosaState(result.fits ? 'celebrating' : 'judging');
         setTimeout(() => setAndsiosaState('idle'), 4000);
@@ -281,7 +279,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const result = rebalanceWeek(activeTasks, events, modes, settings.userName);
       setScheduleResult(result);
       setScheduledBlocks(result.scheduledBlocks);
-      setAssistantMessage(result.message);
       triggerReaction('week-rebalance', result.message);
       setAndsiosaState('focused');
       setTimeout(() => setAndsiosaState('idle'), 4000);
