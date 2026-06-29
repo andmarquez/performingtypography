@@ -60,6 +60,128 @@ export function SettingsScreen() {
                 />
               </section>
 
+              <section className="rounded-[22px] bg-white p-4 card-surface space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-ink">Daily workout</p>
+                    <p className="text-xs text-ink-secondary mt-0.5">
+                      Reserve workout time on every day
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={settings.dailyWorkoutEnabled}
+                    onClick={() =>
+                      updateSettings({ dailyWorkoutEnabled: !settings.dailyWorkoutEnabled })
+                    }
+                    className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+                      settings.dailyWorkoutEnabled ? 'bg-coral' : 'bg-ink-nav/30'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                        settings.dailyWorkoutEnabled ? 'left-[22px]' : 'left-0.5'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {settings.dailyWorkoutEnabled && (
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <label className="block">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.55px] text-mode-label">
+                        Time
+                      </span>
+                      <input
+                        type="time"
+                        value={settings.dailyWorkoutTime}
+                        onChange={(e) => updateSettings({ dailyWorkoutTime: e.target.value })}
+                        className="mt-1 w-full rounded-[14px] bg-bg px-3 py-2.5 text-sm text-ink"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.55px] text-mode-label">
+                        Duration (min)
+                      </span>
+                      <input
+                        type="number"
+                        value={settings.dailyWorkoutDurationMinutes}
+                        onChange={(e) =>
+                          updateSettings({
+                            dailyWorkoutDurationMinutes: parseInt(e.target.value, 10) || 30,
+                          })
+                        }
+                        min={15}
+                        step={15}
+                        className="mt-1 w-full rounded-[14px] bg-bg px-3 py-2.5 text-sm text-ink"
+                      />
+                    </label>
+                  </div>
+                )}
+              </section>
+
+              <section className="rounded-[22px] bg-white p-4 card-surface space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-ink">Daily time off</p>
+                    <p className="text-xs text-ink-secondary mt-0.5">
+                      Protect rest time on every day
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={settings.dailyTimeOffEnabled}
+                    onClick={() =>
+                      updateSettings({ dailyTimeOffEnabled: !settings.dailyTimeOffEnabled })
+                    }
+                    className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+                      settings.dailyTimeOffEnabled ? 'bg-mode-surface' : 'bg-ink-nav/30'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                        settings.dailyTimeOffEnabled ? 'left-[22px]' : 'left-0.5'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {settings.dailyTimeOffEnabled && (
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <label className="block">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.55px] text-mode-label">
+                        Time
+                      </span>
+                      <input
+                        type="time"
+                        value={settings.dailyTimeOffTime}
+                        onChange={(e) => updateSettings({ dailyTimeOffTime: e.target.value })}
+                        className="mt-1 w-full rounded-[14px] bg-bg px-3 py-2.5 text-sm text-ink"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.55px] text-mode-label">
+                        Duration (min)
+                      </span>
+                      <input
+                        type="number"
+                        value={settings.dailyTimeOffDurationMinutes}
+                        onChange={(e) =>
+                          updateSettings({
+                            dailyTimeOffDurationMinutes: parseInt(e.target.value, 10) || 30,
+                          })
+                        }
+                        min={30}
+                        step={30}
+                        className="mt-1 w-full rounded-[14px] bg-bg px-3 py-2.5 text-sm text-ink"
+                      />
+                    </label>
+                  </div>
+                )}
+              </section>
+
               <section>
                 <ReactionVault />
               </section>

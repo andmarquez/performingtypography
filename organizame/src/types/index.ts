@@ -122,6 +122,14 @@ export interface AppSettings {
   googleCalendarConnected: boolean;
   currentModeId: string;
   bufferMinutes: number;
+  dailyWorkoutEnabled: boolean;
+  dailyWorkoutTime: string;
+  dailyWorkoutDurationMinutes: number;
+  dailyWorkoutSkippedDays: string[];
+  dailyTimeOffEnabled: boolean;
+  dailyTimeOffTime: string;
+  dailyTimeOffDurationMinutes: number;
+  dailyTimeOffSkippedDays: string[];
 }
 
 export interface ActiveReaction {

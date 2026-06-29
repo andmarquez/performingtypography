@@ -11,7 +11,7 @@ import {
   type TimelineEditPayload,
 } from './TimelineItemEditSheet';
 import { DayAddTaskSheet, type DayTaskInput } from './DayAddTaskSheet';
-import { buildWorkoutInput } from '../utils/dayPresets';
+import { buildWorkoutInput, hasDailyWorkoutOnDay } from '../utils/dayPresets';
 
 interface DayDetailSheetProps {
   day: Date;
@@ -226,7 +226,8 @@ export function DayDetailSheet({
             <button
               type="button"
               onClick={handleAddWorkout}
-              className="flex-1 rounded-[22px] py-3 text-sm font-medium text-ink"
+              disabled={hasDailyWorkoutOnDay(day, scheduledBlocks)}
+              className="flex-1 rounded-[22px] py-3 text-sm font-medium text-ink disabled:opacity-40"
               style={{ backgroundColor: '#ecfccb' }}
             >
               🏋️ Workout

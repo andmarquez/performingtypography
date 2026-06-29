@@ -12,6 +12,11 @@ import { DEFAULT_MODES } from '../data/defaultModes';
 import { calendarService } from '../services/calendarService';
 import { reactionService } from '../services/reactionService';
 import {
+  isDailyTimeOffTask,
+  isDailyWorkoutTask,
+  syncDailyReservations,
+} from '../services/dailyReservations';
+import {
   generateSchedule,
   getWhatCanIDoNow,
   rebalanceWeek,
@@ -53,6 +58,21 @@ function loadJson<T>(key: string, fallback: T): T {
 function saveJson(key: string, value: unknown): void {
   localStorage.setItem(key, JSON.stringify(value));
 }
+
+const DEFAULT_SETTINGS: AppSettings = {
+  userName: 'Andrea',
+  googleCalendarConnected: false,
+  currentModeId: 'work',
+  bufferMinutes: 10,
+  dailyWorkoutEnabled: true,
+  dailyWorkoutTime: '07:30',
+  dailyWorkoutDurationMinutes: 60,
+  dailyWorkoutSkippedDays: [],
+  dailyTimeOffEnabled: true,
+  dailyTimeOffTime: '20:00',
+  dailyTimeOffDurationMinutes: 120,
+  dailyTimeOffSkippedDays: [],
+};
 
 interface AppContextValue {
   activeTab: TabId;
@@ -116,14 +136,10 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTab] = useState<TabId>('today');
-  const [settings, setSettings] = useState<AppSettings>(() =>
-    loadJson(STORAGE_KEYS.settings, {
-      userName: 'Andrea',
-      googleCalendarConnected: false,
-      currentModeId: 'work',
-      bufferMinutes: 10,
-    }),
-  );
+  const [settings, setSettings] = useState<AppSettings>(() => ({
+    ...DEFAULT_SETTINGS,
+    ...loadJson<Partial<AppSettings>>(STORAGE_KEYS.settings, {}),
+  }));
   const [modes, setModes] = useState<Mode[]>(() => loadJson(STORAGE_KEYS.modes, DEFAULT_MODES));
   const [tasks, setTasks] = useState<Task[]>(() => loadJson(STORAGE_KEYS.tasks, []));
   const [scheduleResult, setScheduleResult] = useState<ScheduleResult | null>(() =>
@@ -156,6 +172,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (scheduleResult) saveJson(STORAGE_KEYS.schedule, scheduleResult);
   }, [scheduleResult]);
+
+  useEffect(() => {
+    setTasks((prevTasks) => {
+      setScheduledBlocks((prevBlocks) => {
+        const synced = syncDailyReservations(settings, prevTasks, prevBlocks);
+        setScheduleResult((prev) => (prev ? { ...prev, scheduledBlocks: synced.blocks } : prev));
+        setTasks(synced.tasks);
+        return synced.blocks;
+      });
+      return prevTasks;
+    });
+  }, [
+    settings.dailyWorkoutEnabled,
+    settings.dailyWorkoutTime,
+    settings.dailyWorkoutDurationMinutes,
+    settings.dailyWorkoutSkippedDays,
+    settings.dailyTimeOffEnabled,
+    settings.dailyTimeOffTime,
+    settings.dailyTimeOffDurationMinutes,
+    settings.dailyTimeOffSkippedDays,
+  ]);
 
   const inboxTasks = useMemo(() => tasks.filter((t) => !t.scheduled && !t.completed), [tasks]);
 
@@ -443,9 +480,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return updated;
     });
     if (taskId) {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === taskId ? { ...t, scheduled: false } : t)),
-      );
+      if (isDailyWorkoutTask(taskId)) {
+        const dayKey = taskId.replace(/^daily-workout-/, '');
+        setSettings((s) => ({
+          ...s,
+          dailyWorkoutSkippedDays: [...new Set([...(s.dailyWorkoutSkippedDays ?? []), dayKey])],
+        }));
+        setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      } else if (isDailyTimeOffTask(taskId)) {
+        const dayKey = taskId.replace(/^daily-timeoff-/, '');
+        setSettings((s) => ({
+          ...s,
+          dailyTimeOffSkippedDays: [...new Set([...(s.dailyTimeOffSkippedDays ?? []), dayKey])],
+        }));
+        setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      } else {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === taskId ? { ...t, scheduled: false } : t)),
+        );
+      }
     }
   }, []);
 

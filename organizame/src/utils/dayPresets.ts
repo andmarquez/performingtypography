@@ -1,9 +1,15 @@
 import { setHours, setMinutes, startOfDay } from 'date-fns';
 import type { CalendarEvent, Mode, ScheduledBlock } from '../types';
 import { findSlotOnDay } from '../services/schedulingEngine';
+import { dailyWorkoutTaskId } from '../services/dailyReservations';
 import type { DayTaskInput } from '../components/DayAddTaskSheet';
 
 const WORKOUT_DURATION = 60;
+
+export function hasDailyWorkoutOnDay(day: Date, scheduledBlocks: ScheduledBlock[]): boolean {
+  const taskId = dailyWorkoutTaskId(day);
+  return scheduledBlocks.some((b) => b.taskId === taskId);
+}
 
 export function buildWorkoutInput(
   day: Date,
