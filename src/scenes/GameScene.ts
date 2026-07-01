@@ -4,6 +4,7 @@ import { Enemy } from '../objects/Enemy';
 import { Collectible } from '../objects/Collectible';
 import { KissProjectile } from '../objects/KissProjectile';
 import { MobileControls } from '../ui/MobileControls';
+import { shouldShowMobileControls } from '../ui/mobileControlUtils';
 import {
   GAME_CONFIG,
   createInitialStats,
@@ -547,8 +548,8 @@ export class GameScene extends Phaser.Scene {
     this.keyX = this.input.keyboard.addKey('X');
     this.keySpace = this.input.keyboard.addKey('SPACE');
 
-    const isTouch = this.sys.game.device.input.touch;
-    if (isTouch) {
+    const showTouch = shouldShowMobileControls(this.game);
+    if (showTouch) {
       this.mobileControls = new MobileControls(this);
     }
   }

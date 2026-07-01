@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { shouldShowMobileControls } from '../ui/mobileControlUtils';
 
 /**
  * MenuScene — title screen with keyboard and tap to start.
@@ -134,11 +135,14 @@ export class MenuScene extends Phaser.Scene {
 
     const updateHint = () => {
       const isPortrait = this.scale.height > this.scale.width;
-      hint.setText(
-        isPortrait
-          ? 'Turn your phone sideways for the best experience.'
-          : '',
-      );
+      const mobileControls = shouldShowMobileControls(this.game);
+      if (isPortrait) {
+        hint.setText('Turn your phone sideways for the best experience.');
+      } else if (!mobileControls && !this.game.device.input.touch) {
+        hint.setText('On desktop: add ?mobile=1 to the URL to preview touch controls.');
+      } else {
+        hint.setText('');
+      }
     };
     updateHint();
     this.scale.on('resize', updateHint);
