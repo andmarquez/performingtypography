@@ -1,12 +1,11 @@
 {
-  "name": "concert-kinetic-typography",
-  "version": "0.1.0",
-  "description": "Mobile-first React Vite kinetic typography concert app",
+  "name": "andsiosas-creative-quest",
+  "version": "1.0.0",
+  "description": "Andsiosa's Creative Quest — a cute retro side-scrolling platformer built with Phaser, Vite, and TypeScript",
   "scripts": {
-    "dev": "npm run experience:manifest && vite --host 0.0.0.0",
-    "build": "npm run experience:manifest && vite build",
-    "build:pages": "npm run experience:manifest && vite build && cp dist/index.html dist/404.html",
-    "experience:manifest": "node scripts/generate-experience-manifest.mjs",
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "build:pages": "npm run build && cp dist/index.html dist/404.html",
     "preview": "vite preview --host 0.0.0.0",
     "phone:tunnel": "bash scripts/phone-tunnel.sh"
   },
@@ -15,13 +14,13 @@
     "url": "git+https://github.com/andmarquez/performingtypography.git"
   },
   "dependencies": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "phaser": "^3.90.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.0.2",
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2",
     "vite": "^8.0.14"
   },
-  "private": "true",
+  "private": true,
   "type": "module"
 }
