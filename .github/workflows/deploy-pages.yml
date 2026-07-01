@@ -18,31 +18,50 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.app.outputs.skip }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect app type
+        id: app
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          if [ "$NAME" != "concert-kinetic-typography" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping Pages deploy: package is '$NAME', not the kinetic typography app."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node
+        if: steps.app.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
       - name: Install dependencies
+        if: steps.app.outputs.skip != 'true'
         run: npm ci
 
       - name: Build for GitHub Pages
+        if: steps.app.outputs.skip != 'true'
         run: npm run build:pages
         env:
           BASE_PATH: /performingtypography/
 
       - name: Upload Pages artifact
+        if: steps.app.outputs.skip != 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.skip != 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -5,13 +5,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
-    "build:pages": "npm run build && cp dist/index.html dist/404.html",
     "preview": "vite preview --host 0.0.0.0",
     "phone:tunnel": "bash scripts/phone-tunnel.sh"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/andmarquez/performingtypography.git"
   },
   "dependencies": {
     "phaser": "^3.90.0"
