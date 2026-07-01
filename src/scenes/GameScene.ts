@@ -89,7 +89,6 @@ export class GameScene extends Phaser.Scene {
   };
   private portraitOverlay?: Phaser.GameObjects.Container;
   private portalMessage?: Phaser.GameObjects.Text;
-  private jumpWasDown = false;
   private gameEnded = false;
   private parallaxLayers: Phaser.GameObjects.GameObject[] = [];
 
@@ -613,7 +612,7 @@ export class GameScene extends Phaser.Scene {
       Phaser.Input.Keyboard.JustDown(this.cursors.up!) ||
       Phaser.Input.Keyboard.JustDown(this.keyW) ||
       Phaser.Input.Keyboard.JustDown(this.keySpace) ||
-      (touch.jump && !this.jumpWasDown);
+      (this.mobileControls?.consumeJumpPress() ?? false);
 
     const kissJustDown =
       Phaser.Input.Keyboard.JustDown(this.keyA) ||
@@ -621,7 +620,6 @@ export class GameScene extends Phaser.Scene {
 
     const highJumpHeld = this.keyX?.isDown || touch.boost;
 
-    this.jumpWasDown = touch.jump;
     this.kissWasDown = touch.kiss;
 
     if (kissJustDown) {

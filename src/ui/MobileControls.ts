@@ -26,6 +26,8 @@ export class MobileControls {
   private kissBtn!: Phaser.GameObjects.Arc;
   private boostBtn!: Phaser.GameObjects.Arc;
   private activePointers = new Map<number, TouchAction>();
+  /** Fires once per tap on jump — enables double jump in mid-air */
+  private jumpPressPending = false;
   input: TouchInput = { left: false, right: false, jump: false, kiss: false, boost: false };
 
   constructor(scene: Phaser.Scene) {
@@ -90,10 +92,12 @@ export class MobileControls {
       fontFamily: 'Nunito, sans-serif',
     }).setOrigin(0.5);
 
-    const jumpLabel = this.scene.add.text(0, 0, '▲', {
-      fontSize: '32px',
+    const jumpLabel = this.scene.add.text(0, 0, '▲\n×2', {
+      fontSize: '22px',
       color: '#ffffff',
       fontFamily: 'Nunito, sans-serif',
+      align: 'center',
+      lineSpacing: -4,
     }).setOrigin(0.5);
 
     this.container.add([
@@ -124,13 +128,15 @@ export class MobileControls {
     const w = this.scene.scale.width;
     const h = this.scene.scale.height;
     const pad = GAME_CONFIG.safePadding + 12;
-    const bottom = h - pad;
+    // Lift controls up so they sit over the playfield, not under browser chrome
+    const lift = Math.max(GAME_CONFIG.mobileControlsLift, h * 0.18);
+    const bottom = h - pad - lift;
 
-    this.leftBtn.setPosition(pad + 44, bottom - 44);
-    this.rightBtn.setPosition(pad + 44 + 96, bottom - 44);
-    this.kissBtn.setPosition(w - pad - 52 - 120, bottom - 44);
-    this.boostBtn.setPosition(w - pad - 52 - 56, bottom - 48);
-    this.jumpBtn.setPosition(w - pad - 52, bottom - 52);
+    this.leftBtn.setPosition(pad + 44, bottom);
+    this.rightBtn.setPosition(pad + 44 + 96, bottom);
+    this.kissBtn.setPosition(w - pad - 52 - 120, bottom);
+    this.boostBtn.setPosition(w - pad - 52 - 56, bottom - 4);
+    this.jumpBtn.setPosition(w - pad - 52, bottom - 4);
 
     for (const btn of [this.leftBtn, this.rightBtn, this.kissBtn, this.boostBtn, this.jumpBtn]) {
       const label = (btn as Phaser.GameObjects.Arc & { label?: Phaser.GameObjects.Text }).label;
@@ -161,6 +167,9 @@ export class MobileControls {
       const action = hitTest(pointer.x, pointer.y);
       if (action) {
         this.activePointers.set(pointer.id, action);
+        if (action === 'jump') {
+          this.jumpPressPending = true;
+        }
         this.refreshInput();
         this.highlightButton(action, true);
       }
@@ -209,6 +218,13 @@ export class MobileControls {
 
   setVisible(visible: boolean): void {
     this.container.setVisible(visible);
+  }
+
+  /** Returns true once per jump-button tap (supports double jump in air). */
+  consumeJumpPress(): boolean {
+    if (!this.jumpPressPending) return false;
+    this.jumpPressPending = false;
+    return true;
   }
 
   destroy(): void {

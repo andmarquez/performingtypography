@@ -22,6 +22,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private isHurt = false;
   private hurtTimer?: Phaser.Time.TimerEvent;
   private facingRight = true;
+  private jumpsRemaining: number = GAME_CONFIG.maxJumps;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'andsiosa-idle');
@@ -86,6 +87,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const right = cursors.right?.isDown || keys.right;
     const jumpPressed = keys.jump;
 
+    if (onFloor) {
+      this.jumpsRemaining = GAME_CONFIG.maxJumps;
+    }
+
     if (left) {
       this.setVelocityX(-GAME_CONFIG.playerSpeed);
       this.setFlipX(true);
@@ -101,12 +106,32 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       if (onFloor) this.setAnimState('idle');
     }
 
-    if (jumpPressed && onFloor) {
-      const jumpPower = keys.highJump
-        ? GAME_CONFIG.playerHighJumpVelocity
-        : GAME_CONFIG.playerJumpVelocity;
+    if (jumpPressed && this.jumpsRemaining > 0) {
+      const isAirJump = !onFloor;
+      let jumpPower: number = GAME_CONFIG.playerJumpVelocity;
+
+      if (isAirJump) {
+        // Double jump — slightly smaller than the first leap
+        jumpPower = GAME_CONFIG.playerDoubleJumpVelocity;
+      } else if (keys.highJump) {
+        jumpPower = GAME_CONFIG.playerHighJumpVelocity;
+      }
+
       this.setVelocityY(jumpPower);
+      this.jumpsRemaining -= 1;
       this.setAnimState('jump');
+
+      if (isAirJump) {
+        // Brief pop on double jump — replace with sprite FX later
+        const baseScale = Math.abs(this.scaleX);
+        this.scene.tweens.add({
+          targets: this,
+          scaleX: this.flipX ? -baseScale * 1.06 : baseScale * 1.06,
+          scaleY: baseScale * 1.06,
+          duration: 80,
+          yoyo: true,
+        });
+      }
     }
 
     if (!onFloor) {
@@ -165,6 +190,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   stompBounce(): void {
     this.setVelocityY(GAME_CONFIG.stompBounceVelocity);
+    this.jumpsRemaining = GAME_CONFIG.maxJumps - 1;
     this.setAnimState('jump');
   }
 }

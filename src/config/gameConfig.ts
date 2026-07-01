@@ -16,6 +16,10 @@ export const GAME_CONFIG = {
   playerJumpVelocity: -520,
   /** Hold X + jump for an extra-high leap */
   playerHighJumpVelocity: -700,
+  /** Second jump in mid-air (tap jump again while airborne) */
+  playerDoubleJumpVelocity: -500,
+  /** Total jumps before landing (2 = single + one double) */
+  maxJumps: 2,
   playerBounce: 0.1,
 
   /** Kiss blow attack */
@@ -53,6 +57,9 @@ export const GAME_CONFIG = {
 
   /** Safe area padding for mobile notches (CSS pixels, scaled in-game) */
   safePadding: 16,
+
+  /** Lift touch controls above the bottom edge (browser bars, thumbs) */
+  mobileControlsLift: 130,
 
   /** Timer pickup floating messages */
   timerMessages: [
