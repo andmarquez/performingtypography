@@ -2,6 +2,22 @@
 
 Drop your custom art here when you are ready to replace placeholder graphics.
 
+## Figma UI (edit screens here)
+
+**Andsiosa's Creative Quest — UI** (mobile landscape 1280×720):
+
+https://www.figma.com/design/1zlB4dA4ktyuuBXzseo1ix
+
+Pages in the file:
+
+| Page | Contents |
+|------|----------|
+| 🎨 Design Tokens | Brand colors + typography notes |
+| 📱 Screens — Mobile Landscape | Start, Gameplay, Game Over, Win |
+| 🧩 Components | Andsiosa states, HUD, Wild Rift controls |
+
+After you update a screen in Figma, ask to sync changes back into the Phaser game.
+
 ## Suggested files
 
 | File | Purpose |
