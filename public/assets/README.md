@@ -10,11 +10,12 @@ https://www.figma.com/design/1zlB4dA4ktyuuBXzseo1ix
 
 Pages in the file:
 
-| Page | Contents |
-|------|----------|
-| 🎨 Design Tokens | Brand colors + typography notes |
-| 📱 Screens — Mobile Landscape | Start, Gameplay, Game Over, Win |
-| 🧩 Components | Andsiosa states, HUD, Wild Rift controls |
+| Page | Artboard size | Contents |
+|------|---------------|----------|
+| 🎨 Design Tokens | — | Brand colors + typography notes |
+| 📱 Screens — Mobile Landscape | **1280 × 720** | M01 Start, M02 Gameplay, M03 Game Over, M04 Win (+ Wild Rift touch controls) |
+| 🖥️ Screens — Desktop | **1920 × 1080** | D01–D04 same screens, centered 1280×720 viewport, keyboard hints (no touch UI) |
+| 🧩 Components | — | Andsiosa states, HUD, Wild Rift controls |
 
 After you update a screen in Figma, ask to sync changes back into the Phaser game.
 
