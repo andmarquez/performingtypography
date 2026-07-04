@@ -3,8 +3,7 @@
  * Extract M02 mobile gameplay zones from Figma into layout-mobile.json.
  *
  * Platforms frame (26:179) is at y=-100 inside artboard 13:2.
- * goal_platform lives in the markers frame (+35 x) at artboard y=561.
- * Kiss/timer positions use artboard coords from M02 decorative layers.
+ * `pipe` zones are tall vertical collision (same arcade physics as platforms).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,37 +17,39 @@ const PLATFORM_FRAME_Y = -100;
 const MARKERS_FRAME_X = 35;
 const WORLD_H = 720;
 
-/** From Figma 26:179 — Platforms (collision), synced 2026-07-04 */
+/**
+ * Figma 26:179 — [nodeId, layoutName, zoneType, x, y, width, height]
+ * zoneType: 'platform' | 'pipe'
+ */
 const PLATFORMS_RAW = [
-  ['ground_floor', -1, 766, 5336, 56],
-  ['platform_start', -1, 684, 231, 36],
-  ['platform_start_1', 303, 666, 174, 54],
-  ['platform_start_2', 540, 620, 113, 100],
-  ['platform_start_3', 653, 691, 195, 29],
-  ['floating_platform_01', 207, 572, 121, 29],
-  ['platform_01', 996, 656, 391, 113],
-  ['floating_platform_02', 935, 569, 122, 34],
-  ['platform_02', 1472, 696, 246, 73],
-  ['pipe_01', 1564, 633, 56, 73],
-  ['floating_platform_03', 1395, 571, 124, 34],
-  ['floating_platform_04', 1860, 586, 98, 69],
-  ['platform_03', 1791, 655, 314, 114],
-  ['pipe_02', 2131, 605, 56, 73],
-  ['floating_platform_05', 3105, 570, 120, 32],
-  ['floating_platform_05b', 2440, 589, 120, 32],
-  ['floating_platform_06', 4163, 597, 90, 69],
-  ['platform_04', 2105, 683, 465, 86],
-  ['floating_platform_07', 4308, 570, 122, 34],
-  ['platform_05', 2717, 686, 1412, 83],
-  ['pipe_03', 3845, 618, 56, 73],
-  ['platform_06', 4127, 666, 386, 103],
-  ['platform_07', 4513, 698, 304, 71],
-  ['floating_platform_08', 4748, 578, 195, 20],
+  ['26:181', 'ground_floor', 'platform', -1, 766, 5336, 56],
+  ['49:2', 'platform_start', 'platform', -1, 684, 231, 36],
+  ['54:2', 'platform_start_1', 'platform', 303, 666, 174, 54],
+  ['54:3', 'platform_start_2', 'platform', 540, 620, 113, 100],
+  ['54:4', 'platform_start_3', 'platform', 653, 691, 195, 29],
+  ['26:183', 'floating_platform_01', 'platform', 207, 572, 121, 29],
+  ['26:185', 'platform_01', 'platform', 996, 656, 391, 113],
+  ['26:187', 'floating_platform_02', 'platform', 935, 569, 122, 34],
+  ['26:189', 'platform_02', 'platform', 1472, 696, 246, 73],
+  ['54:5', 'pipe_1', 'pipe', 1564, 633, 56, 73],
+  ['26:191', 'floating_platform_03', 'platform', 1395, 571, 124, 34],
+  ['26:193', 'floating_platform_04', 'platform', 1860, 586, 98, 69],
+  ['26:195', 'platform_03', 'platform', 1791, 655, 314, 114],
+  ['54:7', 'pipe_2', 'pipe', 2131, 605, 56, 73],
+  ['26:197', 'floating_platform_05', 'platform', 3105, 570, 120, 32],
+  ['54:9', 'floating_platform_05b', 'platform', 2440, 589, 120, 32],
+  ['26:199', 'floating_platform_06', 'platform', 4163, 597, 90, 69],
+  ['26:201', 'platform_04', 'platform', 2105, 683, 465, 86],
+  ['26:203', 'floating_platform_07', 'platform', 4308, 570, 122, 34],
+  ['26:205', 'platform_05', 'platform', 2717, 686, 1412, 83],
+  ['54:8', 'pipe_3', 'pipe', 3845, 618, 56, 73],
+  ['24:448', 'platform_06', 'platform', 4127, 666, 386, 103],
+  ['24:450', 'platform_07', 'platform', 4513, 698, 304, 71],
+  ['26:207', 'floating_platform_08', 'platform', 4748, 578, 195, 20],
 ];
 
-const GOAL_PLATFORM = ['goal_platform', 5172 + MARKERS_FRAME_X, 561, 163, 20];
+const GOAL_PLATFORM = ['26:209', 'goal_platform', 'platform', 5172 + MARKERS_FRAME_X, 561, 163, 20];
 
-/** Artboard x,y,w,h — Kiss / Timer / Spark / enemies on M02 */
 const COLLECTIBLES = {
   kiss: [
     [250, 500, 24, 24],
@@ -59,12 +60,10 @@ const COLLECTIBLES = {
     [710, 631, 24, 24],
   ],
   timer: [[797, 473, 28, 28]],
-  /** Creative Spark — boss reward before the final arena */
   spark: [[4845, 448, 28, 28]],
   enemy: [[500, 510, 40, 32]],
 };
 
-/** Final boss on goal platform */
 const FINAL_BOSS = {
   x: 5172 + MARKERS_FRAME_X + Math.round(163 / 2),
   y: 561,
@@ -72,10 +71,9 @@ const FINAL_BOSS = {
   max: 5365,
 };
 
-/** Andsiosa frame (17:593) — foot at bottom-center */
 const PLAYER_SPAWN = { x: 231, y: 469 };
 
-function toPlatform([name, x, y, w, h], frameY = PLATFORM_FRAME_Y) {
+function toPlatform([_nodeId, name, zoneType, x, y, w, h], frameY = PLATFORM_FRAME_Y) {
   const artY = Math.round(y + frameY);
   let height = Math.round(h);
   if (artY + height > WORLD_H) {
@@ -87,7 +85,7 @@ function toPlatform([name, x, y, w, h], frameY = PLATFORM_FRAME_Y) {
     y: artY,
     width: Math.round(w),
     height,
-    type: 'platform',
+    type: zoneType,
   };
 }
 
@@ -101,6 +99,7 @@ const platforms = [
 ];
 
 const goal = platforms.find((p) => p.name === 'goal_platform');
+const pipeCount = platforms.filter((p) => p.type === 'pipe').length;
 
 const layout = {
   level: 'level-1',
@@ -143,5 +142,5 @@ const layout = {
 
 fs.writeFileSync(OUT, `${JSON.stringify(layout, null, 2)}\n`);
 console.log(
-  `Wrote ${OUT} — ${layout.platforms.length} platforms, ${layout.markers.kiss_collectibles.length} kisses, spark + boss`,
+  `Wrote ${OUT} — ${layout.platforms.length} zones (${pipeCount} pipes), ${layout.markers.kiss_collectibles.length} kisses`,
 );

@@ -113,9 +113,20 @@ export class WorldBuilder {
     g.setDepth(WORLD_LAYERS.debug);
 
     for (const zone of zones) {
-      g.fillStyle(0x00e676, 0.35);
+      const isPipe = zone.type === 'pipe';
+      g.fillStyle(isPipe ? 0x40c4ff : 0x00e676, isPipe ? 0.4 : 0.35);
       g.fillRect(zone.x, zone.y, zone.width, zone.height);
-      WorldBuilder.strokeDashedRect(g, zone.x, zone.y, zone.width, zone.height, 0x009650, 2, 8, 6);
+      WorldBuilder.strokeDashedRect(
+        g,
+        zone.x,
+        zone.y,
+        zone.width,
+        zone.height,
+        isPipe ? 0x0288d1 : 0x009650,
+        2,
+        8,
+        6,
+      );
     }
 
     return { graphics: g, labels: [] };

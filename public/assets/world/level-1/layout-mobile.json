@@ -92,12 +92,12 @@
       "type": "platform"
     },
     {
-      "name": "pipe_01",
+      "name": "pipe_1",
       "x": 1564,
       "y": 533,
       "width": 56,
       "height": 73,
-      "type": "platform"
+      "type": "pipe"
     },
     {
       "name": "floating_platform_03",
@@ -124,12 +124,12 @@
       "type": "platform"
     },
     {
-      "name": "pipe_02",
+      "name": "pipe_2",
       "x": 2131,
       "y": 505,
       "width": 56,
       "height": 73,
-      "type": "platform"
+      "type": "pipe"
     },
     {
       "name": "floating_platform_05",
@@ -180,12 +180,12 @@
       "type": "platform"
     },
     {
-      "name": "pipe_03",
+      "name": "pipe_3",
       "x": 3845,
       "y": 518,
       "width": 56,
       "height": 73,
-      "type": "platform"
+      "type": "pipe"
     },
     {
       "name": "platform_06",

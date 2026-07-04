@@ -6,7 +6,8 @@ export type PlatformZone = {
   y: number;
   width: number;
   height: number;
-  type: 'platform';
+  /** `pipe` = vertical pipe collision (same physics as platform) */
+  type: 'platform' | 'pipe';
 };
 
 export type BackgroundSection = {
