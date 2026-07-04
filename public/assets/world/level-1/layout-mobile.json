@@ -68,18 +68,18 @@
       "type": "platform"
     },
     {
-      "name": "platform_03",
-      "x": 1791,
-      "y": 555,
-      "width": 314,
-      "height": 20,
-      "type": "platform"
-    },
-    {
       "name": "floating_platform_04",
       "x": 1860,
       "y": 486,
       "width": 98,
+      "height": 20,
+      "type": "platform"
+    },
+    {
+      "name": "platform_03",
+      "x": 1791,
+      "y": 555,
+      "width": 314,
       "height": 20,
       "type": "platform"
     },
@@ -92,14 +92,6 @@
       "type": "platform"
     },
     {
-      "name": "platform_05",
-      "x": 2722,
-      "y": 536,
-      "width": 1410,
-      "height": 20,
-      "type": "platform"
-    },
-    {
       "name": "floating_platform_05",
       "x": 3105,
       "y": 470,
@@ -108,10 +100,10 @@
       "type": "platform"
     },
     {
-      "name": "platform_06",
-      "x": 4132,
-      "y": 516,
-      "width": 386,
+      "name": "platform_05",
+      "x": 2717,
+      "y": 676,
+      "width": 1410,
       "height": 20,
       "type": "platform"
     },
@@ -120,6 +112,14 @@
       "x": 4138,
       "y": 497,
       "width": 90,
+      "height": 20,
+      "type": "platform"
+    },
+    {
+      "name": "platform_06",
+      "x": 4127,
+      "y": 656,
+      "width": 386,
       "height": 20,
       "type": "platform"
     },
@@ -133,24 +133,24 @@
     },
     {
       "name": "platform_07",
-      "x": 4505,
-      "y": 536,
+      "x": 4500,
+      "y": 676,
       "width": 317,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "floating_platform_08",
-      "x": 4793,
-      "y": 438,
+      "x": 4788,
+      "y": 578,
       "width": 195,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "goal_platform",
-      "x": 5212,
-      "y": 421,
+      "x": 5207,
+      "y": 561,
       "width": 163,
       "height": 20,
       "type": "platform"
@@ -158,38 +158,38 @@
   ],
   "markers": {
     "player_spawn": {
-      "x": 238,
-      "y": 516
+      "x": 198,
+      "y": 564
     },
     "portal_goal": {
-      "x": 5294,
-      "y": 431
+      "x": 5289,
+      "y": 551
     },
     "kiss_collectibles": [
       {
-        "x": 302,
-        "y": 480
+        "x": 262,
+        "y": 512
       },
       {
-        "x": 467,
-        "y": 300
+        "x": 427,
+        "y": 340
       },
       {
-        "x": 802,
-        "y": 242
+        "x": 762,
+        "y": 282
       }
     ],
     "timer_collectibles": [
       {
-        "x": 904,
-        "y": 244
+        "x": 864,
+        "y": 284
       }
     ],
     "enemies": [
       {
-        "x": 560,
-        "y": 500,
-        "min": 180,
+        "x": 520,
+        "y": 526,
+        "min": 200,
         "max": 820
       }
     ]

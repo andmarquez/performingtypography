@@ -51,6 +51,20 @@ export function isMobileViewport(): boolean {
   return touch && shortSide <= 900;
 }
 
+/**
+ * iPhone 16 / 16 Pro class (393–402 × 852–874 CSS px).
+ * Used for tighter landscape HUD + Dynamic Island side inset.
+ */
+export function isIphone16Class(): boolean {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('iphone16') === '1') return true;
+
+  const { width, height } = getViewportSize();
+  const short = Math.min(width, height);
+  const long = Math.max(width, height);
+  return short >= 390 && short <= 440 && long >= 840 && long <= 940;
+}
+
 /** Always FIT — keeps the full 1280×720 frame visible on every device/orientation. */
 export function resolveScaleMode(): number {
   return Phaser.Scale.FIT;

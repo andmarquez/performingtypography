@@ -25,7 +25,9 @@ Marker positions → `markers` object (use ellipse center as `x`, `y`).
 Then run:
 
 ```bash
-npm run assets:layout   # refresh desktop copy
+npm run assets:layout:mobile   # extract platforms/markers from Figma coords
+npm run assets:download        # refresh background PNG from figma/export-urls.json
+npm run assets:manifest
 ```
 
 Or ask to **extract zones from Figma** and the agent will read positions from the artboard.

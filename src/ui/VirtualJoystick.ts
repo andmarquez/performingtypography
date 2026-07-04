@@ -45,7 +45,7 @@ export class VirtualJoystick {
     const scale = layout?.controlScale ?? 1;
     this.hitScale = scale;
 
-    this.centerX = viewport.x + viewport.width * cfg.xRatio + pad;
+    this.centerX = viewport.x + viewport.width * (layout?.joystickXRatio ?? cfg.xRatio) + pad;
     this.centerY = viewport.y + viewport.height - safeBottom - lift - bottomInset;
 
     this.baseRing.setPosition(this.centerX, this.centerY);

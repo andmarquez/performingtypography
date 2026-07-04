@@ -7,6 +7,7 @@ import { WinScene } from './scenes/WinScene';
 import { GAME_CONFIG } from './config/gameConfig';
 import {
   getViewportSize,
+  isIphone16Class,
   isLandscapeViewport,
   isMobileViewport,
   onViewportChange,
@@ -24,6 +25,7 @@ const applyViewportClasses = () => {
   document.documentElement.classList.toggle('is-portrait-view', !landscape);
   document.documentElement.dataset.viewport = `${width}x${height}`;
   document.documentElement.dataset.orientation = landscape ? 'landscape' : 'portrait';
+  document.documentElement.classList.toggle('is-iphone16-class', isIphone16Class());
 };
 
 const syncGameContainerToVisualViewport = () => {

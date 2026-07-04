@@ -13,7 +13,8 @@
     "assets:export": "node scripts/sync-figma-world-assets.mjs export",
     "assets:list": "node scripts/sync-figma-world-assets.mjs list",
     "assets:sync": "node scripts/sync-figma-world-assets.mjs download && node scripts/sync-figma-world-assets.mjs manifest",
-    "assets:layout": "node scripts/build-level-layout.mjs"
+    "assets:layout": "node scripts/build-level-layout.mjs",
+    "assets:layout:mobile": "node scripts/extract-figma-mobile-layout.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0"
