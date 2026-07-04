@@ -8,7 +8,7 @@ export const GAME_CONFIG = {
   height: 720,
 
   /** World / level dimensions */
-  worldWidth: 8553,
+  worldWidth: 5335,
   worldHeight: 720,
 
   /** Player movement */

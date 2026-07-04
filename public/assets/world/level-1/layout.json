@@ -3,7 +3,7 @@
   "variant": "mobile",
   "figmaArtboard": "M02 — Gameplay (Level 1)",
   "figmaNodeId": "13:2",
-  "width": 8553,
+  "width": 5335,
   "height": 720,
   "background": {
     "mode": "composite",
@@ -296,120 +296,136 @@
     {
       "name": "platform_start",
       "x": 0,
-      "y": 656,
-      "width": 1000,
+      "y": 684,
+      "width": 848,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "floating_platform_01",
-      "x": 329,
-      "y": 531,
-      "width": 195,
-      "height": 20,
-      "type": "platform"
-    },
-    {
-      "name": "platform_01",
-      "x": 1000,
-      "y": 656,
-      "width": 500,
-      "height": 20,
+      "x": 207,
+      "y": 572,
+      "width": 121,
+      "height": 29,
       "type": "platform"
     },
     {
       "name": "floating_platform_02",
-      "x": 853,
-      "y": 600,
-      "width": 480,
-      "height": 20,
+      "x": 935,
+      "y": 569,
+      "width": 122,
+      "height": 34,
       "type": "platform"
     },
     {
-      "name": "platform_02",
-      "x": 1500,
+      "name": "platform_01",
+      "x": 996,
       "y": 656,
-      "width": 1586,
+      "width": 391,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "floating_platform_03",
-      "x": 1500,
-      "y": 531,
-      "width": 195,
-      "height": 20,
+      "x": 1395,
+      "y": 571,
+      "width": 124,
+      "height": 34,
       "type": "platform"
     },
     {
-      "name": "floating_platform_04",
-      "x": 2239,
-      "y": 533,
-      "width": 195,
+      "name": "platform_02",
+      "x": 1472,
+      "y": 696,
+      "width": 246,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "platform_03",
-      "x": 3086,
-      "y": 664,
-      "width": 1400,
+      "x": 1791,
+      "y": 655,
+      "width": 314,
       "height": 20,
       "type": "platform"
     },
     {
-      "name": "floating_platform_05",
-      "x": 2970,
-      "y": 530,
-      "width": 170,
-      "height": 20,
-      "type": "platform"
-    },
-    {
-      "name": "floating_platform_06",
-      "x": 3916,
-      "y": 553,
-      "width": 195,
+      "name": "floating_platform_04",
+      "x": 1860,
+      "y": 586,
+      "width": 98,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "platform_04",
-      "x": 4486,
-      "y": 664,
-      "width": 2225,
-      "height": 20,
-      "type": "platform"
-    },
-    {
-      "name": "floating_platform_07",
-      "x": 4977,
-      "y": 531,
-      "width": 195,
+      "x": 2105,
+      "y": 683,
+      "width": 465,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "platform_05",
-      "x": 6711,
-      "y": 664,
-      "width": 1290,
+      "x": 2682,
+      "y": 676,
+      "width": 1410,
+      "height": 20,
+      "type": "platform"
+    },
+    {
+      "name": "floating_platform_05",
+      "x": 3105,
+      "y": 570,
+      "width": 120,
+      "height": 32,
+      "type": "platform"
+    },
+    {
+      "name": "platform_06",
+      "x": 4092,
+      "y": 656,
+      "width": 386,
+      "height": 20,
+      "type": "platform"
+    },
+    {
+      "name": "floating_platform_06",
+      "x": 4138,
+      "y": 597,
+      "width": 90,
+      "height": 20,
+      "type": "platform"
+    },
+    {
+      "name": "floating_platform_07",
+      "x": 4308,
+      "y": 570,
+      "width": 122,
+      "height": 34,
+      "type": "platform"
+    },
+    {
+      "name": "platform_07",
+      "x": 4465,
+      "y": 676,
+      "width": 317,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "floating_platform_08",
-      "x": 6908,
-      "y": 531,
+      "x": 4753,
+      "y": 578,
       "width": 195,
       "height": 20,
       "type": "platform"
     },
     {
       "name": "goal_platform",
-      "x": 8000,
-      "y": 664,
-      "width": 553,
+      "x": 5172,
+      "y": 561,
+      "width": 163,
       "height": 20,
       "type": "platform"
     }
@@ -562,8 +578,8 @@
       "y": 656
     },
     "portal_goal": {
-      "x": 8459,
-      "y": 545
+      "x": 5254,
+      "y": 571
     },
     "kiss_collectibles": [
       {
@@ -575,7 +591,7 @@
         "y": 440
       },
       {
-        "x": 762,
+        "x": 763,
         "y": 382
       }
     ],
@@ -589,8 +605,8 @@
       {
         "x": 520,
         "y": 640,
-        "min": 350,
-        "max": 750
+        "min": 200,
+        "max": 900
       }
     ]
   }
