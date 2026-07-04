@@ -39,7 +39,8 @@ export class BootScene extends Phaser.Scene {
     }
 
     entries.forEach((entry) => {
-      this.load.image(entry.key, assetUrl(entry.path));
+      const path = entry.path.startsWith('/') ? entry.path.slice(1) : entry.path;
+      this.load.image(entry.key, assetUrl(path));
     });
 
     this.load.once('complete', onComplete);

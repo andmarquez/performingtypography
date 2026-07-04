@@ -43,12 +43,8 @@ const game = new Phaser.Game({
 });
 
 const applyScaleMode = () => {
-  const next = resolveScaleMode();
   document.documentElement.classList.toggle('is-mobile-view', isMobileViewport());
-  if (game.scale.scaleMode !== next) {
-    game.scale.scaleMode = next;
-    game.scale.refresh();
-  }
+  game.scale.refresh();
 };
 
 window.addEventListener('resize', applyScaleMode);

@@ -66,7 +66,7 @@ export const GAME_CONFIG = {
   mobileHudTopInset: 12,
 
   /** Lift touch controls above the bottom edge (browser bars, thumbs) */
-  mobileControlsLift: 130,
+  mobileControlsLift: 88,
 
   /**
    * Wild Rift–style mobile control layout.

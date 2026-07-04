@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 /** Map CSS safe-area insets (px) into Phaser game coordinates. */
 export function safeAreaInsetsInGame(scale: Phaser.Scale.ScaleManager): {
   top: number;
@@ -27,15 +29,13 @@ export function safeAreaInsetsInGame(scale: Phaser.Scale.ScaleManager): {
 
   const gameW = scale.width;
   const gameH = scale.height;
-  const parentW = scale.parentSize?.width || window.innerWidth;
-  const parentH = scale.parentSize?.height || window.innerHeight;
-  const ratioX = gameW / Math.max(parentW, 1);
-  const ratioY = gameH / Math.max(parentH, 1);
+  const displayW = scale.displaySize?.width || scale.parentSize?.width || window.innerWidth;
+  const displayH = scale.displaySize?.height || scale.parentSize?.height || window.innerHeight;
 
   return {
-    top: screen.top * ratioY,
-    right: screen.right * ratioX,
-    bottom: screen.bottom * ratioY,
-    left: screen.left * ratioX,
+    top: screen.top * (gameH / Math.max(displayH, 1)),
+    right: screen.right * (gameW / Math.max(displayW, 1)),
+    bottom: screen.bottom * (gameH / Math.max(displayH, 1)),
+    left: screen.left * (gameW / Math.max(displayW, 1)),
   };
 }

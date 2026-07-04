@@ -4,7 +4,6 @@ import { type UiViewport } from './viewportLayout';
 
 /**
  * Wild Rift–style virtual joystick for movement (left thumb).
- * Drag anywhere in the base ring to steer Andsiosa left/right.
  */
 export class VirtualJoystick {
   private container: Phaser.GameObjects.Container;
@@ -23,7 +22,6 @@ export class VirtualJoystick {
 
     const { baseRadius, thumbRadius } = GAME_CONFIG.mobileWildRift.joystick;
 
-    // Outer faint ring (Wild Rift move area hint)
     this.baseRing = scene.add.circle(0, 0, baseRadius + 10, 0x000000, 0.12);
     this.baseRing.setStrokeStyle(2, 0xc9a96e, 0.35);
 
@@ -36,34 +34,34 @@ export class VirtualJoystick {
     this.container.add([this.baseRing, this.base, this.thumb]);
   }
 
-  layout(viewport: UiViewport): void {
+  layout(viewport: UiViewport, safeBottom = 0): void {
     const cfg = GAME_CONFIG.mobileWildRift.joystick;
     const pad = GAME_CONFIG.safePadding;
-    const lift = Math.max(GAME_CONFIG.mobileControlsLift, viewport.height * 0.14);
+    const lift = Math.max(GAME_CONFIG.mobileControlsLift, 72);
 
-    this.centerX = viewport.x + viewport.width * cfg.xRatio + pad;
-    this.centerY = viewport.y + viewport.height - lift - cfg.bottomInset;
+    this.centerX = viewport.width * cfg.xRatio + pad;
+    this.centerY = viewport.height - safeBottom - lift - cfg.bottomInset;
 
     this.baseRing.setPosition(this.centerX, this.centerY);
     this.base.setPosition(this.centerX, this.centerY);
     this.resetThumb();
   }
 
-  tryActivate(pointer: Phaser.Input.Pointer): boolean {
+  tryActivate(uiX: number, uiY: number, pointer: Phaser.Input.Pointer): boolean {
     if (this.pointerId !== null) return false;
     const cfg = GAME_CONFIG.mobileWildRift.joystick;
-    const dist = Phaser.Math.Distance.Between(pointer.x, pointer.y, this.centerX, this.centerY);
+    const dist = Phaser.Math.Distance.Between(uiX, uiY, this.centerX, this.centerY);
     if (dist > cfg.baseRadius + 28) return false;
 
     this.pointerId = pointer.id;
-    this.updateThumb(pointer.x, pointer.y);
+    this.updateThumb(uiX, uiY);
     this.highlight(true);
     return true;
   }
 
-  updatePointer(pointer: Phaser.Input.Pointer): void {
+  updatePointer(uiX: number, uiY: number, pointer: Phaser.Input.Pointer): void {
     if (pointer.id !== this.pointerId) return;
-    this.updateThumb(pointer.x, pointer.y);
+    this.updateThumb(uiX, uiY);
   }
 
   releasePointer(pointer: Phaser.Input.Pointer): void {
@@ -76,10 +74,6 @@ export class VirtualJoystick {
 
   getAxisX(): number {
     return this.axisX;
-  }
-
-  isActive(): boolean {
-    return this.pointerId !== null;
   }
 
   private updateThumb(x: number, y: number): void {

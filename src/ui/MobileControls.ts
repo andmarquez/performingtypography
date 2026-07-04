@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { getUiViewport } from './viewportLayout';
+import { safeAreaInsetsInGame } from './safeAreaUtils';
+import { getUiViewport, pointerToUiSpace } from './viewportLayout';
 import { VirtualJoystick } from './VirtualJoystick';
 
 export type TouchInput = {
-  /** Horizontal stick axis −1 (left) to 1 (right) */
   moveAxis: number;
   left: boolean;
   right: boolean;
@@ -51,7 +51,7 @@ export class MobileControls {
     this.createAbilityCluster();
     this.setupPointerHandlers();
 
-    scene.scale.on('resize', this.layout, this);
+    scene.scale.on(Phaser.Scale.Events.RESIZE, this.layout, this);
     this.layout();
   }
 
@@ -97,14 +97,15 @@ export class MobileControls {
 
   private layout(): void {
     const vp = getUiViewport(this.scene.scale);
+    const safe = safeAreaInsetsInGame(this.scene.scale);
     const pad = GAME_CONFIG.safePadding;
-    const lift = Math.max(GAME_CONFIG.mobileControlsLift, vp.height * 0.14);
+    const lift = Math.max(GAME_CONFIG.mobileControlsLift, 72);
     const cfg = GAME_CONFIG.mobileWildRift;
 
-    this.joystick.layout(vp);
+    this.joystick.layout(vp, safe.bottom);
 
-    const attackX = vp.x + vp.width - pad - cfg.attackInsetX;
-    const attackY = vp.y + vp.height - lift - cfg.attackInsetY;
+    const attackX = vp.width - pad - safe.right - cfg.attackInsetX;
+    const attackY = vp.height - safe.bottom - lift - cfg.attackInsetY;
     const jump = this.abilities.find((a) => a.id === 'jump')!;
     jump.btn.setPosition(attackX, attackY);
     jump.icon.setPosition(attackX, attackY);
@@ -122,6 +123,7 @@ export class MobileControls {
 
   private setupPointerHandlers(): void {
     this.scene.input.addPointer(3);
+    const camera = this.scene.cameras.main;
 
     const hitAbility = (x: number, y: number): AbilityButton | null => {
       const sorted = [...this.abilities].sort((a, b) => a.radius - b.radius);
@@ -133,12 +135,14 @@ export class MobileControls {
     };
 
     const press = (pointer: Phaser.Input.Pointer) => {
-      if (this.joystick.tryActivate(pointer)) {
+      const ui = pointerToUiSpace(pointer, camera);
+
+      if (this.joystick.tryActivate(ui.x, ui.y, pointer)) {
         this.refreshInput();
         return;
       }
 
-      const ability = hitAbility(pointer.x, pointer.y);
+      const ability = hitAbility(ui.x, ui.y);
       if (!ability) return;
 
       this.abilityPointers.set(pointer.id, ability.id);
@@ -149,7 +153,8 @@ export class MobileControls {
     };
 
     const move = (pointer: Phaser.Input.Pointer) => {
-      this.joystick.updatePointer(pointer);
+      const ui = pointerToUiSpace(pointer, camera);
+      this.joystick.updatePointer(ui.x, ui.y, pointer);
       this.refreshInput();
     };
 
@@ -210,7 +215,7 @@ export class MobileControls {
   }
 
   destroy(): void {
-    this.scene.scale.off('resize', this.layout, this);
+    this.scene.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
     this.container.destroy();
   }
 }

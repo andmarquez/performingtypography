@@ -374,7 +374,7 @@ export class GameScene extends Phaser.Scene {
     this.hud.add([bg, kisses, time, projects, lives, score]);
     this.updateHUD();
 
-    this.scale.on('resize', this.layoutHUD, this);
+    this.scale.on(Phaser.Scale.Events.RESIZE, this.layoutHUD, this);
     this.layoutHUD();
   }
 
@@ -558,7 +558,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   shutdown(): void {
-    this.scale.off('resize', this.layoutHUD, this);
+    this.scale.off(Phaser.Scale.Events.RESIZE, this.layoutHUD, this);
     this.mobileControls?.destroy();
   }
 }
