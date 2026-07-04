@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { WORLD_LAYERS } from './layerConfig';
-import type { LevelLayout, PlatformZone } from './worldTypes';
+import type { LevelLayout, PlatformZone, CloudZone } from './worldTypes';
 import { platformTopLeftToCenter } from './worldTypes';
 
 export type WorldBuildOptions = {
@@ -33,6 +33,9 @@ export class WorldBuilder {
       const { graphics, labels } = WorldBuilder.drawPlatformDebug(scene, layout.platforms);
       debugGraphics.push(graphics);
       debugLabels.push(...labels);
+      if (layout.clouds?.length) {
+        debugGraphics.push(WorldBuilder.drawCloudDebug(scene, layout.clouds));
+      }
     }
 
     const toggleDebug = () => {
@@ -41,6 +44,9 @@ export class WorldBuilder {
         const { graphics, labels } = WorldBuilder.drawPlatformDebug(scene, layout.platforms);
         debugGraphics.push(graphics);
         debugLabels.push(...labels);
+        if (layout.clouds?.length) {
+          debugGraphics.push(WorldBuilder.drawCloudDebug(scene, layout.clouds));
+        }
       }
       debugGraphics.forEach((g) => g.setVisible(debugVisible));
       debugLabels.forEach((t) => t.setVisible(debugVisible));
@@ -48,7 +54,7 @@ export class WorldBuilder {
 
     if (debugVisible) {
       scene.add
-        .text(16, layout.height - 36, 'Platform zones (H to toggle, ?zones=0 to hide)', {
+        .text(16, layout.height - 36, 'Zones: green=platform, blue=pipe, white=cloud (H to toggle)', {
           fontSize: '14px',
           fontFamily: 'Nunito, sans-serif',
           color: '#1b5e20',
@@ -130,6 +136,57 @@ export class WorldBuilder {
     }
 
     return { graphics: g, labels: [] };
+  }
+
+  private static drawCloudDebug(scene: Phaser.Scene, zones: CloudZone[]): Phaser.GameObjects.Graphics {
+    const g = scene.add.graphics();
+    g.setDepth(WORLD_LAYERS.debug - 1);
+
+    for (const zone of zones) {
+      const r = Math.min(zone.height / 2, 40);
+      g.fillStyle(0xffffff, 0.28);
+      g.fillRoundedRect(zone.x, zone.y, zone.width, zone.height, r);
+      WorldBuilder.strokeDashedRoundedRect(
+        g,
+        zone.x,
+        zone.y,
+        zone.width,
+        zone.height,
+        r,
+        0xb8e0f5,
+        2,
+        8,
+        6,
+      );
+    }
+
+    return g;
+  }
+
+  private static strokeDashedRoundedRect(
+    g: Phaser.GameObjects.Graphics,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    radius: number,
+    color: number,
+    lineWidth: number,
+    dash: number,
+    gap: number,
+  ): void {
+    // Approximate rounded rect outline with four straight dashed edges
+    const r = Math.min(radius, w / 2, h / 2);
+    const edges: [number, number, number, number][] = [
+      [x + r, y, x + w - r, y],
+      [x + w, y + r, x + w, y + h - r],
+      [x + w - r, y + h, x + r, y + h],
+      [x, y + h - r, x, y + r],
+    ];
+    g.lineStyle(lineWidth, color, 0.9);
+    for (const [x1, y1, x2, y2] of edges) {
+      WorldBuilder.strokeDashedLine(g, x1, y1, x2, y2, dash, gap);
+    }
   }
 
   /** Figma-style dashed green outline for gameplay zones. */

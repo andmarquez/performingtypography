@@ -10,6 +10,15 @@ export type PlatformZone = {
   type: 'platform' | 'pipe';
 };
 
+/** Decorative cloud placement — visual guide only, no physics */
+export type CloudZone = {
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type BackgroundSection = {
   key: string;
   path: string;
@@ -57,6 +66,8 @@ export type LevelLayout = {
   };
   /** Invisible gameplay rectangles — source of truth for collisions. */
   platforms: PlatformZone[];
+  /** Decorative cloud bounds — sync from Figma, no collision. */
+  clouds?: CloudZone[];
   markers: LevelMarkers;
 };
 

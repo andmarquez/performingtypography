@@ -50,6 +50,23 @@ const PLATFORMS_RAW = [
 
 const GOAL_PLATFORM = ['26:209', 'goal_platform', 'platform', 5172 + MARKERS_FRAME_X, 561, 163, 20];
 
+/**
+ * Figma 55:2 Clouds (decorative) — [nodeId, name, x, y, width, height]
+ * No physics; white dashed boxes for art placement.
+ */
+const CLOUDS_RAW = [
+  ['55:3', 'cloud_01', 120, 80, 180, 70],
+  ['55:4', 'cloud_02', 450, 120, 220, 85],
+  ['55:5', 'cloud_03', 900, 60, 200, 75],
+  ['55:6', 'cloud_04', 1350, 100, 190, 68],
+  ['55:7', 'cloud_05', 1800, 140, 240, 90],
+  ['55:8', 'cloud_06', 2400, 70, 210, 80],
+  ['55:9', 'cloud_07', 3100, 110, 200, 72],
+  ['55:10', 'cloud_08', 3800, 55, 230, 88],
+  ['55:11', 'cloud_09', 4500, 95, 195, 70],
+  ['55:12', 'cloud_10', 5100, 130, 180, 65],
+];
+
 const COLLECTIBLES = {
   kiss: [
     [250, 500, 24, 24],
@@ -93,6 +110,16 @@ function center([x, y, w, h]) {
   return { x: Math.round(x + w / 2), y: Math.round(y + h / 2) };
 }
 
+function toCloud([_nodeId, name, x, y, w, h]) {
+  return {
+    name,
+    x: Math.round(x),
+    y: Math.round(y),
+    width: Math.round(w),
+    height: Math.round(h),
+  };
+}
+
 const platforms = [
   ...PLATFORMS_RAW.map((row) => toPlatform(row)),
   toPlatform(GOAL_PLATFORM, 0),
@@ -100,6 +127,7 @@ const platforms = [
 
 const goal = platforms.find((p) => p.name === 'goal_platform');
 const pipeCount = platforms.filter((p) => p.type === 'pipe').length;
+const clouds = CLOUDS_RAW.map((row) => toCloud(row));
 
 const layout = {
   level: 'level-1',
@@ -122,6 +150,7 @@ const layout = {
     ],
   },
   platforms,
+  clouds,
   markers: {
     player_spawn: PLAYER_SPAWN,
     portal_goal: {
@@ -142,5 +171,5 @@ const layout = {
 
 fs.writeFileSync(OUT, `${JSON.stringify(layout, null, 2)}\n`);
 console.log(
-  `Wrote ${OUT} — ${layout.platforms.length} zones (${pipeCount} pipes), ${layout.markers.kiss_collectibles.length} kisses`,
+  `Wrote ${OUT} — ${layout.platforms.length} zones (${pipeCount} pipes), ${clouds.length} clouds, ${layout.markers.kiss_collectibles.length} kisses`,
 );

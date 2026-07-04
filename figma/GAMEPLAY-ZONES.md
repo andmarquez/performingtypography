@@ -9,7 +9,8 @@ Layer **🎯 Gameplay Zones** on:
 
 | Group | Items | Style |
 |-------|-------|--------|
-| **Platforms (collision)** | `platform_start`, `platform_01`…`07`, `floating_platform_01`…`08`, `goal_platform` | Green dashed rectangles (names on the layer, no text labels) |
+| **Platforms (collision)** | `platform_start`, `platform_01`…`07`, `floating_platform_01`…`08`, `pipe`, `goal_platform` | Green dashed rectangles (blue for pipes) |
+| **Clouds (decorative)** | `cloud_01`…`cloud_10` | White fill, sky-blue dashed outline — **no collision** |
 | **Markers** | `player_spawn`, `portal_goal`, `kiss_1`…, `timer_1`…, `enemy_1`… | Colored ellipses |
 
 Move the green rectangles until they sit on the walkable tops in the artwork. The visible level art is the single **`- 1`** background image (`24:328`) — no per-component PNG exports.
@@ -18,7 +19,7 @@ Move the green rectangles until they sit on the walkable tops in the artwork. Th
 
 After repositioning in Figma, copy each rectangle’s **x, y, width, height** into:
 
-`public/assets/world/level-1/layout-mobile.json` → `platforms[]`
+`public/assets/world/level-1/layout-mobile.json` → `platforms[]` and `clouds[]`
 
 Marker positions → `markers` object (use ellipse center as `x`, `y`).
 
@@ -34,4 +35,4 @@ Or ask to **extract zones from Figma** and the agent will read positions from th
 
 ## Debug in-game
 
-`?debug=1` or press **H** — should match the Figma green boxes.
+`?debug=1` or press **H** — green = platforms, blue = pipes, white = clouds.
