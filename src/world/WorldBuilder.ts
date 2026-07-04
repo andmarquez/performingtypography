@@ -112,26 +112,14 @@ export class WorldBuilder {
   ): { graphics: Phaser.GameObjects.Graphics; labels: Phaser.GameObjects.Text[] } {
     const g = scene.add.graphics();
     g.setDepth(WORLD_LAYERS.debug);
-    const labels: Phaser.GameObjects.Text[] = [];
 
     for (const zone of zones) {
       g.fillStyle(0x00e676, 0.35);
       g.fillRect(zone.x, zone.y, zone.width, zone.height);
       g.lineStyle(2, 0x00c853, 0.95);
       g.strokeRect(zone.x, zone.y, zone.width, zone.height);
-
-      const label = scene.add
-        .text(zone.x + 4, zone.y - 14, zone.name, {
-          fontSize: '11px',
-          fontFamily: 'monospace',
-          color: '#004d40',
-          backgroundColor: '#e8f5e9cc',
-          padding: { x: 3, y: 1 },
-        })
-        .setDepth(WORLD_LAYERS.debug);
-      labels.push(label);
     }
 
-    return { graphics: g, labels };
+    return { graphics: g, labels: [] };
   }
 }

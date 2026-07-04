@@ -5,6 +5,7 @@ import { Collectible } from '../objects/Collectible';
 import { KissProjectile } from '../objects/KissProjectile';
 import { MobileControls } from '../ui/MobileControls';
 import { shouldShowMobileControls } from '../ui/mobileControlUtils';
+import { safeAreaInsetsInGame } from '../ui/safeAreaUtils';
 import {
   GAME_CONFIG,
   createInitialStats,
@@ -338,11 +339,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createHUD(): void {
-    this.hud = this.add.container(0, 0).setScrollFactor(0).setDepth(90);
+    this.hud = this.add.container(0, 0).setScrollFactor(0).setDepth(110);
 
     const pad = GAME_CONFIG.safePadding;
     const bg = this.add
-      .rectangle(GAME_CONFIG.width / 2, pad + 22, GAME_CONFIG.width - pad * 2, 52, 0xffffff, 0.88)
+      .rectangle(GAME_CONFIG.width / 2, pad + 22, GAME_CONFIG.width - pad * 2, 52, 0xffffff, 0.92)
       .setStrokeStyle(2, GAME_CONFIG.colors.uiAccent);
     bg.setScrollFactor(0);
 
@@ -374,17 +375,44 @@ export class GameScene extends Phaser.Scene {
   }
 
   private layoutHUD(): void {
+    const isMobile = shouldShowMobileControls(this.game);
     const pad = GAME_CONFIG.safePadding;
+    const safe = safeAreaInsetsInGame(this.scale);
+    const topY = pad + safe.top + (isMobile ? GAME_CONFIG.mobileHudTopInset : 0);
     const w = this.scale.width;
     const hudBg = this.hud.getAt(0) as Phaser.GameObjects.Rectangle;
-    hudBg.setPosition(w / 2, pad + 22);
-    hudBg.setSize(Math.min(w - pad * 2, GAME_CONFIG.width - pad * 2), 52);
+    const barH = isMobile ? 46 : 52;
 
-    this.hudTexts.kisses.setPosition(pad + 8, pad + 8);
-    this.hudTexts.time.setPosition(w / 2 - 80, pad + 8);
-    this.hudTexts.projects.setPosition(w / 2 + 40, pad + 8);
-    this.hudTexts.lives.setPosition(w - pad - 130, pad + 8);
-    this.hudTexts.score.setPosition(pad + 8, pad + 30);
+    hudBg.setPosition(w / 2, topY + barH / 2);
+    hudBg.setSize(w - pad * 2 - safe.left - safe.right, barH);
+
+    if (isMobile) {
+      const rowY = topY + 14;
+      const innerLeft = pad + safe.left + 8;
+      const innerRight = w - pad - safe.right - 8;
+      this.hudTexts.kisses.setPosition(innerLeft, rowY);
+      this.hudTexts.time.setPosition(w / 2, rowY).setOrigin(0.5, 0);
+      this.hudTexts.lives.setPosition(innerRight, rowY).setOrigin(1, 0);
+      this.hudTexts.projects.setVisible(false);
+      this.hudTexts.score.setVisible(false);
+      this.hudTexts.kisses.setFontSize('18px');
+      this.hudTexts.time.setFontSize('18px');
+      this.hudTexts.lives.setFontSize('18px');
+    } else {
+      this.hudTexts.kisses.setOrigin(0, 0);
+      this.hudTexts.time.setOrigin(0, 0);
+      this.hudTexts.lives.setOrigin(0, 0);
+      this.hudTexts.projects.setVisible(true);
+      this.hudTexts.score.setVisible(true);
+      this.hudTexts.kisses.setPosition(pad + 8, topY + 8);
+      this.hudTexts.time.setPosition(w / 2 - 80, topY + 8);
+      this.hudTexts.projects.setPosition(w / 2 + 40, topY + 8);
+      this.hudTexts.lives.setPosition(w - pad - 130, topY + 8);
+      this.hudTexts.score.setPosition(pad + 8, topY + 30);
+      this.hudTexts.kisses.setFontSize('17px');
+      this.hudTexts.time.setFontSize('17px');
+      this.hudTexts.lives.setFontSize('17px');
+    }
   }
 
   private updateHUD(): void {
@@ -471,7 +499,6 @@ export class GameScene extends Phaser.Scene {
       right: false,
       jump: false,
       kiss: false,
-      boost: false,
     };
 
     const jumpJustDown =
@@ -484,7 +511,7 @@ export class GameScene extends Phaser.Scene {
       Phaser.Input.Keyboard.JustDown(this.keyA) ||
       (this.mobileControls?.consumeKissPress() ?? false);
 
-    const highJumpHeld = this.keyX?.isDown || touch.boost;
+    const highJumpHeld = this.keyX?.isDown ?? false;
 
     if (kissJustDown) {
       this.blowKiss();

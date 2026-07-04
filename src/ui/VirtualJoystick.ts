@@ -32,14 +32,7 @@ export class VirtualJoystick {
     this.thumb = scene.add.circle(0, 0, thumbRadius, 0x1a2332, 0.75);
     this.thumb.setStrokeStyle(2, 0xf5f0e1, 0.85);
 
-    const grip = scene.add.text(0, 0, '✥', {
-      fontSize: '22px',
-      color: '#e8dcc8',
-      fontFamily: 'Nunito, sans-serif',
-    }).setOrigin(0.5);
-
-    this.container.add([this.baseRing, this.base, this.thumb, grip]);
-    (this.thumb as Phaser.GameObjects.Arc & { grip?: Phaser.GameObjects.Text }).grip = grip;
+    this.container.add([this.baseRing, this.base, this.thumb]);
   }
 
   layout(screenW: number, screenH: number): void {
@@ -53,9 +46,6 @@ export class VirtualJoystick {
     this.baseRing.setPosition(this.centerX, this.centerY);
     this.base.setPosition(this.centerX, this.centerY);
     this.resetThumb();
-
-    const grip = (this.thumb as Phaser.GameObjects.Arc & { grip?: Phaser.GameObjects.Text }).grip;
-    grip?.setPosition(this.thumb.x, this.thumb.y);
   }
 
   tryActivate(pointer: Phaser.Input.Pointer): boolean {
@@ -104,16 +94,11 @@ export class VirtualJoystick {
     const thumbY = this.centerY + Math.sin(angle) * clamped;
     this.thumb.setPosition(thumbX, thumbY);
 
-    const grip = (this.thumb as Phaser.GameObjects.Arc & { grip?: Phaser.GameObjects.Text }).grip;
-    grip?.setPosition(thumbX, thumbY);
-
     this.axisX = Phaser.Math.Clamp(dx / maxDrag, -1, 1);
   }
 
   private resetThumb(): void {
     this.thumb.setPosition(this.centerX, this.centerY);
-    const grip = (this.thumb as Phaser.GameObjects.Arc & { grip?: Phaser.GameObjects.Text }).grip;
-    grip?.setPosition(this.centerX, this.centerY);
   }
 
   private highlight(active: boolean): void {

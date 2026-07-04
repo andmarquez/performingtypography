@@ -9,22 +9,21 @@ export type TouchInput = {
   right: boolean;
   jump: boolean;
   kiss: boolean;
-  boost: boolean;
 };
 
-type AbilityId = 'jump' | 'kiss' | 'boost';
+type AbilityId = 'jump' | 'kiss';
 
 type AbilityButton = {
   id: AbilityId;
   btn: Phaser.GameObjects.Arc;
-  label: Phaser.GameObjects.Text;
+  icon: Phaser.GameObjects.Graphics;
   radius: number;
 };
 
 /**
  * MobileControls — Wild Rift–style layout:
  * - Left: virtual joystick for movement
- * - Right: primary action + ability arc (jump, boost, kiss)
+ * - Right: jump (primary) + heart power (kiss blow)
  */
 export class MobileControls {
   private scene: Phaser.Scene;
@@ -41,7 +40,6 @@ export class MobileControls {
     right: false,
     jump: false,
     kiss: false,
-    boost: false,
   };
 
   constructor(scene: Phaser.Scene) {
@@ -57,60 +55,68 @@ export class MobileControls {
   }
 
   private createAbilityCluster(): void {
-    const defs: { id: AbilityId; label: string; radius: number; primary?: boolean }[] = [
-      { id: 'jump', label: '▲\n×2', radius: GAME_CONFIG.mobileWildRift.attackRadius, primary: true },
-      { id: 'boost', label: '✦', radius: GAME_CONFIG.mobileWildRift.abilityRadius },
-      { id: 'kiss', label: '♥', radius: GAME_CONFIG.mobileWildRift.abilityRadius - 2 },
+    const defs: { id: AbilityId; radius: number; primary?: boolean }[] = [
+      { id: 'jump', radius: GAME_CONFIG.mobileWildRift.attackRadius, primary: true },
+      { id: 'kiss', radius: GAME_CONFIG.mobileWildRift.abilityRadius },
     ];
 
     defs.forEach((def) => {
-      const fill = def.primary ? 0x1a2332 : 0x121820;
-      const alpha = def.primary ? 0.72 : 0.62;
-      const stroke = def.primary ? 0xf5f0e1 : 0xc9a96e;
+      const fill = def.primary ? 0x1a2332 : 0x2a1520;
+      const alpha = def.primary ? 0.78 : 0.72;
+      const stroke = def.primary ? 0xf5f0e1 : 0xf48fb1;
 
       const btn = this.scene.add.circle(0, 0, def.radius, fill, alpha);
-      btn.setStrokeStyle(def.primary ? 3 : 2, stroke, def.primary ? 0.95 : 0.75);
+      btn.setStrokeStyle(def.primary ? 3 : 2, stroke, def.primary ? 0.95 : 0.85);
 
-      const label = this.scene.add.text(0, 0, def.label, {
-        fontSize: def.primary ? '22px' : '24px',
-        color: def.primary ? '#ffffff' : '#f8bbd0',
-        fontFamily: 'Nunito, sans-serif',
-        align: 'center',
-        lineSpacing: def.primary ? -4 : 0,
-        fontStyle: def.primary ? 'bold' : 'normal',
-      }).setOrigin(0.5);
+      const icon = this.scene.add.graphics();
+      if (def.id === 'jump') {
+        this.drawJumpIcon(icon, def.radius);
+      } else {
+        this.drawHeartIcon(icon, def.radius);
+      }
 
-      this.container.add([btn, label]);
-      this.abilities.push({ id: def.id, btn, label, radius: def.radius });
+      this.container.add([btn, icon]);
+      this.abilities.push({ id: def.id, btn, icon, radius: def.radius });
     });
+  }
+
+  private drawJumpIcon(g: Phaser.GameObjects.Graphics, radius: number): void {
+    const s = radius * 0.38;
+    g.fillStyle(0xffffff, 0.95);
+    g.fillTriangle(0, -s, -s * 0.85, s * 0.55, s * 0.85, s * 0.55);
+  }
+
+  private drawHeartIcon(g: Phaser.GameObjects.Graphics, radius: number): void {
+    const s = radius * 0.22;
+    g.fillStyle(0xf48fb1, 1);
+    g.fillCircle(-s, -s * 0.35, s);
+    g.fillCircle(s, -s * 0.35, s);
+    g.fillTriangle(-s * 2, -s * 0.1, s * 2, -s * 0.1, 0, s * 2.2);
   }
 
   private layout(): void {
     const w = this.scene.scale.width;
     const h = this.scene.scale.height;
     const pad = GAME_CONFIG.safePadding;
-    const lift = Math.max(GAME_CONFIG.mobileControlsLift, h * 0.16);
+    const lift = Math.max(GAME_CONFIG.mobileControlsLift, h * 0.14);
     const cfg = GAME_CONFIG.mobileWildRift;
 
     this.joystick.layout(w, h);
 
-    // Primary "attack" button — bottom-right (Wild Rift basic attack position)
     const attackX = w - pad - cfg.attackInsetX;
     const attackY = h - lift - cfg.attackInsetY;
     const jump = this.abilities.find((a) => a.id === 'jump')!;
     jump.btn.setPosition(attackX, attackY);
-    jump.label.setPosition(attackX, attackY);
+    jump.icon.setPosition(attackX, attackY);
 
-    // Ability arc fanning up-left from the attack button
-    const arc = cfg.abilityArc;
     const arcButtons = this.abilities.filter((a) => a.id !== 'jump');
     arcButtons.forEach((ability, i) => {
-      const slot = arc[i];
+      const slot = cfg.abilityArc[i];
       const rad = Phaser.Math.DegToRad(slot.angleDeg);
       const x = attackX + Math.cos(rad) * slot.distance;
       const y = attackY + Math.sin(rad) * slot.distance;
       ability.btn.setPosition(x, y);
-      ability.label.setPosition(x, y);
+      ability.icon.setPosition(x, y);
     });
   }
 
@@ -118,7 +124,6 @@ export class MobileControls {
     this.scene.input.addPointer(3);
 
     const hitAbility = (x: number, y: number): AbilityButton | null => {
-      // Test smallest buttons first so arc abilities win over jump when overlapping
       const sorted = [...this.abilities].sort((a, b) => a.radius - b.radius);
       for (const ability of sorted) {
         const dist = Phaser.Math.Distance.Between(x, y, ability.btn.x, ability.btn.y);
@@ -168,9 +173,9 @@ export class MobileControls {
   private highlightAbility(id: AbilityId, pressed: boolean): void {
     const ability = this.abilities.find((a) => a.id === id);
     if (!ability) return;
-    ability.btn.setAlpha(pressed ? 0.92 : id === 'jump' ? 0.72 : 0.62);
+    ability.btn.setAlpha(pressed ? 0.95 : id === 'jump' ? 0.78 : 0.72);
     ability.btn.setScale(pressed ? 0.93 : 1);
-    ability.label.setScale(pressed ? 0.93 : 1);
+    ability.icon.setScale(pressed ? 0.93 : 1);
   }
 
   private refreshInput(): void {
@@ -182,7 +187,6 @@ export class MobileControls {
     this.input.right = this.input.moveAxis > deadzone;
     this.input.jump = false;
     this.input.kiss = false;
-    this.input.boost = false;
 
     for (const id of this.abilityPointers.values()) {
       this.input[id] = true;

@@ -58,6 +58,9 @@ export const GAME_CONFIG = {
   /** Safe area padding for mobile notches (CSS pixels, scaled in-game) */
   safePadding: 16,
 
+  /** Extra HUD offset below the notch on touch devices */
+  mobileHudTopInset: 12,
+
   /** Lift touch controls above the bottom edge (browser bars, thumbs) */
   mobileControlsLift: 130,
 
@@ -78,11 +81,8 @@ export const GAME_CONFIG = {
     abilityRadius: 44,
     attackInsetX: 64,
     attackInsetY: 40,
-    /** Ability buttons arc up-left from jump (Wild Rift spell layout) */
-    abilityArc: [
-      { angleDeg: 215, distance: 96 },
-      { angleDeg: 195, distance: 118 },
-    ],
+    /** Kiss (heart power) sits up-left from jump */
+    abilityArc: [{ angleDeg: 215, distance: 100 }],
   },
 
   /** Timer pickup floating messages */
