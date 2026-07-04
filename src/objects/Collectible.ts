@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 
-export type CollectibleType = 'kiss' | 'timer';
+export type CollectibleType = 'kiss' | 'timer' | 'spark';
 
 /**
  * Collectible — kisses (score) or timers (time + projects).
@@ -18,7 +18,8 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
     y: number,
     type: CollectibleType,
   ) {
-    const texture = type === 'kiss' ? 'kiss' : 'timer';
+    const texture =
+      type === 'kiss' ? 'kiss' : type === 'timer' ? 'timer' : 'boss-spark';
     super(scene, x, y, texture);
     this.collectibleType = type;
 
@@ -38,13 +39,23 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
       ease: 'Sine.easeInOut',
     });
 
-    // Sparkle rotation for timers
-    if (type === 'timer') {
+    // Sparkle rotation for timers and boss spark
+    if (type === 'timer' || type === 'spark') {
       scene.tweens.add({
         targets: this,
         angle: 360,
-        duration: 4000,
+        duration: type === 'spark' ? 3000 : 4000,
         repeat: -1,
+      });
+    }
+    if (type === 'spark') {
+      scene.tweens.add({
+        targets: this,
+        scale: 1.08,
+        duration: 700,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
       });
     }
   }
@@ -54,8 +65,10 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
 
     if (this.collectibleType === 'kiss') {
       this.spawnKissParticles();
-    } else {
+    } else if (this.collectibleType === 'timer') {
       this.spawnTimerGlow();
+    } else {
+      this.spawnSparkBurst();
     }
 
     scene.tweens.add({
@@ -114,6 +127,33 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
       alpha: 0,
       duration: 400,
       onComplete: () => ring.destroy(),
+    });
+  }
+
+  private spawnSparkBurst(): void {
+    const emitter = this.scene.add.particles(this.x, this.y, 'particle', {
+      speed: { min: 50, max: 140 },
+      scale: { start: 0.9, end: 0 },
+      lifespan: 550,
+      quantity: 12,
+      tint: [GAME_CONFIG.colors.bossSpark, GAME_CONFIG.colors.bossSparkGlow, 0xffffff],
+      emitting: false,
+    });
+    emitter.explode(14);
+    this.scene.time.delayedCall(600, () => emitter.destroy());
+
+    const star = this.scene.add.text(this.x, this.y - 10, '✦', {
+      fontSize: '28px',
+      color: '#ffd54f',
+    });
+    star.setOrigin(0.5);
+    this.scene.tweens.add({
+      targets: star,
+      y: star.y - 45,
+      alpha: 0,
+      scale: 1.8,
+      duration: 650,
+      onComplete: () => star.destroy(),
     });
   }
 }

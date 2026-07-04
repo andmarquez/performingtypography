@@ -56,6 +56,11 @@ export const GAME_CONFIG = {
   /** Enemy patrol speed */
   enemySpeed: 80,
 
+  /** Final boss at goal platform */
+  finalBossHp: 5,
+  finalBossSpeed: 55,
+  bossSparkScore: 250,
+
   /** Camera follow smoothing (lower = snappier) */
   cameraLerp: 0.1,
 
@@ -66,8 +71,10 @@ export const GAME_CONFIG = {
   /** Safe area padding for mobile notches (CSS pixels, scaled in-game) */
   safePadding: 16,
 
-  /** HUD top edge — Figma M02 HUD frame 13:3 y=50 */
-  mobileHudTopRatio: 50 / 720,
+  /** HUD top edge — Figma M02 HUD frame 13:3 y=106 */
+  mobileHudTopRatio: 106 / 720,
+  /** Pill radius — Figma rounded-[60px] capped to bar height */
+  hudCornerRadius: 26,
 
   /** Lift touch controls above the bottom edge (browser bars, thumbs) */
   mobileControlsLift: 88,
@@ -81,12 +88,12 @@ export const GAME_CONFIG = {
    */
   /**
    * Wild Rift controls — anchors from Figma M02 gameplay zones (node 26:178).
-   * Joystick 13:16 center (97, 503), Jump 17:582 center (1194, 431), Kiss 17:583 (1094, 393).
+   * Joystick 13:16 center (107, 543), Jump 17:582 center (1194, 431), Kiss 17:583 (1094, 393).
    */
   mobileWildRift: {
     joystick: {
-      xRatio: 97 / 1280,
-      yRatio: 503 / 720,
+      xRatio: 107 / 1280,
+      yRatio: 543 / 720,
       baseRadius: 74,
       thumbRadius: 30,
       maxDrag: 52,
@@ -129,6 +136,11 @@ export const GAME_CONFIG = {
     portalGlow: 0xf8bbd0,
     enemy: 0x5d4037,
     enemyAccent: 0x8d6e63,
+    bossBody: 0x4a148c,
+    bossAccent: 0xce93d8,
+    bossGlow: 0xf8bbd0,
+    bossSpark: 0xffd54f,
+    bossSparkGlow: 0xfff176,
     playerRed: 0xe53935,
     playerWhite: 0xffffff,
     playerHair: 0xc62828,
@@ -144,6 +156,8 @@ export type GameStats = {
   timeRemaining: number;
   projectsCompleted: number;
   lives: number;
+  hasBossSpark: boolean;
+  bossDefeated: boolean;
 };
 
 export const createInitialStats = (): GameStats => ({
@@ -152,4 +166,6 @@ export const createInitialStats = (): GameStats => ({
   timeRemaining: GAME_CONFIG.startingTime,
   projectsCompleted: 0,
   lives: GAME_CONFIG.startingLives,
+  hasBossSpark: false,
+  bossDefeated: false,
 });

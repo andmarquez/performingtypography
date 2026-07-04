@@ -25,12 +25,21 @@ export type EnemyMarker = {
   max: number;
 };
 
+export type BossMarker = {
+  x: number;
+  y: number;
+  min: number;
+  max: number;
+};
+
 export type LevelMarkers = {
   player_spawn: { x: number; y: number };
   portal_goal: { x: number; y: number };
   kiss_collectibles: { x: number; y: number }[];
   timer_collectibles: { x: number; y: number }[];
+  boss_spark_collectibles?: { x: number; y: number }[];
   enemies: EnemyMarker[];
+  final_boss?: BossMarker;
 };
 
 export type LevelLayout = {

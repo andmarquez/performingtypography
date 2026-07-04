@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Player } from '../objects/Player';
 import { Enemy } from '../objects/Enemy';
+import { FinalBoss } from '../objects/FinalBoss';
 import { Collectible } from '../objects/Collectible';
 import { KissProjectile } from '../objects/KissProjectile';
 import { MobileControls } from '../ui/MobileControls';
@@ -26,6 +27,7 @@ export class GameScene extends Phaser.Scene {
   private player!: Player;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private enemies: Enemy[] = [];
+  private finalBoss?: FinalBoss;
   private collectibles: Collectible[] = [];
   private portal!: Phaser.Physics.Arcade.Sprite;
   private mobileControls?: MobileControls;
@@ -40,6 +42,7 @@ export class GameScene extends Phaser.Scene {
 
   private stats: GameStats = createInitialStats();
   private hud!: Phaser.GameObjects.Container;
+  private hudBg!: Phaser.GameObjects.Graphics;
   private hudTexts!: {
     kisses: Phaser.GameObjects.Text;
     time: Phaser.GameObjects.Text;
@@ -79,6 +82,7 @@ export class GameScene extends Phaser.Scene {
     this.createPlayer();
     this.createCollectibles();
     this.createEnemies();
+    this.createFinalBoss();
     this.createPortal();
     this.setupCollisions();
     this.createHUD();
@@ -115,6 +119,11 @@ export class GameScene extends Phaser.Scene {
       timer.setDepth(WORLD_LAYERS.collectibles);
       this.collectibles.push(timer);
     });
+    (this.levelLayout.markers.boss_spark_collectibles ?? []).forEach(({ x, y }) => {
+      const spark = new Collectible(this, x, y, 'spark');
+      spark.setDepth(WORLD_LAYERS.collectibles);
+      this.collectibles.push(spark);
+    });
   }
 
   private createEnemies(): void {
@@ -125,6 +134,14 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private createFinalBoss(): void {
+    const marker = this.levelLayout.markers.final_boss;
+    if (!marker) return;
+
+    this.finalBoss = new FinalBoss(this, marker.x, marker.y, marker.min, marker.max);
+    this.finalBoss.setDepth(WORLD_LAYERS.enemies + 5);
+  }
+
   private createPortal(): void {
     const { x, y } = this.levelLayout.markers.portal_goal;
     this.portal = this.physics.add.sprite(x, y, 'portal');
@@ -132,6 +149,7 @@ export class GameScene extends Phaser.Scene {
     (this.portal.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     this.portal.setDepth(WORLD_LAYERS.collectibles);
     this.portal.setScale(1.2);
+    this.portal.setAlpha(0.45);
 
     this.tweens.add({
       targets: this.portal,
@@ -158,6 +176,9 @@ export class GameScene extends Phaser.Scene {
     this.enemies.forEach((enemy) => {
       this.physics.add.collider(enemy, this.platforms);
     });
+    if (this.finalBoss) {
+      this.physics.add.collider(this.finalBoss, this.platforms);
+    }
 
     this.collectibles.forEach((item) => {
       this.physics.add.overlap(this.player, item, () => {
@@ -174,6 +195,66 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.overlap(this.player, enemy, () => {
         this.handleEnemyContact(enemy);
       });
+    });
+
+    if (this.finalBoss) {
+      this.physics.add.overlap(this.player, this.finalBoss, () => {
+        this.handleBossContact();
+      });
+    }
+  }
+
+  private handleBossContact(): void {
+    if (!this.finalBoss || this.finalBoss.isDefeated() || this.gameEnded) return;
+    if (this.player.isInvulnerable()) return;
+
+    const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+    const falling = playerBody.velocity.y > 0;
+    const stomping = falling && this.player.y < this.finalBoss.y - 20;
+
+    if (stomping && this.stats.hasBossSpark) {
+      this.damageBoss(true);
+      return;
+    }
+
+    if (stomping && !this.stats.hasBossSpark) {
+      this.showFloatingMessage('Grab the Creative Spark first!');
+      return;
+    }
+
+    this.handleEnemyHit();
+  }
+
+  private damageBoss(fromStomp = false): void {
+    if (!this.finalBoss || this.finalBoss.isDefeated()) return;
+
+    if (fromStomp) {
+      this.player.stompBounce();
+    }
+
+    const defeated = this.finalBoss.takeDamage(() => {
+      this.onBossDefeated();
+    });
+
+    if (!defeated) {
+      this.showFloatingMessage(fromStomp ? 'Boss hit!' : 'Spark kiss lands!');
+    }
+  }
+
+  private onBossDefeated(): void {
+    this.stats.bossDefeated = true;
+    this.finalBoss = undefined;
+    this.stats.kisses += 1;
+    this.updateHUD();
+    this.showFloatingMessage('Final boss defeated!');
+
+    this.tweens.add({
+      targets: this.portal,
+      alpha: 1,
+      scale: 1.35,
+      duration: 500,
+      yoyo: true,
+      repeat: 2,
     });
   }
 
@@ -233,6 +314,19 @@ export class GameScene extends Phaser.Scene {
     );
 
     projectile.registerEnemyOverlap(this.enemies);
+    if (this.finalBoss && !this.finalBoss.isDefeated()) {
+      projectile.registerBossOverlap(this.finalBoss, (_boss, proj) => {
+        if (!this.stats.hasBossSpark) {
+          this.showFloatingMessage('Find the Creative Spark!');
+          proj.destroy();
+          this.kissProjectiles = this.kissProjectiles.filter((p) => p !== proj);
+          return;
+        }
+        this.damageBoss(false);
+        proj.destroy();
+        this.kissProjectiles = this.kissProjectiles.filter((p) => p !== proj);
+      });
+    }
     this.kissProjectiles.push(projectile);
     this.player.playKissBlow();
   }
@@ -243,6 +337,12 @@ export class GameScene extends Phaser.Scene {
     if (item.collectibleType === 'kiss') {
       this.stats.kisses += 1;
       this.stats.score += GAME_CONFIG.kissScore;
+    } else if (item.collectibleType === 'spark') {
+      if (!this.stats.hasBossSpark) {
+        this.stats.hasBossSpark = true;
+        this.stats.score += GAME_CONFIG.bossSparkScore;
+        this.showFloatingMessage('Creative Spark acquired!');
+      }
     } else {
       this.stats.timeRemaining += GAME_CONFIG.timerBonus;
       if (this.stats.projectsCompleted < GAME_CONFIG.requiredProjects) {
@@ -323,6 +423,38 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    if (!this.stats.bossDefeated) {
+      if (!this.portalMessage) {
+        this.portalMessage = this.add
+          .text(
+            this.player.x,
+            this.player.y - 80,
+            this.stats.hasBossSpark
+              ? 'Defeat the final boss to open the portal!'
+              : 'Collect the Creative Spark and defeat the boss!',
+            {
+              fontSize: '18px',
+              fontFamily: 'Nunito, sans-serif',
+              color: '#ffffff',
+              backgroundColor: '#ad1457cc',
+              padding: { x: 14, y: 8 },
+              align: 'center',
+              wordWrap: { width: 280 },
+            },
+          )
+          .setOrigin(0.5)
+          .setDepth(60);
+
+        this.time.delayedCall(2500, () => {
+          this.portalMessage?.destroy();
+          this.portalMessage = undefined;
+        });
+      } else {
+        this.portalMessage.setPosition(this.player.x, this.player.y - 80);
+      }
+      return;
+    }
+
     this.winGame();
   }
 
@@ -355,10 +487,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = this.add.container(0, 0).setScrollFactor(0).setDepth(110);
 
     const pad = GAME_CONFIG.safePadding;
-    const bg = this.add
-      .rectangle(GAME_CONFIG.width / 2, pad + 22, GAME_CONFIG.width - pad * 2, 52, 0xffffff, 0.92)
-      .setStrokeStyle(2, GAME_CONFIG.colors.uiAccent);
-    bg.setScrollFactor(0);
+    this.hudBg = this.add.graphics().setScrollFactor(0);
 
     const style: Phaser.Types.GameObjects.Text.TextStyle = {
       fontSize: '17px',
@@ -380,11 +509,20 @@ export class GameScene extends Phaser.Scene {
       .setScrollFactor(0);
 
     this.hudTexts = { kisses, time, projects, lives, score };
-    this.hud.add([bg, kisses, time, projects, lives, score]);
+    this.hud.add([this.hudBg, kisses, time, projects, lives, score]);
     this.updateHUD();
 
     this.scale.on(Phaser.Scale.Events.RESIZE, this.layoutHUD, this);
     this.layoutHUD();
+  }
+
+  private drawHudBackground(cx: number, cy: number, w: number, h: number): void {
+    const r = Math.min(GAME_CONFIG.hudCornerRadius, h / 2);
+    this.hudBg.clear();
+    this.hudBg.fillStyle(0xffffff, 0.88);
+    this.hudBg.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, r);
+    this.hudBg.lineStyle(2, GAME_CONFIG.colors.uiAccent, 1);
+    this.hudBg.strokeRoundedRect(cx - w / 2, cy - h / 2, w, h, r);
   }
 
   private layoutHUD(): void {
@@ -396,14 +534,15 @@ export class GameScene extends Phaser.Scene {
       vp.y +
       safe.top +
       (isMobile ? vp.height * GAME_CONFIG.mobileHudTopRatio : 8);
-    const hudBg = this.hud.getAt(0) as Phaser.GameObjects.Rectangle;
-    const barH = isMobile ? 46 : 44;
+    const barH = isMobile ? 52 : 44;
+    const barW = vp.width - pad * 2 - safe.left - safe.right;
+    const barCx = vp.x + vp.width / 2;
+    const barCy = topY + barH / 2;
 
-    hudBg.setPosition(vp.x + vp.width / 2, topY + barH / 2);
-    hudBg.setSize(vp.width - pad * 2 - safe.left - safe.right, barH);
+    this.drawHudBackground(barCx, barCy, barW, barH);
 
     if (isMobile) {
-      const rowY = topY + 14;
+      const rowY = topY + 16;
       const innerLeft = vp.x + pad + safe.left + 8;
       const innerRight = vp.x + vp.width - pad - safe.right - 8;
       this.hudTexts.kisses.setPosition(innerLeft, rowY);
@@ -441,7 +580,8 @@ export class GameScene extends Phaser.Scene {
   private updateHUD(): void {
     const isMobile = shouldShowMobileControls(this.game);
     if (isMobile) {
-      this.hudTexts.kisses.setText(`♥ ${this.stats.kisses}`);
+      const spark = this.stats.hasBossSpark ? ' ✦' : '';
+      this.hudTexts.kisses.setText(`♥ ${this.stats.kisses}${spark}`);
     } else {
       this.hudTexts.kisses.setText(`♥ ${this.stats.kisses}   Score: ${this.stats.score}`);
     }
@@ -562,6 +702,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.enemies.forEach((e) => e.update());
+    this.finalBoss?.update();
 
     this.player.setDepth(depthFromFootY(this.player.y, WORLD_LAYERS.player));
 

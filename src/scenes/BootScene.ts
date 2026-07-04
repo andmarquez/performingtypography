@@ -71,7 +71,9 @@ export class BootScene extends Phaser.Scene {
   private generatePlaceholderTextures(): void {
     this.createPlayerTextures();
     this.createEnemyTexture();
+    this.createFinalBossTexture();
     this.createKissTexture();
+    this.createBossSparkTexture();
     this.createTimerTexture();
     this.createPortalTexture();
     this.createParticleTexture();
@@ -175,6 +177,55 @@ export class BootScene extends Phaser.Scene {
     }
 
     g.generateTexture('deadline-bug', 40, 40);
+    g.destroy();
+  }
+
+  /** Final boss — larger deadline overlord guarding the portal */
+  private createFinalBossTexture(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const body = GAME_CONFIG.colors.bossBody;
+    const accent = GAME_CONFIG.colors.bossAccent;
+    const glow = GAME_CONFIG.colors.bossGlow;
+
+    g.fillStyle(glow, 0.35);
+    g.fillEllipse(40, 36, 72, 56);
+    g.fillStyle(body, 1);
+    g.fillEllipse(40, 38, 60, 48);
+    g.fillStyle(accent, 1);
+    g.fillCircle(24, 30, 8);
+    g.fillCircle(56, 30, 8);
+    g.fillStyle(0xff5252, 1);
+    g.fillCircle(24, 30, 4);
+    g.fillCircle(56, 30, 4);
+    g.lineStyle(3, accent, 1);
+    g.lineBetween(20, 18, 12, 2);
+    g.lineBetween(60, 18, 68, 2);
+    g.fillStyle(0xffab91, 1);
+    g.fillCircle(12, 2, 5);
+    g.fillCircle(68, 2, 5);
+    g.fillStyle(0x212121, 1);
+    g.fillRoundedRect(28, 48, 24, 8, 3);
+    for (let i = 0; i < 4; i++) {
+      g.lineBetween(16 + i * 16, 58, 10 + i * 16, 72);
+      g.lineBetween(16 + i * 16, 58, 22 + i * 16, 72);
+    }
+    g.fillStyle(0xffffff, 0.85);
+    this.drawStar(g, 40, 8, 5, 7, 3);
+
+    g.generateTexture('final-boss', 80, 80);
+    g.destroy();
+  }
+
+  /** Creative Spark — boss reward collectible */
+  private createBossSparkTexture(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    g.fillStyle(GAME_CONFIG.colors.bossSparkGlow, 0.55);
+    g.fillCircle(18, 18, 16);
+    g.fillStyle(GAME_CONFIG.colors.bossSpark, 1);
+    this.drawStar(g, 18, 18, 5, 12, 5);
+    g.fillStyle(0xffffff, 0.9);
+    this.drawStar(g, 18, 18, 5, 5, 2);
+    g.generateTexture('boss-spark', 36, 36);
     g.destroy();
   }
 

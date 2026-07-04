@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { Enemy } from './Enemy';
+import type { FinalBoss } from './FinalBoss';
 
 /**
  * KissProjectile — a blown kiss that converts deadline bugs into hearts.
@@ -52,6 +53,16 @@ export class KissProjectile extends Phaser.Physics.Arcade.Sprite {
         if (!this.active || !enemy.active || enemy.isConverted()) return;
         this.onHitEnemy?.(enemy, this);
       });
+    });
+  }
+
+  registerBossOverlap(
+    boss: FinalBoss,
+    onHit: (boss: FinalBoss, projectile: KissProjectile) => void,
+  ): void {
+    this.scene.physics.add.overlap(this, boss, () => {
+      if (!this.active || boss.isDefeated()) return;
+      onHit(boss, this);
     });
   }
 }

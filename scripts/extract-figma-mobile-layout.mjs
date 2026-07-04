@@ -21,27 +21,34 @@ const WORLD_H = 720;
 /** From Figma 26:179 — Platforms (collision), synced 2026-07-04 */
 const PLATFORMS_RAW = [
   ['ground_floor', -1, 766, 5336, 56],
-  ['platform_start', -1, 684, 848, 20],
+  ['platform_start', -1, 684, 231, 36],
+  ['platform_start_1', 303, 666, 174, 54],
+  ['platform_start_2', 540, 620, 113, 100],
+  ['platform_start_3', 653, 691, 195, 29],
   ['floating_platform_01', 207, 572, 121, 29],
-  ['floating_platform_02', 935, 569, 122, 34],
   ['platform_01', 996, 656, 391, 113],
-  ['floating_platform_03', 1395, 571, 124, 34],
+  ['floating_platform_02', 935, 569, 122, 34],
   ['platform_02', 1472, 696, 246, 73],
+  ['pipe_01', 1564, 633, 56, 73],
+  ['floating_platform_03', 1395, 571, 124, 34],
   ['floating_platform_04', 1860, 586, 98, 69],
   ['platform_03', 1791, 655, 314, 114],
-  ['platform_04', 2105, 683, 465, 86],
+  ['pipe_02', 2131, 605, 56, 73],
   ['floating_platform_05', 3105, 570, 120, 32],
-  ['platform_05', 2717, 686, 1410, 83],
+  ['floating_platform_05b', 2440, 589, 120, 32],
   ['floating_platform_06', 4163, 597, 90, 69],
-  ['platform_06', 4127, 666, 386, 103],
+  ['platform_04', 2105, 683, 465, 86],
   ['floating_platform_07', 4308, 570, 122, 34],
+  ['platform_05', 2717, 686, 1412, 83],
+  ['pipe_03', 3845, 618, 56, 73],
+  ['platform_06', 4127, 666, 386, 103],
   ['platform_07', 4513, 698, 304, 71],
   ['floating_platform_08', 4748, 578, 195, 20],
 ];
 
 const GOAL_PLATFORM = ['goal_platform', 5172 + MARKERS_FRAME_X, 561, 163, 20];
 
-/** Artboard x,y,w,h — Kiss / Timer layers on M02 */
+/** Artboard x,y,w,h — Kiss / Timer / Spark / enemies on M02 */
 const COLLECTIBLES = {
   kiss: [
     [250, 500, 24, 24],
@@ -52,7 +59,17 @@ const COLLECTIBLES = {
     [710, 631, 24, 24],
   ],
   timer: [[797, 473, 28, 28]],
+  /** Creative Spark — boss reward before the final arena */
+  spark: [[4845, 448, 28, 28]],
   enemy: [[500, 510, 40, 32]],
+};
+
+/** Final boss on goal platform */
+const FINAL_BOSS = {
+  x: 5172 + MARKERS_FRAME_X + Math.round(163 / 2),
+  y: 561,
+  min: 5215,
+  max: 5365,
 };
 
 /** Andsiosa frame (17:593) — foot at bottom-center */
@@ -114,15 +131,17 @@ const layout = {
     },
     kiss_collectibles: COLLECTIBLES.kiss.map(center),
     timer_collectibles: COLLECTIBLES.timer.map(center),
+    boss_spark_collectibles: COLLECTIBLES.spark.map(center),
     enemies: COLLECTIBLES.enemy.map((rect) => ({
       ...center(rect),
       min: 120,
       max: 900,
     })),
+    final_boss: FINAL_BOSS,
   },
 };
 
 fs.writeFileSync(OUT, `${JSON.stringify(layout, null, 2)}\n`);
 console.log(
-  `Wrote ${OUT} — ${layout.platforms.length} platforms, ${layout.markers.kiss_collectibles.length} kisses`,
+  `Wrote ${OUT} — ${layout.platforms.length} platforms, ${layout.markers.kiss_collectibles.length} kisses, spark + boss`,
 );
