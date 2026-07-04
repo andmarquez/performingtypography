@@ -6,6 +6,7 @@ import { KissProjectile } from '../objects/KissProjectile';
 import { MobileControls } from '../ui/MobileControls';
 import { shouldShowMobileControls } from '../ui/mobileControlUtils';
 import { safeAreaInsetsInGame } from '../ui/safeAreaUtils';
+import { getUiViewport } from '../ui/viewportLayout';
 import {
   GAME_CONFIG,
   createInitialStats,
@@ -378,20 +379,20 @@ export class GameScene extends Phaser.Scene {
     const isMobile = shouldShowMobileControls(this.game);
     const pad = GAME_CONFIG.safePadding;
     const safe = safeAreaInsetsInGame(this.scale);
-    const topY = pad + safe.top + (isMobile ? GAME_CONFIG.mobileHudTopInset : 0);
-    const w = this.scale.width;
+    const vp = getUiViewport(this.scale);
+    const topY = vp.y + safe.top + (isMobile ? GAME_CONFIG.mobileHudTopInset : pad);
     const hudBg = this.hud.getAt(0) as Phaser.GameObjects.Rectangle;
     const barH = isMobile ? 46 : 52;
 
-    hudBg.setPosition(w / 2, topY + barH / 2);
-    hudBg.setSize(w - pad * 2 - safe.left - safe.right, barH);
+    hudBg.setPosition(vp.x + vp.width / 2, topY + barH / 2);
+    hudBg.setSize(vp.width - pad * 2 - safe.left - safe.right, barH);
 
     if (isMobile) {
       const rowY = topY + 14;
-      const innerLeft = pad + safe.left + 8;
-      const innerRight = w - pad - safe.right - 8;
+      const innerLeft = vp.x + pad + safe.left + 8;
+      const innerRight = vp.x + vp.width - pad - safe.right - 8;
       this.hudTexts.kisses.setPosition(innerLeft, rowY);
-      this.hudTexts.time.setPosition(w / 2, rowY).setOrigin(0.5, 0);
+      this.hudTexts.time.setPosition(vp.x + vp.width / 2, rowY).setOrigin(0.5, 0);
       this.hudTexts.lives.setPosition(innerRight, rowY).setOrigin(1, 0);
       this.hudTexts.projects.setVisible(false);
       this.hudTexts.score.setVisible(false);
@@ -404,11 +405,11 @@ export class GameScene extends Phaser.Scene {
       this.hudTexts.lives.setOrigin(0, 0);
       this.hudTexts.projects.setVisible(true);
       this.hudTexts.score.setVisible(true);
-      this.hudTexts.kisses.setPosition(pad + 8, topY + 8);
-      this.hudTexts.time.setPosition(w / 2 - 80, topY + 8);
-      this.hudTexts.projects.setPosition(w / 2 + 40, topY + 8);
-      this.hudTexts.lives.setPosition(w - pad - 130, topY + 8);
-      this.hudTexts.score.setPosition(pad + 8, topY + 30);
+      this.hudTexts.kisses.setPosition(vp.x + pad + 8, topY + 8);
+      this.hudTexts.time.setPosition(vp.x + vp.width / 2 - 80, topY + 8);
+      this.hudTexts.projects.setPosition(vp.x + vp.width / 2 + 40, topY + 8);
+      this.hudTexts.lives.setPosition(vp.x + vp.width - pad - 130, topY + 8);
+      this.hudTexts.score.setPosition(vp.x + pad + 8, topY + 30);
       this.hudTexts.kisses.setFontSize('17px');
       this.hudTexts.time.setFontSize('17px');
       this.hudTexts.lives.setFontSize('17px');

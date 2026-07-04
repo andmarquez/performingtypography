@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { getUiViewport } from './viewportLayout';
 import { VirtualJoystick } from './VirtualJoystick';
 
 export type TouchInput = {
@@ -95,16 +96,15 @@ export class MobileControls {
   }
 
   private layout(): void {
-    const w = this.scene.scale.width;
-    const h = this.scene.scale.height;
+    const vp = getUiViewport(this.scene.scale);
     const pad = GAME_CONFIG.safePadding;
-    const lift = Math.max(GAME_CONFIG.mobileControlsLift, h * 0.14);
+    const lift = Math.max(GAME_CONFIG.mobileControlsLift, vp.height * 0.14);
     const cfg = GAME_CONFIG.mobileWildRift;
 
-    this.joystick.layout(w, h);
+    this.joystick.layout(vp);
 
-    const attackX = w - pad - cfg.attackInsetX;
-    const attackY = h - lift - cfg.attackInsetY;
+    const attackX = vp.x + vp.width - pad - cfg.attackInsetX;
+    const attackY = vp.y + vp.height - lift - cfg.attackInsetY;
     const jump = this.abilities.find((a) => a.id === 'jump')!;
     jump.btn.setPosition(attackX, attackY);
     jump.icon.setPosition(attackX, attackY);

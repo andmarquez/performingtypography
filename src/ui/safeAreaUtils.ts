@@ -25,14 +25,17 @@ export function safeAreaInsetsInGame(scale: Phaser.Scale.ScaleManager): {
   };
   document.body.removeChild(probe);
 
+  const gameW = scale.width;
   const gameH = scale.height;
-  const displayH = scale.displaySize.height || gameH;
-  const ratio = gameH / Math.max(displayH, 1);
+  const parentW = scale.parentSize?.width || window.innerWidth;
+  const parentH = scale.parentSize?.height || window.innerHeight;
+  const ratioX = gameW / Math.max(parentW, 1);
+  const ratioY = gameH / Math.max(parentH, 1);
 
   return {
-    top: screen.top * ratio,
-    right: screen.right * ratio,
-    bottom: screen.bottom * ratio,
-    left: screen.left * ratio,
+    top: screen.top * ratioY,
+    right: screen.right * ratioX,
+    bottom: screen.bottom * ratioY,
+    left: screen.left * ratioX,
   };
 }

@@ -17,8 +17,9 @@ const game = new Phaser.Game({
   height: GAME_CONFIG.height,
   backgroundColor: '#fce4ec',
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.ENVELOP,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    expandParent: true,
     width: GAME_CONFIG.width,
     height: GAME_CONFIG.height,
   },

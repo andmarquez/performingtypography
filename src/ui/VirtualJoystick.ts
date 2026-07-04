@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { type UiViewport } from './viewportLayout';
 
 /**
  * Wild Rift–style virtual joystick for movement (left thumb).
@@ -35,13 +36,13 @@ export class VirtualJoystick {
     this.container.add([this.baseRing, this.base, this.thumb]);
   }
 
-  layout(screenW: number, screenH: number): void {
+  layout(viewport: UiViewport): void {
     const cfg = GAME_CONFIG.mobileWildRift.joystick;
     const pad = GAME_CONFIG.safePadding;
-    const lift = Math.max(GAME_CONFIG.mobileControlsLift, screenH * 0.16);
+    const lift = Math.max(GAME_CONFIG.mobileControlsLift, viewport.height * 0.14);
 
-    this.centerX = screenW * cfg.xRatio + pad;
-    this.centerY = screenH - lift - cfg.bottomInset;
+    this.centerX = viewport.x + viewport.width * cfg.xRatio + pad;
+    this.centerY = viewport.y + viewport.height - lift - cfg.bottomInset;
 
     this.baseRing.setPosition(this.centerX, this.centerY);
     this.base.setPosition(this.centerX, this.centerY);
