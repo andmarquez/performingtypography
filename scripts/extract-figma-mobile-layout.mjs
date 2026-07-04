@@ -16,6 +16,7 @@ const OUT = path.join(ROOT, 'public/assets/world/level-1/layout-mobile.json');
 
 const PLATFORM_FRAME_Y = -100;
 const MARKERS_FRAME_X = 35;
+const WORLD_H = 720;
 
 /** From Figma 26:179 — Platforms (collision), synced 2026-07-04 */
 const PLATFORMS_RAW = [
@@ -58,12 +59,17 @@ const COLLECTIBLES = {
 const PLAYER_SPAWN = { x: 231, y: 469 };
 
 function toPlatform([name, x, y, w, h], frameY = PLATFORM_FRAME_Y) {
+  const artY = Math.round(y + frameY);
+  let height = Math.round(h);
+  if (artY + height > WORLD_H) {
+    height = Math.max(1, WORLD_H - artY);
+  }
   return {
     name,
     x: Math.max(0, Math.round(x)),
-    y: Math.round(y + frameY),
+    y: artY,
     width: Math.round(w),
-    height: Math.round(h),
+    height,
     type: 'platform',
   };
 }

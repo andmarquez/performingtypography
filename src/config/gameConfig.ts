@@ -66,8 +66,8 @@ export const GAME_CONFIG = {
   /** Safe area padding for mobile notches (CSS pixels, scaled in-game) */
   safePadding: 16,
 
-  /** Extra HUD offset below the notch on touch devices */
-  mobileHudTopInset: 12,
+  /** HUD top edge — Figma M02 HUD frame 13:3 y=50 */
+  mobileHudTopRatio: 50 / 720,
 
   /** Lift touch controls above the bottom edge (browser bars, thumbs) */
   mobileControlsLift: 88,
@@ -79,20 +79,26 @@ export const GAME_CONFIG = {
    * Wild Rift–style mobile control layout.
    * Left = move joystick, right = attack + ability arc.
    */
+  /**
+   * Wild Rift controls — anchors from Figma M02 gameplay zones (node 26:178).
+   * Joystick 13:16 center (126, 526), Jump 17:582 center (1155, 531).
+   */
   mobileWildRift: {
     joystick: {
-      xRatio: 0.13,
-      bottomInset: 36,
+      xRatio: 126 / 1280,
+      yRatio: 526 / 720,
       baseRadius: 74,
       thumbRadius: 30,
       maxDrag: 52,
       deadzone: 0.18,
     },
+    jumpXRatio: 1155 / 1280,
+    jumpYRatio: 531 / 720,
+    kissXRatio: 1054 / 1280,
+    kissYRatio: 492 / 720,
     attackRadius: 56,
     abilityRadius: 44,
-    attackInsetX: 64,
-    attackInsetY: 40,
-    /** Kiss (heart power) sits up-left from jump */
+    /** Legacy arc offset — used when kissXRatio not applied */
     abilityArc: [{ angleDeg: 225, distance: 138 }],
   },
 

@@ -26,27 +26,29 @@ export class VirtualJoystick {
 
     this.baseRing = scene.add.circle(0, 0, baseRadius + 10, 0x000000, 0.12);
     this.baseRing.setStrokeStyle(2, 0xc9a96e, 0.35);
+    this.baseRing.setScrollFactor(0);
 
     this.base = scene.add.circle(0, 0, baseRadius, 0x0d1117, 0.42);
     this.base.setStrokeStyle(3, 0xc9a96e, 0.55);
+    this.base.setScrollFactor(0);
+    this.base.setInteractive(
+      new Phaser.Geom.Circle(0, 0, baseRadius + 32),
+      Phaser.Geom.Circle.Contains,
+    );
 
     this.thumb = scene.add.circle(0, 0, thumbRadius, 0x1a2332, 0.75);
     this.thumb.setStrokeStyle(2, 0xf5f0e1, 0.85);
+    this.thumb.setScrollFactor(0);
 
     this.container.add([this.baseRing, this.base, this.thumb]);
   }
 
-  layout(viewport: UiViewport, safeBottom = 0, insets?: MobileLayoutInsets): void {
-    const cfg = GAME_CONFIG.mobileWildRift.joystick;
-    const pad = GAME_CONFIG.safePadding;
-    const layout = insets;
-    const lift = layout?.controlsLift ?? Math.max(GAME_CONFIG.mobileControlsLift, 72);
-    const bottomInset = layout?.joystickBottomInset ?? cfg.bottomInset;
-    const scale = layout?.controlScale ?? 1;
+  layout(viewport: UiViewport, insets: MobileLayoutInsets): void {
+    const scale = insets.controlScale;
     this.hitScale = scale;
 
-    this.centerX = viewport.x + viewport.width * (layout?.joystickXRatio ?? cfg.xRatio) + pad;
-    this.centerY = viewport.y + viewport.height - safeBottom - lift - bottomInset;
+    this.centerX = viewport.x + viewport.width * insets.joystickXRatio;
+    this.centerY = viewport.y + viewport.height * insets.joystickYRatio;
 
     this.baseRing.setPosition(this.centerX, this.centerY);
     this.base.setPosition(this.centerX, this.centerY);
@@ -60,7 +62,7 @@ export class VirtualJoystick {
     if (this.pointerId !== null) return false;
     const cfg = GAME_CONFIG.mobileWildRift.joystick;
     const dist = Phaser.Math.Distance.Between(uiX, uiY, this.centerX, this.centerY);
-    if (dist > (cfg.baseRadius + 28) * this.hitScale) return false;
+    if (dist > (cfg.baseRadius + 32) * this.hitScale) return false;
 
     this.pointerId = pointer.id;
     this.updateThumb(uiX, uiY);
@@ -90,7 +92,7 @@ export class VirtualJoystick {
     const dx = x - this.centerX;
     const dy = y - this.centerY;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const maxDrag = cfg.maxDrag;
+    const maxDrag = cfg.maxDrag * this.hitScale;
     const clamped = Math.min(dist, maxDrag);
     const angle = Math.atan2(dy, dx);
 
@@ -107,6 +109,6 @@ export class VirtualJoystick {
 
   private highlight(active: boolean): void {
     this.base.setAlpha(active ? 0.58 : 0.42);
-    this.thumb.setScale(active ? 1.05 : 1);
+    this.thumb.setScale(active ? 1.05 * this.hitScale : this.hitScale);
   }
 }

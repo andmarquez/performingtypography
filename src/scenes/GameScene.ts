@@ -5,7 +5,7 @@ import { Collectible } from '../objects/Collectible';
 import { KissProjectile } from '../objects/KissProjectile';
 import { MobileControls } from '../ui/MobileControls';
 import { shouldShowMobileControls } from '../ui/mobileControlUtils';
-import { getMobileLayoutInsets, isLandscapeViewport } from '../ui/scaleMode';
+import { isLandscapeViewport } from '../ui/scaleMode';
 import { safeAreaInsetsInGame } from '../ui/safeAreaUtils';
 import { getUiViewport } from '../ui/viewportLayout';
 import {
@@ -392,7 +392,10 @@ export class GameScene extends Phaser.Scene {
     const pad = GAME_CONFIG.safePadding;
     const safe = safeAreaInsetsInGame(this.scale);
     const vp = getUiViewport(this.scale);
-    const topY = vp.y + safe.top + (isMobile ? getMobileLayoutInsets().hudTopInset : 8);
+    const topY =
+      vp.y +
+      safe.top +
+      (isMobile ? vp.height * GAME_CONFIG.mobileHudTopRatio : 8);
     const hudBg = this.hud.getAt(0) as Phaser.GameObjects.Rectangle;
     const barH = isMobile ? 46 : 44;
 

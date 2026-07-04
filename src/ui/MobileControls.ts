@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { safeAreaInsetsInGame } from './safeAreaUtils';
 import { getUiViewport, pointerToUiSpace } from './viewportLayout';
 import { getMobileLayoutInsets } from './scaleMode';
 import { VirtualJoystick } from './VirtualJoystick';
@@ -22,10 +21,10 @@ type AbilityButton = {
   radius: number;
 };
 
+const UI_DEPTH = 10000;
+
 /**
- * MobileControls — Wild Rift–style layout:
- * - Left: virtual joystick for movement
- * - Right: jump (primary) + heart power (kiss blow)
+ * MobileControls — Wild Rift–style layout anchored to Figma M02 gameplay zones.
  */
 export class MobileControls {
   private scene: Phaser.Scene;
@@ -47,7 +46,10 @@ export class MobileControls {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    this.container = scene.add.container(0, 0).setScrollFactor(0).setDepth(100);
+    this.container = scene.add
+      .container(0, 0)
+      .setScrollFactor(0)
+      .setDepth(UI_DEPTH);
 
     this.joystick = new VirtualJoystick(scene, this.container);
     this.createAbilityCluster();
@@ -70,8 +72,14 @@ export class MobileControls {
 
       const btn = this.scene.add.circle(0, 0, def.radius, fill, alpha);
       btn.setStrokeStyle(def.primary ? 3 : 2, stroke, def.primary ? 0.95 : 0.85);
+      btn.setScrollFactor(0);
+      btn.setInteractive(
+        new Phaser.Geom.Circle(0, 0, def.radius + 8),
+        Phaser.Geom.Circle.Contains,
+      );
 
       const icon = this.scene.add.graphics();
+      icon.setScrollFactor(0);
       if (def.id === 'jump') {
         this.drawJumpIcon(icon, def.radius);
       } else {
@@ -99,51 +107,43 @@ export class MobileControls {
 
   private layout(): void {
     const vp = getUiViewport(this.scene.scale);
-    const safe = safeAreaInsetsInGame(this.scene.scale);
-    const pad = GAME_CONFIG.safePadding;
     const layout = getMobileLayoutInsets();
-    const cfg = GAME_CONFIG.mobileWildRift;
     const scale = layout.controlScale;
     this.controlScale = scale;
 
-    this.joystick.layout(vp, safe.bottom, layout);
+    this.joystick.layout(vp, layout);
 
-    const attackX = vp.x + vp.width - pad - safe.right - layout.attackInsetX;
-    const attackY = vp.y + vp.height - safe.bottom - layout.controlsLift - layout.attackInsetY;
+    const jumpX = vp.x + vp.width * layout.jumpXRatio;
+    const jumpY = vp.y + vp.height * layout.jumpYRatio;
+    const kissX = vp.x + vp.width * layout.kissXRatio;
+    const kissY = vp.y + vp.height * layout.kissYRatio;
+
     const jump = this.abilities.find((a) => a.id === 'jump')!;
-    jump.btn.setPosition(attackX, attackY);
+    jump.btn.setPosition(jumpX, jumpY);
     jump.btn.setScale(scale);
-    jump.icon.setPosition(attackX, attackY);
+    jump.icon.setPosition(jumpX, jumpY);
     jump.icon.setScale(scale);
 
-    const arcButtons = this.abilities.filter((a) => a.id !== 'jump');
-    arcButtons.forEach((ability, i) => {
-      const slot = cfg.abilityArc[i];
-      const rad = Phaser.Math.DegToRad(slot.angleDeg);
-      const x = attackX + Math.cos(rad) * slot.distance * scale;
-      const y = attackY + Math.sin(rad) * slot.distance * scale;
-      ability.btn.setPosition(x, y);
-      ability.btn.setScale(scale);
-      ability.icon.setPosition(x, y);
-      ability.icon.setScale(scale);
-    });
+    const kiss = this.abilities.find((a) => a.id === 'kiss')!;
+    kiss.btn.setPosition(kissX, kissY);
+    kiss.btn.setScale(scale);
+    kiss.icon.setPosition(kissX, kissY);
+    kiss.icon.setScale(scale);
   }
 
   private setupPointerHandlers(): void {
     this.scene.input.addPointer(3);
-    const camera = this.scene.cameras.main;
-
     const hitAbility = (x: number, y: number): AbilityButton | null => {
       const sorted = [...this.abilities].sort((a, b) => a.radius - b.radius);
       for (const ability of sorted) {
         const dist = Phaser.Math.Distance.Between(x, y, ability.btn.x, ability.btn.y);
-        if (dist <= (ability.radius + 6) * this.controlScale) return ability;
+        if (dist <= (ability.radius + 12) * this.controlScale) return ability;
       }
       return null;
     };
 
     const press = (pointer: Phaser.Input.Pointer) => {
-      const ui = pointerToUiSpace(pointer, camera);
+      const ui = pointerToUiSpace(pointer);
 
       if (this.joystick.tryActivate(ui.x, ui.y, pointer)) {
         this.refreshInput();
@@ -161,7 +161,7 @@ export class MobileControls {
     };
 
     const move = (pointer: Phaser.Input.Pointer) => {
-      const ui = pointerToUiSpace(pointer, camera);
+      const ui = pointerToUiSpace(pointer);
       this.joystick.updatePointer(ui.x, ui.y, pointer);
       this.refreshInput();
     };
@@ -175,6 +175,10 @@ export class MobileControls {
       }
       this.refreshInput();
     };
+
+    this.abilities.forEach((ability) => {
+      ability.btn.on('pointerdown', (p: Phaser.Input.Pointer) => press(p));
+    });
 
     this.scene.input.on('pointerdown', press);
     this.scene.input.on('pointermove', move);

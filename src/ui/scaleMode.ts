@@ -29,48 +29,32 @@ export function getUiLayoutRect(scale: Phaser.Scale.ScaleManager) {
 }
 
 export type MobileLayoutInsets = {
-  controlsLift: number;
   hudTopInset: number;
-  joystickBottomInset: number;
   joystickXRatio: number;
-  attackInsetX: number;
-  attackInsetY: number;
+  joystickYRatio: number;
+  jumpXRatio: number;
+  jumpYRatio: number;
+  kissXRatio: number;
+  kissYRatio: number;
   controlScale: number;
 };
 
-/** Touch HUD/control spacing tuned for landscape vs portrait. */
-export function getMobileLayoutInsets(): MobileLayoutInsets {
-  if (isLandscapeViewport()) {
-    if (isIphone16Class()) {
-      return {
-        controlsLift: 22,
-        hudTopInset: 4,
-        joystickBottomInset: 14,
-        joystickXRatio: 0.17,
-        attackInsetX: 48,
-        attackInsetY: 22,
-        controlScale: 0.8,
-      };
-    }
+const CFG = GAME_CONFIG.mobileWildRift;
 
-    return {
-      controlsLift: 36,
-      hudTopInset: 6,
-      joystickBottomInset: 20,
-      joystickXRatio: 0.13,
-      attackInsetX: 52,
-      attackInsetY: 28,
-      controlScale: 0.88,
-    };
-  }
+/** Figma M02 control anchors scaled to visible viewport. */
+export function getMobileLayoutInsets(): MobileLayoutInsets {
+  const scale = isLandscapeViewport() ? (isIphone16Class() ? 0.8 : 0.88) : 1;
 
   return {
-    controlsLift: GAME_CONFIG.mobileControlsLift,
-    hudTopInset: GAME_CONFIG.mobileHudTopInset,
-    joystickBottomInset: GAME_CONFIG.mobileWildRift.joystick.bottomInset,
-    joystickXRatio: GAME_CONFIG.mobileWildRift.joystick.xRatio,
-    attackInsetX: GAME_CONFIG.mobileWildRift.attackInsetX,
-    attackInsetY: GAME_CONFIG.mobileWildRift.attackInsetY,
-    controlScale: 1,
+    hudTopInset: isLandscapeViewport()
+      ? (isIphone16Class() ? 4 : 6)
+      : Math.round(GAME_CONFIG.height * GAME_CONFIG.mobileHudTopRatio),
+    joystickXRatio: CFG.joystick.xRatio,
+    joystickYRatio: CFG.joystick.yRatio,
+    jumpXRatio: CFG.jumpXRatio,
+    jumpYRatio: CFG.jumpYRatio,
+    kissXRatio: CFG.kissXRatio,
+    kissYRatio: CFG.kissYRatio,
+    controlScale: scale,
   };
 }
