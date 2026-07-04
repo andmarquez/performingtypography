@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { WorldManifest } from '../world/worldTypes';
+import { assetUrl } from '../utils/assetUrl';
 
 /**
  * BootScene — loads Figma world background + generates gameplay placeholders.
@@ -13,9 +14,9 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.load.json('world-manifest', '/assets/world/manifest.json');
-    this.load.json('level-1-layout-mobile', '/assets/world/level-1/layout-mobile.json');
-    this.load.json('level-1-layout-desktop', '/assets/world/level-1/layout-desktop.json');
+    this.load.json('world-manifest', assetUrl('assets/world/manifest.json'));
+    this.load.json('level-1-layout-mobile', assetUrl('assets/world/level-1/layout-mobile.json'));
+    this.load.json('level-1-layout-desktop', assetUrl('assets/world/level-1/layout-desktop.json'));
   }
 
   create(): void {
@@ -38,7 +39,7 @@ export class BootScene extends Phaser.Scene {
     }
 
     entries.forEach((entry) => {
-      this.load.image(entry.key, entry.path);
+      this.load.image(entry.key, assetUrl(entry.path));
     });
 
     this.load.once('complete', onComplete);

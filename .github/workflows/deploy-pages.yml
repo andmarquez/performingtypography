@@ -29,12 +29,15 @@ jobs:
         run: |
           NAME=$(node -p "require('./package.json').name")
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
-          if [ "$NAME" != "concert-kinetic-typography" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Skipping Pages deploy: package is '$NAME', not the kinetic typography app."
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
+          case "$NAME" in
+            concert-kinetic-typography|andsiosas-creative-quest)
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "Skipping Pages deploy: unsupported package '$NAME'."
+              ;;
+          esac
 
       - name: Setup Node
         if: steps.app.outputs.skip != 'true'
