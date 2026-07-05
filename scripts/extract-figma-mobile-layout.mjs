@@ -18,7 +18,31 @@ const MARKERS_JSON = path.join(ROOT, 'figma/figma-gameplay-markers.json');
 const DESKTOP_W = 4895;
 const MOBILE_W = 5335;
 
-const PLAYER_SPAWN_FALLBACK = { x: 174, y: 630 };
+const PLAYER_SPAWN_FALLBACK = { x: 233, y: 519 };
+
+function resolvePlayerSpawn(platforms, markersData) {
+  if (markersData.player_spawn) {
+    return markersData.player_spawn;
+  }
+
+  const platformStart = platforms.find((p) => p.name === 'platform_start');
+  if (platformStart) {
+    return {
+      x: platformStart.x + Math.round(platformStart.width / 2),
+      y: platformStart.y,
+    };
+  }
+
+  const platformStart1 = platforms.find((p) => p.name === 'platform_start_1');
+  if (platformStart1) {
+    return {
+      x: platformStart1.x + Math.round(platformStart1.width / 2),
+      y: platformStart1.y,
+    };
+  }
+
+  return PLAYER_SPAWN_FALLBACK;
+}
 
 function loadMarkers() {
   if (!fs.existsSync(MARKERS_JSON)) {
@@ -57,13 +81,7 @@ const platformArt = platforms
     height: p.height,
   }));
 
-const platformStart = platforms.find((p) => p.name === 'platform_start');
-const PLAYER_SPAWN = platformStart
-  ? {
-      x: platformStart.x + Math.round(platformStart.width / 2),
-      y: platformStart.y,
-    }
-  : PLAYER_SPAWN_FALLBACK;
+const PLAYER_SPAWN = resolvePlayerSpawn(platforms, markersData);
 
 const pipeCount = platforms.filter((p) => p.type === 'pipe').length;
 
