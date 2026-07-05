@@ -3,7 +3,7 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import { WORLD_LAYERS } from './layerConfig';
 import type { LevelLayout, PlatformZone, CloudZone } from './worldTypes';
 import { getPlatformZoneVisualAlpha } from './layoutUtils';
-import { platformTopLeftToCenter } from './worldTypes';
+import { getPlatformCollisionRect, platformTopLeftToCenter } from './worldTypes';
 
 export type WorldBuildOptions = {
   debug?: boolean;
@@ -120,9 +120,14 @@ export class WorldBuilder {
       const nativeH = frame.height;
       if (nativeW === 0 || nativeH === 0) continue;
 
-      const scale = Math.min(art.width / nativeW, art.height / nativeH);
-      const displayW = nativeW * scale;
-      const displayH = nativeH * scale;
+      const scaleW = art.width / nativeW;
+      let displayW = art.width;
+      let displayH = nativeH * scaleW;
+      if (displayH > art.height) {
+        const scaleH = art.height / nativeH;
+        displayH = art.height;
+        displayW = nativeW * scaleH;
+      }
       const cx = art.x + art.width / 2;
       const cy = art.y + art.height - displayH / 2;
 
@@ -138,9 +143,10 @@ export class WorldBuilder {
     zones: PlatformZone[],
   ): void {
     for (const zone of zones) {
-      const { cx, cy } = platformTopLeftToCenter(zone);
+      const collision = getPlatformCollisionRect(zone);
+      const { cx, cy } = platformTopLeftToCenter(collision);
       const body = platforms.create(cx, cy, 'platform-tile') as Phaser.Physics.Arcade.Sprite;
-      body.setDisplaySize(zone.width, zone.height);
+      body.setDisplaySize(collision.width, collision.height);
       body.setVisible(false);
       body.setData('platformName', zone.name);
       body.refreshBody();

@@ -79,8 +79,22 @@ const FINAL_BOSS = {
 const PLAYER_SPAWN = { x: 233, y: 519 };
 
 function toPlatform([_nodeId, name, zoneType, x, y, w, h], frameY = PLATFORM_FRAME_Y) {
-  const artY = Math.round(y + frameY);
+  let artY = Math.round(y + frameY);
   let height = Math.round(h);
+  const width = Math.round(w);
+
+  if (name === 'ground_floor') {
+    artY = WORLD_H - height;
+    return {
+      name,
+      x: Math.max(0, Math.round(x)),
+      y: artY,
+      width,
+      height,
+      type: zoneType,
+    };
+  }
+
   if (artY + height > WORLD_H) {
     height = Math.max(1, WORLD_H - artY);
   }
@@ -88,7 +102,7 @@ function toPlatform([_nodeId, name, zoneType, x, y, w, h], frameY = PLATFORM_FRA
     name,
     x: Math.max(0, Math.round(x)),
     y: artY,
-    width: Math.round(w),
+    width,
     height,
     type: zoneType,
   };

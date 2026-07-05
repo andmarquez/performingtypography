@@ -22,9 +22,9 @@
     {
       "name": "ground_floor",
       "x": 0,
-      "y": 720,
+      "y": 684,
       "width": 5336,
-      "height": 1,
+      "height": 36,
       "type": "platform"
     },
     {

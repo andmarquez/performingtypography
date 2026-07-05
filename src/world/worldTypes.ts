@@ -107,5 +107,14 @@ export const platformTopLeftToCenter = (p: PlatformZone) => ({
   cy: p.y + p.height / 2,
 });
 
+/** Gameplay collision — thin top surface for platforms; full box for pipes and ground. */
+export function getPlatformCollisionRect(zone: PlatformZone): PlatformZone {
+  if (zone.type === 'pipe' || zone.name === 'ground_floor') {
+    return zone;
+  }
+  const surfaceH = Math.min(zone.height, 18);
+  return { ...zone, height: surfaceH };
+}
+
 /** Spawn marker y is the platform surface (foot Y). */
 export const markerToFoot = (m: { x: number; y: number }) => ({ x: m.x, y: m.y });
