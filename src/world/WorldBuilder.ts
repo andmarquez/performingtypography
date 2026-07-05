@@ -129,7 +129,7 @@ export class WorldBuilder {
         displayW = nativeW * scaleH;
       }
       const cx = art.x + art.width / 2;
-      const cy = art.y + displayH / 2;
+      const cy = art.y + art.height - displayH / 2;
 
       const img = scene.add.image(cx, cy, art.key);
       img.setDisplaySize(displayW, displayH);

@@ -109,20 +109,27 @@ export const platformTopLeftToCenter = (p: PlatformZone) => ({
   cy: p.y + p.height / 2,
 });
 
-/** Foot Y on the visible walk surface inside a Figma platform zone. */
-export const platformStandY = (zone: PlatformZone, standInset = 0): number =>
-  zone.y + standInset;
-
-/** Gameplay collision — stand on the visible icing top, not the Figma box top. */
-export function getPlatformCollisionRect(zone: PlatformZone, standInset = 0): PlatformZone {
+/** Gameplay collision — walk surface at bottom of Figma zone (matches bottom-aligned art). */
+export function getPlatformCollisionRect(zone: PlatformZone, _standInset = 0): PlatformZone {
   if (zone.type === 'pipe' || zone.name === 'ground_floor') {
     return zone;
   }
-  const top = zone.y + standInset;
-  const remain = Math.max(1, zone.height - standInset);
-  const surfaceH = Math.min(remain, 18);
-  return { ...zone, y: top, height: surfaceH };
+  const surfaceH = Math.min(zone.height, 18);
+  return {
+    ...zone,
+    y: zone.y + zone.height - surfaceH,
+    height: surfaceH,
+  };
 }
+
+/** Foot Y on the platform walk surface (top of bottom collision strip). */
+export const platformStandY = (zone: PlatformZone): number => {
+  if (zone.type === 'pipe' || zone.name === 'ground_floor') {
+    return zone.y;
+  }
+  const surfaceH = Math.min(zone.height, 18);
+  return zone.y + zone.height - surfaceH;
+};
 
 /** Spawn marker y is the platform surface (foot Y). */
 export const markerToFoot = (m: { x: number; y: number }) => ({ x: m.x, y: m.y });

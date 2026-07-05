@@ -158,16 +158,14 @@ for (const art of platformArt) {
 }
 
 const platformStart = platforms.find((p) => p.name === 'platform_start');
-const startArt = platformArt.find((a) => a.name === 'platform_start');
 const PLAYER_SPAWN = platformStart
   ? {
       x: platformStart.x + Math.round(platformStart.width / 2),
-      y: platformStart.y + (startArt?.standInset ?? 0),
+      y: platformStart.y + platformStart.height - Math.min(platformStart.height, 18),
     }
   : PLAYER_SPAWN_FALLBACK;
 
 const goal = platforms.find((p) => p.name === 'goal_platform');
-const goalArt = platformArt.find((a) => a.name === 'goal_platform');
 const pipeCount = platforms.filter((p) => p.type === 'pipe').length;
 const clouds = CLOUDS_RAW.map((row) => toCloud(row));
 
@@ -198,7 +196,7 @@ const layout = {
     player_spawn: PLAYER_SPAWN,
     portal_goal: {
       x: goal.x + Math.round(goal.width / 2),
-      y: goal.y + (goalArt?.standInset ?? 0) - 10,
+      y: goal.y + goal.height - Math.min(goal.height, 18) - 10,
     },
     kiss_collectibles: COLLECTIBLES.kiss.map(center),
     timer_collectibles: COLLECTIBLES.timer.map(center),

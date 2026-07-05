@@ -410,11 +410,11 @@
   "markers": {
     "player_spawn": {
       "x": 115,
-      "y": 647
+      "y": 648
     },
     "portal_goal": {
       "x": 5197,
-      "y": 552
+      "y": 553
     },
     "kiss_collectibles": [
       {

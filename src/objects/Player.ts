@@ -261,7 +261,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const bodyW = 28 * GAME_CONFIG.playerDisplayScale;
     const bodyH = 52 * GAME_CONFIG.playerDisplayScale;
     const offsetX = (frame.width - bodyW) / 2;
-    const offsetY = frame.height - bodyH;
+    const offsetY = frame.height * this.originY - bodyH;
 
     body.setSize(bodyW, bodyH, false);
     body.setOffset(offsetX, offsetY);
