@@ -1,6 +1,7 @@
 export const WORLD_LAYERS = {
   sky: -30,
   background: -20,
+  platformArt: -15,
   platformDebug: 5,
   collectibles: 30,
   enemies: 35,

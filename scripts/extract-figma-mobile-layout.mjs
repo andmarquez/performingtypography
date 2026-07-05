@@ -132,6 +132,19 @@ const goal = platforms.find((p) => p.name === 'goal_platform');
 const pipeCount = platforms.filter((p) => p.type === 'pipe').length;
 const clouds = CLOUDS_RAW.map((row) => toCloud(row));
 
+/** Visual platform sprites — image fills on Figma collision rectangles. */
+const platformArt = platforms
+  .filter((p) => p.type === 'platform' && p.name !== 'ground_floor')
+  .map((p) => ({
+    name: p.name,
+    key: `platform-art:${p.name}`,
+    path: `/assets/world/platforms/${p.name}.png`,
+    x: p.x,
+    y: p.y,
+    width: p.width,
+    height: p.height,
+  }));
+
 const layout = {
   level: 'level-1',
   variant: 'mobile',
@@ -153,6 +166,7 @@ const layout = {
     ],
   },
   platforms,
+  platformArt,
   clouds,
   markers: {
     player_spawn: PLAYER_SPAWN,
@@ -174,7 +188,7 @@ const layout = {
 
 fs.writeFileSync(OUT, `${JSON.stringify(layout, null, 2)}\n`);
 console.log(
-  `Wrote ${OUT} — ${layout.platforms.length} zones (${pipeCount} pipes), ${clouds.length} clouds, ${layout.markers.kiss_collectibles.length} kisses`,
+  `Wrote ${OUT} — ${layout.platforms.length} zones (${pipeCount} pipes), ${platformArt.length} platform art, ${clouds.length} clouds, ${layout.markers.kiss_collectibles.length} kisses`,
 );
 
 /** Mirror clouds into desktop layout (scaled X/width). */

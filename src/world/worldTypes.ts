@@ -19,6 +19,17 @@ export type CloudZone = {
   height: number;
 };
 
+/** Platform image fill exported from Figma — visual only, aligned to collision zone. */
+export type PlatformArt = {
+  name: string;
+  key: string;
+  path: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type BackgroundSection = {
   key: string;
   path: string;
@@ -66,6 +77,8 @@ export type LevelLayout = {
   };
   /** Invisible gameplay rectangles — source of truth for collisions. */
   platforms: PlatformZone[];
+  /** Figma image fills on platform rectangles — rendered above background. */
+  platformArt?: PlatformArt[];
   /** Decorative cloud bounds — sync from Figma, no collision. */
   clouds?: CloudZone[];
   markers: LevelMarkers;

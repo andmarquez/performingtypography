@@ -33,6 +33,7 @@ export class WorldBuilder {
 
     WorldBuilder.createSky(scene, layout.width);
     WorldBuilder.drawBackground(scene, layout);
+    WorldBuilder.drawPlatformArt(scene, layout);
     WorldBuilder.createPlatformBodies(platforms, layout.platforms);
 
     const renderPlatformDebug = () => {
@@ -102,6 +103,17 @@ export class WorldBuilder {
       const img = scene.add.image(section.x + displayW / 2, section.y + section.height / 2, key);
       img.setDisplaySize(displayW, section.height);
       img.setDepth(WORLD_LAYERS.background);
+      img.setScrollFactor(1);
+    }
+  }
+
+  private static drawPlatformArt(scene: Phaser.Scene, layout: LevelLayout): void {
+    for (const art of layout.platformArt ?? []) {
+      if (!scene.textures.exists(art.key)) continue;
+
+      const img = scene.add.image(art.x + art.width / 2, art.y + art.height / 2, art.key);
+      img.setDisplaySize(art.width, art.height);
+      img.setDepth(WORLD_LAYERS.platformArt);
       img.setScrollFactor(1);
     }
   }

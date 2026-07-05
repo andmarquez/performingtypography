@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import type { WorldManifest } from '../world/worldTypes';
+import type { LevelLayout, WorldManifest } from '../world/worldTypes';
 import { assetUrl } from '../utils/assetUrl';
 
 /**
@@ -26,19 +26,28 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     this.worldManifest = this.cache.json.get('world-manifest') as WorldManifest | null;
-    this.loadWorldBackgrounds(() => {
+    this.loadWorldAssets(() => {
       this.generatePlaceholderTextures();
       this.registry.set('worldManifest', this.worldManifest);
       this.scene.start('MenuScene');
     });
   }
 
-  /** Load exported Figma background PNGs listed in manifest (skip missing files). */
-  private loadWorldBackgrounds(onComplete: () => void): void {
+  /** Load Figma background PNGs + platform art sprites from layout JSON. */
+  private loadWorldAssets(onComplete: () => void): void {
     const backgrounds = this.worldManifest?.backgrounds ?? {};
-    const entries = Object.values(backgrounds).filter((b) => b.present);
+    const bgEntries = Object.values(backgrounds).filter((b) => b.present);
 
-    if (entries.length === 0) {
+    const mobile = this.cache.json.get('level-1-layout-mobile') as LevelLayout | null;
+    const desktop = this.cache.json.get('level-1-layout-desktop') as LevelLayout | null;
+    const artByKey = new Map<string, string>();
+    for (const layout of [mobile, desktop]) {
+      for (const art of layout?.platformArt ?? []) {
+        if (!artByKey.has(art.key)) artByKey.set(art.key, art.path);
+      }
+    }
+
+    if (bgEntries.length === 0 && artByKey.size === 0) {
       onComplete();
       return;
     }
@@ -52,7 +61,7 @@ export class BootScene extends Phaser.Scene {
     };
 
     const timeout = this.time.delayedCall(12000, () => {
-      console.warn('[BootScene] Background load timed out — continuing to menu.');
+      console.warn('[BootScene] World asset load timed out — continuing to menu.');
       finish();
     });
 
@@ -60,9 +69,14 @@ export class BootScene extends Phaser.Scene {
       console.warn('[BootScene] Failed to load asset:', file.key);
     });
 
-    entries.forEach((entry) => {
+    bgEntries.forEach((entry) => {
       const path = entry.path.startsWith('/') ? entry.path.slice(1) : entry.path;
       this.load.image(entry.key, assetUrl(path));
+    });
+
+    artByKey.forEach((assetPath, key) => {
+      const path = assetPath.startsWith('/') ? assetPath.slice(1) : assetPath;
+      this.load.image(key, assetUrl(path));
     });
 
     this.load.once('complete', finish);
