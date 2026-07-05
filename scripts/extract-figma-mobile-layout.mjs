@@ -28,8 +28,16 @@ const SPAWN_PLATFORM_PRIORITY = [
   'platform_start_3',
 ];
 
-/** Figma spawn marker gives X; foot Y snaps to the walk surface (platform zone top). */
+/** Figma spawn marker gives X; foot Y snaps to platform_start walk surface. */
 function resolvePlayerSpawn(platforms, markersData) {
+  const platformStart = platforms.find((p) => p.name === 'platform_start');
+  if (platformStart) {
+    return {
+      x: platformStart.x + Math.round(platformStart.width / 2),
+      y: platformStart.y,
+    };
+  }
+
   const markerX = markersData.player_spawn?.x ?? PLAYER_SPAWN_FALLBACK.x;
 
   const overlapping = platforms.filter(
