@@ -76,7 +76,7 @@ const FINAL_BOSS = {
   max: GOAL_X + 203,
 };
 
-const PLAYER_SPAWN = { x: 233, y: 519 };
+const PLAYER_SPAWN = { x: 233, y: 630 };
 
 function toPlatform([_nodeId, name, zoneType, x, y, w, h], frameY = PLATFORM_FRAME_Y) {
   let artY = Math.round(y + frameY);

@@ -107,7 +107,7 @@ export const platformTopLeftToCenter = (p: PlatformZone) => ({
   cy: p.y + p.height / 2,
 });
 
-/** Gameplay collision — thin surface at bottom of zone (matches platform art). */
+/** Gameplay collision — thin surface at top of zone (feet stand on zone.y). */
 export function getPlatformCollisionRect(zone: PlatformZone): PlatformZone {
   if (zone.type === 'pipe' || zone.name === 'ground_floor') {
     return zone;
@@ -115,7 +115,7 @@ export function getPlatformCollisionRect(zone: PlatformZone): PlatformZone {
   const surfaceH = Math.min(zone.height, 18);
   return {
     ...zone,
-    y: zone.y + zone.height - surfaceH,
+    y: zone.y,
     height: surfaceH,
   };
 }
