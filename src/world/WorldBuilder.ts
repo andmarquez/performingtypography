@@ -50,7 +50,7 @@ export class WorldBuilder {
       cloudLabels.push(...labels);
     };
 
-    if (platformDebugVisible) renderPlatformDebug();
+    if (platformDebugVisible && getPlatformZoneVisualAlpha() > 0) renderPlatformDebug();
     if (options.cloudZones) renderCloudDebug();
 
     const toggleDebug = () => {
@@ -115,8 +115,19 @@ export class WorldBuilder {
     for (const art of layout.platformArt ?? []) {
       if (!scene.textures.exists(art.key)) continue;
 
-      const img = scene.add.image(art.x + art.width / 2, art.y + art.height / 2, art.key);
-      img.setDisplaySize(art.width, art.height);
+      const frame = scene.textures.get(art.key).get();
+      const nativeW = frame.width;
+      const nativeH = frame.height;
+      if (nativeW === 0 || nativeH === 0) continue;
+
+      const scale = Math.min(art.width / nativeW, art.height / nativeH);
+      const displayW = nativeW * scale;
+      const displayH = nativeH * scale;
+      const cx = art.x + art.width / 2;
+      const cy = art.y + art.height - displayH / 2;
+
+      const img = scene.add.image(cx, cy, art.key);
+      img.setDisplaySize(displayW, displayH);
       img.setDepth(WORLD_LAYERS.platformArt);
       img.setScrollFactor(1);
     }
