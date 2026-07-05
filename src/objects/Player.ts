@@ -34,8 +34,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setBounce(GAME_CONFIG.playerBounce);
     this.setDragX(800);
     this.setOrigin(0.5, 1);
-    this.body!.setSize(28, 52);
-    this.body!.setOffset(10, 0);
+    this.fitDisplayScale();
 
     this.createAnimations();
     this.setAnimState('idle');
@@ -71,6 +70,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.animState = state;
     this.setTexture(`andsiosa-${state}`);
+    this.fitDisplayScale();
     const animKey = `andsiosa-anim-${state}`;
     if (this.anims.currentAnim?.key !== animKey) {
       this.play(animKey, true);
@@ -231,5 +231,21 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   hasTripleJump(): boolean {
     return this.maxJumpsAllowed >= GAME_CONFIG.maxJumpsWithPrize;
+  }
+
+  /** Scale trimmed Figma art to consistent on-screen height with transparent padding. */
+  private fitDisplayScale(): void {
+    const frame = this.texture.get();
+    if (!frame.height) return;
+
+    const flip = this.flipX;
+    const targetH = 64 * GAME_CONFIG.playerDisplayScale;
+    const scale = (targetH / frame.height) * (flip ? -1 : 1);
+    this.setScale(scale);
+
+    const s = Math.abs(this.scaleX);
+    this.body?.setSize(28 * s, 52 * s);
+    this.body?.setOffset(10 * s, 0);
+    this.body?.updateFromGameObject();
   }
 }

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { getCharacterDisplayScale } from '../utils/characterDisplay';
 
 export type GameOverReason = 'time' | 'lives' | 'fall';
 
@@ -58,7 +59,9 @@ export class GameOverScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this.add.image(w / 2, 440, 'andsiosa-hurt').setScale(2);
+    this.add
+      .image(w / 2, 440, 'andsiosa-hurt')
+      .setScale(getCharacterDisplayScale(this.textures, 'andsiosa-hurt', 2));
 
     const retry = this.add
       .text(w / 2, 560, 'Press Enter / Tap to Try Again', {

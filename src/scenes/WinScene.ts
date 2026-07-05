@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { getCharacterDisplayScale } from '../utils/characterDisplay';
 
 /**
  * WinScene — shown when Andsiosa completes all projects and reaches the portal.
@@ -66,7 +67,9 @@ export class WinScene extends Phaser.Scene {
       )
       .setOrigin(0.5);
 
-    const hero = this.add.image(w / 2, 450, 'andsiosa-victory').setScale(2.2);
+    const hero = this.add
+      .image(w / 2, 450, 'andsiosa-victory')
+      .setScale(getCharacterDisplayScale(this.textures, 'andsiosa-victory', 2.2));
     this.tweens.add({
       targets: hero,
       y: hero.y - 15,

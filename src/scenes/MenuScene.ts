@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { shouldShowMobileControls } from '../ui/mobileControlUtils';
 import { isLandscapeViewport } from '../ui/scaleMode';
+import { getCharacterDisplayScale } from '../utils/characterDisplay';
 import { getUiViewport } from '../ui/viewportLayout';
 
 /**
@@ -97,7 +98,10 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    this.preview = this.add.image(0, 0, 'andsiosa-idle').setScale(2).setDepth(110);
+    this.preview = this.add
+      .image(0, 0, 'andsiosa-idle')
+      .setScale(getCharacterDisplayScale(this.textures, 'andsiosa-idle', 2))
+      .setDepth(110);
     this.tweens.add({
       targets: this.preview,
       y: '-=10',
