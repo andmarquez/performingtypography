@@ -29,33 +29,33 @@
     },
     {
       "name": "platform_start",
-      "x": 0,
-      "y": 584,
-      "width": 231,
+      "x": 11,
+      "y": 594,
+      "width": 207,
       "height": 36,
       "type": "platform"
     },
     {
       "name": "platform_start_1",
-      "x": 303,
-      "y": 566,
+      "x": 300,
+      "y": 576,
       "width": 174,
       "height": 54,
       "type": "platform"
     },
     {
       "name": "platform_start_2",
-      "x": 540,
-      "y": 530,
+      "x": 516,
+      "y": 541,
       "width": 113,
       "height": 90,
       "type": "platform"
     },
     {
       "name": "platform_start_3",
-      "x": 653,
-      "y": 591,
-      "width": 195,
+      "x": 600,
+      "y": 602,
+      "width": 203,
       "height": 29,
       "type": "platform"
     },
@@ -69,15 +69,15 @@
     },
     {
       "name": "platform_01",
-      "x": 996,
-      "y": 557,
+      "x": 775,
+      "y": 568,
       "width": 391,
       "height": 132,
       "type": "platform"
     },
     {
       "name": "floating_platform_02",
-      "x": 935,
+      "x": 1205,
       "y": 469,
       "width": 122,
       "height": 34,
@@ -85,42 +85,42 @@
     },
     {
       "name": "platform_02",
-      "x": 1472,
-      "y": 586,
+      "x": 1334,
+      "y": 599,
       "width": 246,
       "height": 35,
       "type": "platform"
     },
     {
       "name": "pipe_1",
-      "x": 1564,
-      "y": 529,
+      "x": 1499,
+      "y": 539,
       "width": 56,
       "height": 73,
       "type": "pipe"
     },
     {
       "name": "floating_platform_03",
-      "x": 1395,
-      "y": 471,
+      "x": 1967,
+      "y": 479,
       "width": 124,
       "height": 34,
       "type": "platform"
     },
     {
       "name": "floating_platform_04",
-      "x": 1860,
-      "y": 503,
+      "x": 1714,
+      "y": 519,
       "width": 98,
       "height": 56,
       "type": "platform"
     },
     {
       "name": "platform_03",
-      "x": 1791,
-      "y": 555,
+      "x": 1643,
+      "y": 570,
       "width": 314,
-      "height": 114,
+      "height": 70,
       "type": "platform"
     },
     {
@@ -133,8 +133,8 @@
     },
     {
       "name": "floating_platform_05",
-      "x": 3105,
-      "y": 470,
+      "x": 2968,
+      "y": 471,
       "width": 120,
       "height": 32,
       "type": "platform"
@@ -150,57 +150,57 @@
     {
       "name": "floating_platform_06",
       "x": 4135,
-      "y": 503,
+      "y": 524,
       "width": 102,
       "height": 70,
       "type": "platform"
     },
     {
       "name": "platform_04",
-      "x": 2101,
-      "y": 583,
-      "width": 465,
+      "x": 2159,
+      "y": 605,
+      "width": 219,
       "height": 38,
       "type": "platform"
     },
     {
       "name": "floating_platform_07",
       "x": 4308,
-      "y": 470,
+      "y": 485,
       "width": 122,
-      "height": 34,
+      "height": 38,
+      "type": "platform"
+    },
+    {
+      "name": "platform_06",
+      "x": 4089,
+      "y": 575,
+      "width": 541,
+      "height": 68,
       "type": "platform"
     },
     {
       "name": "platform_05",
       "x": 2687,
-      "y": 577,
+      "y": 592,
       "width": 1442,
-      "height": 47,
+      "height": 51,
       "type": "platform"
     },
     {
       "name": "pipe_3",
       "x": 3845,
-      "y": 518,
+      "y": 533,
       "width": 56,
-      "height": 73,
+      "height": 77,
       "type": "pipe"
-    },
-    {
-      "name": "platform_06",
-      "x": 4089,
-      "y": 560,
-      "width": 541,
-      "height": 64,
-      "type": "platform"
     },
     {
       "name": "floating_platform_08",
       "x": 4748,
-      "y": 478,
+      "y": 493,
       "width": 195,
-      "height": 66,
+      "height": 70,
       "type": "platform"
     },
     {
@@ -217,17 +217,17 @@
       "name": "platform_start",
       "key": "platform-art:platform_start",
       "path": "/assets/world/platforms/platform_start.png",
-      "x": 0,
-      "y": 584,
-      "width": 231,
+      "x": 11,
+      "y": 594,
+      "width": 207,
       "height": 36
     },
     {
       "name": "platform_start_1",
       "key": "platform-art:platform_start_1",
       "path": "/assets/world/platforms/platform_start_1.png",
-      "x": 303,
-      "y": 566,
+      "x": 300,
+      "y": 576,
       "width": 174,
       "height": 54
     },
@@ -235,8 +235,8 @@
       "name": "platform_start_2",
       "key": "platform-art:platform_start_2",
       "path": "/assets/world/platforms/platform_start_2.png",
-      "x": 540,
-      "y": 530,
+      "x": 516,
+      "y": 541,
       "width": 113,
       "height": 90
     },
@@ -244,9 +244,9 @@
       "name": "platform_start_3",
       "key": "platform-art:platform_start_3",
       "path": "/assets/world/platforms/platform_start_3.png",
-      "x": 653,
-      "y": 591,
-      "width": 195,
+      "x": 600,
+      "y": 602,
+      "width": 203,
       "height": 29
     },
     {
@@ -262,8 +262,8 @@
       "name": "platform_01",
       "key": "platform-art:platform_01",
       "path": "/assets/world/platforms/platform_01.png",
-      "x": 996,
-      "y": 557,
+      "x": 775,
+      "y": 568,
       "width": 391,
       "height": 132
     },
@@ -271,7 +271,7 @@
       "name": "floating_platform_02",
       "key": "platform-art:floating_platform_02",
       "path": "/assets/world/platforms/floating_platform_02.png",
-      "x": 935,
+      "x": 1205,
       "y": 469,
       "width": 122,
       "height": 34
@@ -280,8 +280,8 @@
       "name": "platform_02",
       "key": "platform-art:platform_02",
       "path": "/assets/world/platforms/platform_02.png",
-      "x": 1472,
-      "y": 586,
+      "x": 1334,
+      "y": 599,
       "width": 246,
       "height": 35
     },
@@ -289,8 +289,8 @@
       "name": "floating_platform_03",
       "key": "platform-art:floating_platform_03",
       "path": "/assets/world/platforms/floating_platform_03.png",
-      "x": 1395,
-      "y": 471,
+      "x": 1967,
+      "y": 479,
       "width": 124,
       "height": 34
     },
@@ -298,8 +298,8 @@
       "name": "floating_platform_04",
       "key": "platform-art:floating_platform_04",
       "path": "/assets/world/platforms/floating_platform_04.png",
-      "x": 1860,
-      "y": 503,
+      "x": 1714,
+      "y": 519,
       "width": 98,
       "height": 56
     },
@@ -307,17 +307,17 @@
       "name": "platform_03",
       "key": "platform-art:platform_03",
       "path": "/assets/world/platforms/platform_03.png",
-      "x": 1791,
-      "y": 555,
+      "x": 1643,
+      "y": 570,
       "width": 314,
-      "height": 114
+      "height": 70
     },
     {
       "name": "floating_platform_05",
       "key": "platform-art:floating_platform_05",
       "path": "/assets/world/platforms/floating_platform_05.png",
-      "x": 3105,
-      "y": 470,
+      "x": 2968,
+      "y": 471,
       "width": 120,
       "height": 32
     },
@@ -335,7 +335,7 @@
       "key": "platform-art:floating_platform_06",
       "path": "/assets/world/platforms/floating_platform_06.png",
       "x": 4135,
-      "y": 503,
+      "y": 524,
       "width": 102,
       "height": 70
     },
@@ -343,9 +343,9 @@
       "name": "platform_04",
       "key": "platform-art:platform_04",
       "path": "/assets/world/platforms/platform_04.png",
-      "x": 2101,
-      "y": 583,
-      "width": 465,
+      "x": 2159,
+      "y": 605,
+      "width": 219,
       "height": 38
     },
     {
@@ -353,36 +353,36 @@
       "key": "platform-art:floating_platform_07",
       "path": "/assets/world/platforms/floating_platform_07.png",
       "x": 4308,
-      "y": 470,
+      "y": 485,
       "width": 122,
-      "height": 34
-    },
-    {
-      "name": "platform_05",
-      "key": "platform-art:platform_05",
-      "path": "/assets/world/platforms/platform_05.png",
-      "x": 2687,
-      "y": 577,
-      "width": 1442,
-      "height": 47
+      "height": 38
     },
     {
       "name": "platform_06",
       "key": "platform-art:platform_06",
       "path": "/assets/world/platforms/platform_06.png",
       "x": 4089,
-      "y": 560,
+      "y": 575,
       "width": 541,
-      "height": 64
+      "height": 68
+    },
+    {
+      "name": "platform_05",
+      "key": "platform-art:platform_05",
+      "path": "/assets/world/platforms/platform_05.png",
+      "x": 2687,
+      "y": 592,
+      "width": 1442,
+      "height": 51
     },
     {
       "name": "floating_platform_08",
       "key": "platform-art:floating_platform_08",
       "path": "/assets/world/platforms/floating_platform_08.png",
       "x": 4748,
-      "y": 478,
+      "y": 493,
       "width": 195,
-      "height": 66
+      "height": 70
     },
     {
       "name": "goal_platform",
@@ -394,78 +394,7 @@
       "height": 20
     }
   ],
-  "clouds": [
-    {
-      "name": "cloud_01",
-      "x": 120,
-      "y": 156,
-      "width": 180,
-      "height": 58
-    },
-    {
-      "name": "cloud_02",
-      "x": 450,
-      "y": 189,
-      "width": 220,
-      "height": 71
-    },
-    {
-      "name": "cloud_03",
-      "x": 900,
-      "y": 139,
-      "width": 200,
-      "height": 63
-    },
-    {
-      "name": "cloud_04",
-      "x": 1350,
-      "y": 173,
-      "width": 190,
-      "height": 56
-    },
-    {
-      "name": "cloud_05",
-      "x": 1800,
-      "y": 206,
-      "width": 240,
-      "height": 75
-    },
-    {
-      "name": "cloud_06",
-      "x": 2400,
-      "y": 148,
-      "width": 210,
-      "height": 66
-    },
-    {
-      "name": "cloud_07",
-      "x": 3100,
-      "y": 181,
-      "width": 200,
-      "height": 60
-    },
-    {
-      "name": "cloud_08",
-      "x": 3800,
-      "y": 135,
-      "width": 230,
-      "height": 73
-    },
-    {
-      "name": "cloud_09",
-      "x": 4500,
-      "y": 168,
-      "width": 195,
-      "height": 59
-    },
-    {
-      "name": "cloud_10",
-      "x": 5100,
-      "y": 198,
-      "width": 180,
-      "height": 54
-    }
-  ],
+  "clouds": [],
   "markers": {
     "player_spawn": {
       "x": 231,
