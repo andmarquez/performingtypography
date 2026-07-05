@@ -20,6 +20,14 @@
   },
   "platforms": [
     {
+      "name": "platform_start",
+      "x": 11,
+      "y": 630,
+      "width": 207,
+      "height": 36,
+      "type": "platform"
+    },
+    {
       "name": "platform_start_1",
       "x": 300,
       "y": 612,
@@ -173,6 +181,15 @@
     }
   ],
   "platformArt": [
+    {
+      "name": "platform_start",
+      "key": "platform-art:platform_start",
+      "path": "/assets/world/platforms/platform_start.png",
+      "x": 11,
+      "y": 630,
+      "width": 207,
+      "height": 36
+    },
     {
       "name": "platform_start_1",
       "key": "platform-art:platform_start_1",
@@ -339,8 +356,8 @@
   "clouds": [],
   "markers": {
     "player_spawn": {
-      "x": 233,
-      "y": 443
+      "x": 115,
+      "y": 630
     },
     "portal_goal": {
       "x": 5182,

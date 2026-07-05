@@ -18,9 +18,10 @@ const MARKERS_JSON = path.join(ROOT, 'figma/figma-gameplay-markers.json');
 const DESKTOP_W = 4895;
 const MOBILE_W = 5335;
 
-const PLAYER_SPAWN_FALLBACK = { x: 267, y: 443 };
+const PLAYER_SPAWN_FALLBACK = { x: 115, y: 630 };
 
 const SPAWN_PLATFORM_PRIORITY = [
+  'platform_start',
   'floating_platform_01',
   'platform_start_1',
   'platform_start_2',
