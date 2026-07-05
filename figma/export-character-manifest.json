@@ -1,0 +1,8 @@
+{
+  "idle": { "nodeId": "65:210", "export": "https://www.figma.com/api/mcp/asset/f0febecf-4f5f-4d49-88f0-4a084bc37df7" },
+  "run": { "nodeId": "65:228", "export": "https://www.figma.com/api/mcp/asset/42f63b3c-802a-4752-ac58-a05bca08cce8" },
+  "jump": { "nodeId": "65:248", "export": "https://www.figma.com/api/mcp/asset/22b98049-971d-4ae8-9fbf-c4ad6c01ddd0" },
+  "fall": { "nodeId": "65:268", "export": "https://www.figma.com/api/mcp/asset/3de52047-073c-4ed9-a3a5-a6a969fc2876" },
+  "hurt": { "nodeId": "65:288", "export": "https://www.figma.com/api/mcp/asset/b6b1666b-b1d5-4a97-a4a7-1be32749b08e" },
+  "victory": { "nodeId": "65:307", "export": "https://www.figma.com/api/mcp/asset/31dba54d-547c-491d-b92a-c40157681bb4" }
+}

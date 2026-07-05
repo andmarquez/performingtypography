@@ -15,13 +15,14 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     const v = GAME_CONFIG.worldAssetVersion;
+    const cv = GAME_CONFIG.characterAssetVersion;
     this.load.json('world-manifest', assetUrl('assets/world/manifest.json', v));
     this.load.json('level-1-layout-mobile', assetUrl('assets/world/level-1/layout-mobile.json', v));
     this.load.json('level-1-layout-desktop', assetUrl('assets/world/level-1/layout-desktop.json', v));
 
     const states = ['idle', 'run', 'jump', 'fall', 'hurt', 'victory'] as const;
     states.forEach((state) => {
-      this.load.image(`andsiosa-${state}`, assetUrl(`assets/character/andsiosa-${state}.png`));
+      this.load.image(`andsiosa-${state}`, assetUrl(`assets/character/andsiosa-${state}.png`, cv));
     });
   }
 

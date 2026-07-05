@@ -13,6 +13,19 @@ Frame **🧍 Character States (replaceable)** — below M02 artboard on the game
 | `Character/Andsiosa/hurt` | `andsiosa-hurt` | Hit / game over |
 | `Character/Andsiosa/victory` | `andsiosa-victory` | Win screen |
 
+Figma node IDs (48×64 components on **📱 Screens — Mobile Landscape**):
+
+| State | Node ID |
+|-------|---------|
+| idle | `65:210` |
+| run | `65:228` |
+| jump | `65:248` |
+| fall | `65:268` |
+| hurt | `65:288` |
+| victory | `65:307` |
+
+Sync: `npm run assets:character` (uses `figma/export-character-manifest.json`).
+
 ## Replace art
 
 1. In Figma, open **Assets** → search `Character/Andsiosa`
