@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { getFootOriginY } from '../utils/footOrigin';
 
 export type PlayerAnimState =
   | 'idle'
@@ -33,7 +34,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
     this.setBounce(GAME_CONFIG.playerBounce);
     this.setDragX(800);
-    this.setOrigin(0.5, 1);
+    this.applyFootOrigin();
+
     this.fitDisplayScale();
 
     this.createAnimations();
@@ -70,6 +72,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.animState = state;
     this.setTexture(`andsiosa-${state}`);
+    this.applyFootOrigin();
     this.fitDisplayScale();
     const animKey = `andsiosa-anim-${state}`;
     if (this.anims.currentAnim?.key !== animKey) {
@@ -230,6 +233,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   hasTripleJump(): boolean {
     return this.maxJumpsAllowed >= GAME_CONFIG.maxJumpsWithPrize;
+  }
+
+  /** Anchor sprite on scanned shoe soles, not transparent frame padding. */
+  private applyFootOrigin(): void {
+    const originY = getFootOriginY(this.scene.textures, this.texture.key);
+    this.setOrigin(0.5, originY);
   }
 
   /** Scale trimmed Figma art to consistent on-screen height with transparent padding. */
