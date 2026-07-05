@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { WORLD_LAYERS } from './layerConfig';
 import type { LevelLayout, PlatformZone, CloudZone } from './worldTypes';
+import { getPlatformZoneVisualAlpha } from './layoutUtils';
 import { platformTopLeftToCenter } from './worldTypes';
 
 export type WorldBuildOptions = {
@@ -61,18 +62,21 @@ export class WorldBuilder {
 
     if (platformDebugVisible || options.cloudZones) {
       const hints: string[] = [];
-      if (platformDebugVisible) hints.push('green=platform, blue=pipe');
+      const zoneAlpha = getPlatformZoneVisualAlpha();
+      if (platformDebugVisible && zoneAlpha > 0) hints.push('green=platform, blue=pipe');
       if (options.cloudZones) hints.push('purple=cloud');
-      scene.add
-        .text(16, layout.height - 36, `Zones: ${hints.join(', ')}  |  ?clouds=1  H toggles platforms`, {
-          fontSize: '14px',
-          fontFamily: 'Nunito, sans-serif',
-          color: '#4a148c',
-          backgroundColor: '#ffffffcc',
-          padding: { x: 8, y: 4 },
-        })
-        .setScrollFactor(0)
-        .setDepth(WORLD_LAYERS.debug);
+      if (hints.length > 0) {
+        scene.add
+          .text(16, layout.height - 36, `Zones: ${hints.join(', ')}  |  ?zones=1  H toggles platforms`, {
+            fontSize: '14px',
+            fontFamily: 'Nunito, sans-serif',
+            color: '#4a148c',
+            backgroundColor: '#ffffffcc',
+            padding: { x: 8, y: 4 },
+          })
+          .setScrollFactor(0)
+          .setDepth(WORLD_LAYERS.debug);
+      }
     }
 
     return { platforms, layout, toggleDebug };
@@ -138,10 +142,12 @@ export class WorldBuilder {
   ): { graphics: Phaser.GameObjects.Graphics; labels: Phaser.GameObjects.Text[] } {
     const g = scene.add.graphics();
     g.setDepth(WORLD_LAYERS.debug);
+    const fillAlpha = getPlatformZoneVisualAlpha();
+    const strokeAlpha = fillAlpha > 0 ? 0.95 : 0;
 
     for (const zone of zones) {
       const isPipe = zone.type === 'pipe';
-      g.fillStyle(isPipe ? 0x40c4ff : 0x00e676, isPipe ? 0.4 : 0.35);
+      g.fillStyle(isPipe ? 0x40c4ff : 0x00e676, fillAlpha);
       g.fillRect(zone.x, zone.y, zone.width, zone.height);
       WorldBuilder.strokeDashedRect(
         g,
@@ -153,6 +159,7 @@ export class WorldBuilder {
         2,
         8,
         6,
+        strokeAlpha,
       );
     }
 
@@ -234,6 +241,7 @@ export class WorldBuilder {
     lineWidth: number,
     dash: number,
     gap: number,
+    alpha = 0.95,
   ): void {
     const edges: [number, number, number, number][] = [
       [x, y, x + w, y],
@@ -242,7 +250,7 @@ export class WorldBuilder {
       [x, y + h, x, y],
     ];
 
-    g.lineStyle(lineWidth, color, 0.95);
+    g.lineStyle(lineWidth, color, alpha);
     for (const [x1, y1, x2, y2] of edges) {
       WorldBuilder.strokeDashedLine(g, x1, y1, x2, y2, dash, gap);
     }

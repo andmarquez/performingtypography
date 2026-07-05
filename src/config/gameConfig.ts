@@ -119,8 +119,9 @@ export const GAME_CONFIG = {
 
   /** Colors — Andsiosa red & white identity */
   colors: {
+    /** Figma M02 sky — Token Swatches Sky Top #B8E0F5 */
     skyTop: 0xb8e0f5,
-    skyBottom: 0xfce4ec,
+    skyBottom: 0xb8e0f5,
     cloud: 0xffffff,
     hillFar: 0xf8bbd0,
     hillNear: 0xf48fb1,
