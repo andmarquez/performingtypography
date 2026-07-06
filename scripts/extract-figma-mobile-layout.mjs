@@ -42,7 +42,7 @@ function loadPlatformZones() {
   }));
 }
 
-const platforms = loadPlatformZones().filter((p) => p.name !== 'ground_floor');
+const platforms = loadPlatformZones();
 const markersData = loadMarkers();
 
 const platformArt = platforms

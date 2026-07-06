@@ -149,7 +149,7 @@ export class WorldBuilder {
     for (const zone of zones) {
       const isPipe = zone.type === 'pipe';
       const collision = getPlatformCollisionRect(zone);
-      const isPlatform = !isPipe;
+      const isPlatform = !isPipe && zone.name !== 'ground_floor';
 
       if (isPlatform) {
         g.fillStyle(0x00e676, fillAlpha * 0.25);
