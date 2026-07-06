@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { getUiViewport, pointerToUiSpace } from './viewportLayout';
-import { getMobileLayoutInsets } from './scaleMode';
+import { getMobileLayoutInsets, bottomAnchoredControlY } from './scaleMode';
 import { VirtualJoystick } from './VirtualJoystick';
 import { onViewportChange } from './viewportMetrics';
 
@@ -111,12 +111,22 @@ export class MobileControls {
     const scale = layout.controlScale;
     this.controlScale = scale;
 
-    this.joystick.layout(vp, layout);
+    this.joystick.layout(vp, layout, this.scene.scale);
 
     const jumpX = vp.x + vp.width * layout.jumpXRatio;
-    const jumpY = vp.y + vp.height * layout.jumpYRatio;
+    const jumpY = bottomAnchoredControlY(
+      vp,
+      this.scene.scale,
+      GAME_CONFIG.mobileWildRift.attackRadius,
+      scale,
+    );
     const kissX = vp.x + vp.width * layout.kissXRatio;
-    const kissY = vp.y + vp.height * layout.kissYRatio;
+    const kissY = bottomAnchoredControlY(
+      vp,
+      this.scene.scale,
+      GAME_CONFIG.mobileWildRift.abilityRadius,
+      scale,
+    );
 
     const jump = this.abilities.find((a) => a.id === 'jump')!;
     jump.btn.setPosition(jumpX, jumpY);

@@ -84,19 +84,15 @@ export const GAME_CONFIG = {
   /** Pill radius — Figma rounded-[60px] capped to bar height */
   hudCornerRadius: 26,
 
-  /** Lift touch controls above the bottom edge (browser bars, thumbs) */
-  mobileControlsLift: 88,
+  /** Padding from bottom of screen for touch controls (plus safe-area inset) */
+  mobileControlsLift: 48,
 
   /** Bias camera down on mobile landscape so ENVELOP crop keeps ground visible */
   mobileLandscapeCameraFollowOffsetY: 48,
 
   /**
-   * Wild Rift–style mobile control layout.
-   * Left = move joystick, right = attack + ability arc.
-   */
-  /**
-   * Wild Rift controls — anchors from Figma M02 gameplay zones (node 26:178).
-   * Joystick 13:16 center (107, 572), Jump 17:582 center (1194, 431), Kiss 17:583 (1094, 393).
+   * Wild Rift controls — X anchors from Figma M02; Y is bottom-anchored in MobileControls.
+   * Joystick left, Jump + Kiss on the right along the bottom edge.
    */
   mobileWildRift: {
     joystick: {

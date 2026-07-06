@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { type MobileLayoutInsets } from './scaleMode';
+import { type MobileLayoutInsets, bottomAnchoredControlY } from './scaleMode';
 import { type UiViewport } from './viewportLayout';
 
 /**
@@ -41,18 +41,19 @@ export class VirtualJoystick {
     this.container.add([this.baseRing, this.base, this.thumb]);
   }
 
-  layout(viewport: UiViewport, insets: MobileLayoutInsets): void {
-    const scale = insets.controlScale;
-    this.hitScale = scale;
+  layout(viewport: UiViewport, insets: MobileLayoutInsets, scale: Phaser.Scale.ScaleManager): void {
+    const controlScale = insets.controlScale;
+    this.hitScale = controlScale;
 
+    const { baseRadius } = GAME_CONFIG.mobileWildRift.joystick;
     this.centerX = viewport.x + viewport.width * insets.joystickXRatio;
-    this.centerY = viewport.y + viewport.height * insets.joystickYRatio;
+    this.centerY = bottomAnchoredControlY(viewport, scale, baseRadius, controlScale);
 
     this.baseRing.setPosition(this.centerX, this.centerY);
     this.base.setPosition(this.centerX, this.centerY);
-    this.baseRing.setScale(scale);
-    this.base.setScale(scale);
-    this.thumb.setScale(scale);
+    this.baseRing.setScale(controlScale);
+    this.base.setScale(controlScale);
+    this.thumb.setScale(controlScale);
     this.resetThumb();
   }
 

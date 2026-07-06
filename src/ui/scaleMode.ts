@@ -8,6 +8,8 @@ import {
   onViewportChange,
   resolveScaleMode,
 } from './viewportMetrics';
+import { safeAreaInsetsInGame } from './safeAreaUtils';
+import { type UiViewport } from './viewportLayout';
 
 export {
   getViewportSize,
@@ -41,7 +43,19 @@ export type MobileLayoutInsets = {
 
 const CFG = GAME_CONFIG.mobileWildRift;
 
-/** Figma M02 control anchors scaled to visible viewport. */
+/** Y center for a bottom-anchored circular control (joystick, jump, kiss). */
+export function bottomAnchoredControlY(
+  viewport: UiViewport,
+  scale: Phaser.Scale.ScaleManager,
+  radius: number,
+  controlScale: number,
+): number {
+  const safe = safeAreaInsetsInGame(scale);
+  const bottomPad = GAME_CONFIG.mobileControlsLift + safe.bottom;
+  return viewport.y + viewport.height - bottomPad - radius * controlScale;
+}
+
+/** Figma M02 control anchors — X from Figma, Y bottom-anchored at runtime. */
 export function getMobileLayoutInsets(): MobileLayoutInsets {
   const scale = isLandscapeViewport() ? (isIphone16Class() ? 0.8 : 0.88) : 1;
 
