@@ -58,6 +58,8 @@ export const END_SCREEN = {
     ctaRadius: 44,
     ctaTextSize: 22,
     ctaLabel: 'Play Again',
+    /** Nudge cover-fit art down (design px) so top title isn't cropped on phones. */
+    artShiftY: 56,
   },
 } as const;
 
@@ -75,7 +77,7 @@ export type ScreenLayout = {
 };
 
 /** Cover-fit layout — fills viewport like MenuScene splash (no letterbox bars). */
-export function getCoverScreenLayout(scene: Phaser.Scene): ScreenLayout {
+export function getCoverScreenLayout(scene: Phaser.Scene, shiftDesignY = 0): ScreenLayout {
   const vp = getUiViewport(scene.scale);
   const landscape = isLandscapeViewport();
   const scaleX = vp.width / GAME_CONFIG.width;
@@ -85,7 +87,7 @@ export function getCoverScreenLayout(scene: Phaser.Scene): ScreenLayout {
   const contentW = GAME_CONFIG.width * scale;
   const contentH = GAME_CONFIG.height * scale;
   const offsetX = vp.x + (vp.width - contentW) / 2;
-  const offsetY = vp.y + (vp.height - contentH) / 2;
+  const offsetY = vp.y + (vp.height - contentH) / 2 + shiftDesignY * scale;
 
   return {
     vp,
@@ -132,13 +134,15 @@ export function layoutCoverScreenBackground(
   scene: Phaser.Scene,
   textureKey: string,
   depth = 0,
+  shiftDesignY = 0,
 ): ScreenLayout {
-  const vp = getUiViewport(scene.scale);
-  const cx = vp.x + vp.width / 2;
-  const cy = vp.y + vp.height / 2;
-  const bg = scene.add.image(cx, cy, textureKey).setScrollFactor(0).setDepth(depth);
-  coverFitImage(bg, vp.width, vp.height);
-  return getCoverScreenLayout(scene);
+  const layout = getCoverScreenLayout(scene, shiftDesignY);
+  const bg = scene.add
+    .image(layout.cx, layout.cy, textureKey)
+    .setScrollFactor(0)
+    .setDepth(depth);
+  coverFitImage(bg, layout.vp.width, layout.vp.height);
+  return layout;
 }
 
 export function coverFitImage(
@@ -313,6 +317,24 @@ export function addCtaButton(
   });
 
   return { bg, label, hit };
+}
+
+/** Invisible tap target over art that already includes a painted CTA. */
+export function addCtaHitZone(
+  scene: Phaser.Scene,
+  cx: number,
+  y: number,
+  ctaW: number,
+  ctaH: number,
+  onPress: () => void,
+): Phaser.GameObjects.Zone {
+  const hit = scene.add
+    .zone(cx, y, ctaW + 32, ctaH + 28)
+    .setScrollFactor(0)
+    .setDepth(32)
+    .setInteractive({ useHandCursor: true });
+  hit.on('pointerdown', onPress);
+  return hit;
 }
 
 export function bindRestartInput(scene: Phaser.Scene, restart: () => void, ctaY: number): void {

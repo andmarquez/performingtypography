@@ -1,14 +1,14 @@
 import Phaser from 'phaser';
 import {
   END_SCREEN,
-  addCtaButton,
+  addCtaHitZone,
   addStatsPill,
   layoutCoverScreenBackground,
   scalePx,
 } from '../ui/endScreenLayout';
 
 /**
- * WinScene — full-frame Figma M04 art + dynamic stats and CTA.
+ * WinScene — full-frame Figma M04 art + dynamic stats; CTA is baked into art.
  */
 export class WinScene extends Phaser.Scene {
   private score = 0;
@@ -36,7 +36,12 @@ export class WinScene extends Phaser.Scene {
     this.children.removeAll(true);
 
     const base = END_SCREEN.win;
-    const layout = layoutCoverScreenBackground(this, 'screen-win-screen');
+    const layout = layoutCoverScreenBackground(
+      this,
+      'screen-win-screen',
+      0,
+      base.artShiftY,
+    );
     const { cx, mapY, vp } = layout;
     const px = (n: number) => scalePx(layout, n);
 
@@ -68,16 +73,8 @@ export class WinScene extends Phaser.Scene {
       },
     );
 
-    const ctaY = mapY(base.ctaY);
     const restart = () => this.scene.start('GameScene');
-    addCtaButton(this, cx, ctaY, base.ctaLabel, {
-      ctaW: px(base.ctaW),
-      ctaH: px(base.ctaH),
-      ctaColor: base.ctaColor,
-      ctaHover: base.ctaHover,
-      ctaTextSize: px(base.ctaTextSize),
-      ctaRadius: px(base.ctaRadius),
-    }, restart);
+    addCtaHitZone(this, cx, mapY(base.ctaY), px(base.ctaW), px(base.ctaH), restart);
   };
 
   private setupRestart(): void {
