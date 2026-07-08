@@ -58,8 +58,8 @@ export const END_SCREEN = {
     ctaRadius: 44,
     ctaTextSize: 22,
     ctaLabel: 'Play Again',
-    /** Scale-to-fit inside viewport (0–1) so top/bottom aren't cropped on phones. */
-    fitScale: 0.92,
+    /** Bottom inset (screen px) when anchoring art on phone landscape. */
+    bottomInset: 10,
   },
 } as const;
 
@@ -186,6 +186,45 @@ export function layoutFitScreenBackground(
     GAME_CONFIG.height * layout.scale,
   );
   return layout;
+}
+
+/**
+ * Win screen — full-bleed gradient + width-fill art anchored to bottom so
+ * Play Again stays visible without side letterbox bars.
+ */
+export function layoutWinScreenBackground(
+  scene: Phaser.Scene,
+  textureKey: string,
+  bottomInset = 10,
+): ScreenLayout {
+  const vp = getUiViewport(scene.scale);
+  const landscape = isLandscapeViewport();
+  addViewportWinGradient(scene, vp);
+
+  const frame = scene.textures.get(textureKey).get();
+  const fw = frame.width;
+  const scale = vp.width / fw;
+  const designScale = vp.width / GAME_CONFIG.width;
+
+  const cx = vp.x + vp.width / 2;
+  const cy = vp.y + vp.height - bottomInset - 360 * designScale;
+  const bg = scene.add.image(cx, cy, textureKey).setScrollFactor(0).setDepth(1);
+  bg.setScale(scale);
+
+  const contentW = GAME_CONFIG.width * designScale;
+  const contentH = GAME_CONFIG.height * designScale;
+  const offsetX = cx - contentW / 2;
+  const offsetY = cy - contentH / 2;
+
+  return {
+    vp,
+    cx,
+    cy,
+    scale: designScale,
+    landscape,
+    mapY: (designY: number) => offsetY + designY * designScale,
+    mapX: (designX: number) => offsetX + designX * designScale,
+  };
 }
 
 export function coverFitImage(
