@@ -3,12 +3,12 @@ import {
   END_SCREEN,
   addCtaHitZone,
   addStatsPill,
-  layoutWinScreenBackground,
+  layoutCoverScreenBackground,
   scalePx,
 } from '../ui/endScreenLayout';
 
 /**
- * WinScene — full-frame Figma M04 art + dynamic stats; CTA is baked into art.
+ * WinScene — full-frame Figma M04 art (cover-fit) + dynamic stats; CTA baked in.
  */
 export class WinScene extends Phaser.Scene {
   private score = 0;
@@ -36,11 +36,7 @@ export class WinScene extends Phaser.Scene {
     this.children.removeAll(true);
 
     const base = END_SCREEN.win;
-    const layout = layoutWinScreenBackground(
-      this,
-      'screen-win-screen',
-      base.fitPadding,
-    );
+    const layout = layoutCoverScreenBackground(this, 'screen-win-screen');
     const { cx, mapY, vp } = layout;
     const px = (n: number) => scalePx(layout, n);
 

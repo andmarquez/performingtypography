@@ -1,7 +1,7 @@
 {
   "figmaFileKey": "1zlB4dA4ktyuuBXzseo1ix",
   "figmaFileUrl": "https://www.figma.com/design/1zlB4dA4ktyuuBXzseo1ix",
-  "syncedAt": "2026-07-08T15:20:00.000Z",
+  "syncedAt": "2026-07-08T16:10:00.000Z",
   "screens": {
     "menu-start": {
       "figmaNodeId": "150:117",
@@ -18,7 +18,7 @@
     "win-screen": {
       "figmaNodeId": "150:2",
       "figmaName": "M04 — Win",
-      "export": "https://www.figma.com/api/mcp/asset/932a4ee2-48d5-42f2-b280-01f21afe5c77",
+      "export": "https://www.figma.com/api/mcp/asset/bb6cb926-f219-48b6-a7fb-ec605fc23cb5",
       "dest": "public/assets/ui/screens/win-screen.png"
     }
   },

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
-import { isLandscapeViewport, isMobileViewport } from './viewportMetrics';
+import { isLandscapeViewport } from './viewportMetrics';
 import { getUiViewport, type UiViewport } from './viewportLayout';
 
 /** Figma M03/M04 — landscape 1280×720 artboard coordinates. */
@@ -44,13 +44,13 @@ export const END_SCREEN = {
     characterY: 374,
     characterW: 178,
     characterH: 227,
-    statsY: 523,
-    statsW: 309,
+    statsY: 505,
+    statsW: 332,
     statsH: 55,
     statsBg: 0x3744a4,
     statsTextColor: '#ffffff',
     statsTextSize: 22,
-    ctaY: 593,
+    ctaY: 575,
     ctaW: 175,
     ctaH: 49,
     ctaColor: 0xfc72ac,
@@ -58,8 +58,6 @@ export const END_SCREEN = {
     ctaRadius: 44,
     ctaTextSize: 22,
     ctaLabel: 'Play Again',
-    /** Fit padding when scaling art inside viewport (mobile uses a bit tighter). */
-    fitPadding: 0.95,
   },
 } as const;
 
@@ -180,30 +178,6 @@ export function layoutFitScreenBackground(
     .image(layout.cx, layout.cy, textureKey)
     .setScrollFactor(0)
     .setDepth(depth);
-  fitImageToSize(
-    bg,
-    GAME_CONFIG.width * layout.scale,
-    GAME_CONFIG.height * layout.scale,
-  );
-  return layout;
-}
-
-/**
- * Win screen — full-bleed gradient with centered art scaled to fit (no crop).
- */
-export function layoutWinScreenBackground(
-  scene: Phaser.Scene,
-  textureKey: string,
-  fitPadding = 0.95,
-): ScreenLayout {
-  const vp = getUiViewport(scene.scale);
-  addViewportWinGradient(scene, vp);
-  const padding = isMobileViewport() ? Math.min(fitPadding, 0.9) : fitPadding;
-  const layout = getFitScreenLayout(scene, padding);
-  const bg = scene.add
-    .image(layout.cx, layout.cy, textureKey)
-    .setScrollFactor(0)
-    .setDepth(1);
   fitImageToSize(
     bg,
     GAME_CONFIG.width * layout.scale,
