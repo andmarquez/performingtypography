@@ -5,6 +5,7 @@ import { GameScene } from './scenes/GameScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { WinScene } from './scenes/WinScene';
 import { GAME_CONFIG } from './config/gameConfig';
+import { bootstrapDesktopPrompt, mountDesktopPrompt } from './ui/desktopPrompt';
 import { bootstrapRotatePrompt, mountRotatePrompt } from './ui/rotatePrompt';
 import {
   getViewportSize,
@@ -16,6 +17,7 @@ import {
 } from './ui/viewportMetrics';
 
 bootstrapRotatePrompt();
+bootstrapDesktopPrompt();
 
 const applyViewportClasses = () => {
   const mobile = isMobileViewport();
@@ -81,6 +83,7 @@ onViewportChange(applyScaleMode);
 game.events.once('ready', () => {
   applyScaleMode();
   mountRotatePrompt(game);
+  mountDesktopPrompt(game);
   if (game.input.touch) {
     game.input.touch.capture = false;
   }

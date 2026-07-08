@@ -96,6 +96,49 @@
         font-size: clamp(3rem, 14vw, 4.5rem);
         line-height: 1;
       }
+
+      #desktop-prompt {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #b8e0f5;
+        pointer-events: auto;
+        touch-action: none;
+      }
+
+      #desktop-prompt[hidden] {
+        display: none !important;
+      }
+
+      .desktop-prompt__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        max-width: 22rem;
+        padding: 1.5rem;
+        text-align: center;
+        color: #01579b;
+        font-family: 'Inter', 'Nunito', system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.15rem, 4vw, 1.6rem);
+        line-height: 1.4;
+      }
+
+      .desktop-prompt__icon {
+        font-size: clamp(3rem, 14vw, 4.5rem);
+        line-height: 1;
+      }
+
+      .desktop-prompt__hint {
+        font-weight: 500;
+        font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+        color: #0277bd;
+        opacity: 0.9;
+      }
     </style>
   </head>
   <body>
@@ -104,6 +147,13 @@
       <div class="rotate-prompt__inner">
         <span class="rotate-prompt__icon" aria-hidden="true">↻</span>
         <p>Rotate your phone<br />to play</p>
+      </div>
+    </div>
+    <div id="desktop-prompt" hidden>
+      <div class="desktop-prompt__inner">
+        <span class="desktop-prompt__icon" aria-hidden="true">📱</span>
+        <p>At the moment, this game is only available on phones.</p>
+        <p class="desktop-prompt__hint">Open the link on your phone to play.</p>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
