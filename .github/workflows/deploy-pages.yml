@@ -54,7 +54,7 @@ jobs:
         if: steps.app.outputs.skip != 'true'
         run: npm run build:pages
         env:
-          BASE_PATH: /venezuelan-game/
+          BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: Upload Pages artifact
         if: steps.app.outputs.skip != 'true'
