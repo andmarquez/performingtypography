@@ -23,7 +23,7 @@
       "name": "ground_floor",
       "x": 0,
       "y": 684,
-      "width": 5336,
+      "width": 233,
       "height": 36,
       "type": "platform"
     },
@@ -85,19 +85,11 @@
     },
     {
       "name": "platform_02",
-      "x": 1334,
+      "x": 1353,
       "y": 633,
-      "width": 246,
+      "width": 208,
       "height": 35,
       "type": "platform"
-    },
-    {
-      "name": "pipe_1",
-      "x": 1499,
-      "y": 573,
-      "width": 56,
-      "height": 73,
-      "type": "pipe"
     },
     {
       "name": "floating_platform_03",
@@ -256,9 +248,9 @@
       "name": "platform_02",
       "key": "platform-art:platform_02",
       "path": "/assets/world/platforms/platform_02.png",
-      "x": 1334,
+      "x": 1353,
       "y": 633,
-      "width": 246,
+      "width": 208,
       "height": 35
     },
     {
@@ -493,6 +485,10 @@
       {
         "x": 811,
         "y": 487
+      },
+      {
+        "x": 3627,
+        "y": 525
       }
     ],
     "boss_spark_collectibles": [

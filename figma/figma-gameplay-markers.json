@@ -1,7 +1,7 @@
 {
   "source": "Figma M02 — Gameplay (Level 1) node 13:2",
   "figmaFileKey": "1zlB4dA4ktyuuBXzseo1ix",
-  "syncedAt": "2026-07-05T21:30:00.000Z",
+  "syncedAt": "2026-07-08T17:15:00.000Z",
   "kisses": [
     { "x": 194, "y": 580 },
     { "x": 375, "y": 561 },
@@ -33,7 +33,10 @@
     { "x": 4456, "y": 593 },
     { "x": 4688, "y": 420 }
   ],
-  "timer": [{ "x": 811, "y": 487 }],
+  "timer": [
+    { "x": 811, "y": 487 },
+    { "x": 3627, "y": 525 }
+  ],
   "spark": [{ "x": 4859, "y": 462 }],
   "enemies": [
     { "x": 520, "y": 526, "min": 120, "max": 900 }
