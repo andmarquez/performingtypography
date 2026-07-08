@@ -38,6 +38,7 @@ export class BootScene extends Phaser.Scene {
       'menu-start',
       'game-over-title',
       'game-over-character',
+      'game-over-platform',
       'win-title',
       'win-character',
     ] as const;
@@ -83,6 +84,7 @@ export class BootScene extends Phaser.Scene {
       'screen-menu-start',
       'screen-game-over-title',
       'screen-game-over-character',
+      'screen-game-over-platform',
       'screen-win-title',
       'screen-win-character',
     ]) {

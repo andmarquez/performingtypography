@@ -4,11 +4,11 @@ import {
   addCtaButton,
   addEndScreenBackground,
   addStatsPill,
-  bindRestartInput,
   fitImageToSize,
   getScreenLayout,
   scalePx,
 } from '../ui/endScreenLayout';
+import { PortraitGate } from '../ui/PortraitGate';
 
 export type GameOverReason = 'time' | 'lives' | 'fall';
 
@@ -19,12 +19,14 @@ const REASON_COPY: Record<GameOverReason, string> = {
 };
 
 /**
- * GameOverScene — Figma M03 layout with dynamic stats + reason.
+ * GameOverScene — Figma M03; portrait gate + responsive layout.
  */
 export class GameOverScene extends Phaser.Scene {
   private reason: GameOverReason = 'lives';
   private score = 0;
   private kisses = 0;
+  private portraitGate?: PortraitGate;
+  private content?: Phaser.GameObjects.Container;
 
   constructor() {
     super({ key: 'GameOverScene' });
@@ -37,24 +39,33 @@ export class GameOverScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.content = this.add.container(0, 0).setDepth(0);
+    this.portraitGate = new PortraitGate(this, () => this.buildUi());
     this.buildUi();
+    this.setupRestart();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.buildUi, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.buildUi, this);
+      this.portraitGate?.destroy();
     });
   }
 
   private buildUi = (): void => {
-    this.children.removeAll(true);
+    this.content?.removeAll(true);
+
+    const allowed = this.portraitGate?.isContentAllowed() ?? true;
+    this.content?.setVisible(allowed);
+    if (!allowed) return;
+
     const base = END_SCREEN.gameOver;
     const layout = getScreenLayout(this);
-    const { cx, mapY } = layout;
+    const { cx, mapY, mapX } = layout;
     const px = (n: number) => scalePx(layout, n);
 
     this.cameras.main.setBackgroundColor('#fce4ec');
-    addEndScreenBackground(this, base.bg);
+    this.content?.add(addEndScreenBackground(this, base.bg, layout));
 
-    this.add
+    const reason = this.add
       .text(cx, mapY(base.reasonY), REASON_COPY[this.reason], {
         fontSize: `${px(base.reasonSize)}px`,
         fontFamily: 'Inter, Nunito, system-ui, sans-serif',
@@ -63,14 +74,16 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setDepth(10);
+    this.content?.add(reason);
 
     const title = this.add
       .image(cx, mapY(base.titleY), 'screen-game-over-title')
       .setScrollFactor(0)
       .setDepth(11);
     fitImageToSize(title, px(base.titleMaxW), px(338));
+    this.content?.add(title);
 
-    addStatsPill(
+    const stats = addStatsPill(
       this,
       cx,
       mapY(base.statsY),
@@ -78,26 +91,49 @@ export class GameOverScene extends Phaser.Scene {
       {
         statsW: px(base.statsW),
         statsH: px(base.statsH),
-        statsColor: base.statsColor,
+        statsBg: base.statsBg,
+        statsTextColor: base.statsTextColor,
         statsTextSize: px(base.statsTextSize),
       },
     );
+    this.content?.add([stats.bg, stats.label]);
 
     const character = this.add
       .image(cx, mapY(base.characterY), 'screen-game-over-character')
       .setScrollFactor(0)
       .setDepth(12);
     fitImageToSize(character, px(base.characterW), px(base.characterH));
+    this.content?.add(character);
+
+    const platform = this.add
+      .image(mapX(627), mapY(base.platformY), 'screen-game-over-platform')
+      .setScrollFactor(0)
+      .setDepth(11);
+    fitImageToSize(platform, px(base.platformW), px(base.platformH));
+    this.content?.add(platform);
 
     const ctaY = mapY(base.ctaY);
-    const restart = () => this.scene.start('GameScene');
-    addCtaButton(this, cx, ctaY, base.ctaLabel, {
+    const restart = () => {
+      if (!this.portraitGate?.isContentAllowed()) return;
+      this.scene.start('GameScene');
+    };
+    const cta = addCtaButton(this, cx, ctaY, base.ctaLabel, {
       ctaW: px(base.ctaW),
       ctaH: px(base.ctaH),
       ctaColor: base.ctaColor,
       ctaHover: base.ctaHover,
       ctaTextSize: px(base.ctaTextSize),
+      ctaRadius: px(base.ctaRadius),
     }, restart);
-    bindRestartInput(this, restart, ctaY);
+    this.content?.add([cta.bg, cta.label, cta.hit]);
   };
+
+  private setupRestart(): void {
+    const restart = () => {
+      if (!this.portraitGate?.isContentAllowed()) return;
+      this.scene.start('GameScene');
+    };
+    this.input.keyboard?.on('keydown-ENTER', restart);
+    this.input.keyboard?.on('keydown-SPACE', restart);
+  }
 }

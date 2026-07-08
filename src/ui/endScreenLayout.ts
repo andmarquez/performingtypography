@@ -1,53 +1,61 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { isLandscapeViewport } from './viewportMetrics';
 import { getUiViewport, type UiViewport } from './viewportLayout';
 
-/** Figma M03/M04 layout at 1280×720 — positions are artboard centers / tops. */
+/** Figma M03/M04 — landscape 1280×720 artboard coordinates. */
 export const END_SCREEN = {
   designW: GAME_CONFIG.width,
   designH: GAME_CONFIG.height,
   gameOver: {
     bg: 0xfce4ec,
-    reasonY: 103,
+    reasonY: 143,
     reasonSize: 23,
     reasonColor: '#880e4f',
-    titleY: 313,
+    titleY: 349,
     titleMaxW: 568,
-    statsY: 293,
+    statsY: 321,
     statsW: 309,
     statsH: 55,
-    statsColor: 0x3744a4,
+    statsBg: 0xfffaa3,
+    statsTextColor: '#3744a4',
     statsTextSize: 22,
-    characterY: 414,
-    characterW: 171,
-    characterH: 228,
-    ctaY: 551,
+    characterY: 543,
+    characterW: 184,
+    characterH: 246,
+    platformY: 685,
+    platformW: 274,
+    platformH: 88,
+    ctaY: 383,
     ctaW: 177,
     ctaH: 47,
-    ctaColor: 0xe91e63,
-    ctaHover: 0xc2185b,
+    ctaColor: 0x0168f0,
+    ctaHover: 0x0156c7,
+    ctaRadius: 24,
     ctaTextSize: 22,
     ctaLabel: 'Try Again',
   },
   win: {
     gradientTop: 0xfff5dc,
     gradientBottom: 0xd6eaf8,
-    titleY: 323,
+    titleY: 309,
     titleMaxW: 547,
-    characterXOffset: 34,
-    characterY: 334,
+    characterX: 674,
+    characterY: 374,
     characterW: 178,
     characterH: 227,
-    statsY: 483,
-    statsW: 420,
+    statsY: 523,
+    statsW: 309,
     statsH: 55,
-    statsColor: 0x3744a4,
+    statsBg: 0x3744a4,
+    statsTextColor: '#ffffff',
     statsTextSize: 22,
-    ctaY: 553,
+    ctaY: 593,
     ctaW: 175,
     ctaH: 49,
-    ctaColor: 0xe91e63,
-    ctaHover: 0xc2185b,
+    ctaColor: 0xfc72ac,
+    ctaHover: 0xe91e63,
+    ctaRadius: 44,
     ctaTextSize: 22,
     ctaLabel: 'Play Again',
   },
@@ -59,35 +67,43 @@ export type ScreenLayout = {
   vp: UiViewport;
   cx: number;
   cy: number;
-  /** Uniform scale from Figma 720px-tall artboard to visible height. */
+  /** Uniform contain scale — fits design in visible area without squish. */
   scale: number;
+  landscape: boolean;
   mapY: (designY: number) => number;
   mapX: (designX: number) => number;
 };
 
-/** Layout for static screens — full canvas bg + UI mapped into visible ENVELOP region. */
+/** Responsive layout for static screens (portrait gate hides content until landscape). */
 export function getScreenLayout(scene: Phaser.Scene): ScreenLayout {
   const vp = getUiViewport(scene.scale);
-  const scale = vp.height / GAME_CONFIG.height;
+  const landscape = isLandscapeViewport();
+  const scaleX = vp.width / GAME_CONFIG.width;
+  const scaleY = vp.height / GAME_CONFIG.height;
+  const scale = Math.min(scaleX, scaleY);
+
+  const contentW = GAME_CONFIG.width * scale;
+  const contentH = GAME_CONFIG.height * scale;
+  const offsetX = vp.x + (vp.width - contentW) / 2;
+  const offsetY = vp.y + (vp.height - contentH) / 2;
 
   return {
     vp,
-    cx: vp.x + vp.width / 2,
-    cy: vp.y + vp.height / 2,
+    cx: offsetX + contentW / 2,
+    cy: offsetY + contentH / 2,
     scale,
-    mapY: (designY: number) => vp.y + (designY / GAME_CONFIG.height) * vp.height,
-    mapX: (designX: number) => vp.x + (designX / GAME_CONFIG.width) * vp.width,
+    landscape,
+    mapY: (designY: number) => offsetY + designY * scale,
+    mapX: (designX: number) => offsetX + designX * scale,
   };
 }
 
-/** Full 1280×720 design canvas — use for cover-fit backgrounds (no stretch). */
 export function getFullScreenRect() {
   const w = GAME_CONFIG.width;
   const h = GAME_CONFIG.height;
   return { width: w, height: h, cx: w / 2, cy: h / 2 };
 }
 
-/** Scale image uniformly to cover a target area without squishing. */
 export function coverFitImage(
   image: Phaser.GameObjects.Image,
   targetW: number,
@@ -106,23 +122,28 @@ export function fitImageToSize(
 ): void {
   const frame = image.frame;
   if (!frame.width || !frame.height) return;
-  const s = Math.min(maxW / frame.width, maxH / frame.height);
-  image.setScale(s);
+  image.setScale(Math.min(maxW / frame.width, maxH / frame.height));
 }
 
 export function addEndScreenBackground(
   scene: Phaser.Scene,
   color: number,
+  layout: ScreenLayout,
 ): Phaser.GameObjects.Rectangle {
-  const { width, height, cx, cy } = getFullScreenRect();
+  const w = GAME_CONFIG.width * layout.scale;
+  const h = GAME_CONFIG.height * layout.scale;
   return scene.add
-    .rectangle(cx, cy, width, height, color)
+    .rectangle(layout.cx, layout.cy, w, h, color)
     .setScrollFactor(0)
     .setDepth(0);
 }
 
-export function addWinGradientBackground(scene: Phaser.Scene): Phaser.GameObjects.Graphics {
-  const { width, height, cx, cy } = getFullScreenRect();
+export function addWinGradientBackground(
+  scene: Phaser.Scene,
+  layout: ScreenLayout,
+): Phaser.GameObjects.Graphics {
+  const w = GAME_CONFIG.width * layout.scale;
+  const h = GAME_CONFIG.height * layout.scale;
   const g = scene.add.graphics().setScrollFactor(0).setDepth(0);
   g.fillGradientStyle(
     END_SCREEN.win.gradientTop,
@@ -131,7 +152,7 @@ export function addWinGradientBackground(scene: Phaser.Scene): Phaser.GameObject
     END_SCREEN.win.gradientBottom,
     1,
   );
-  g.fillRect(cx - width / 2, cy - height / 2, width, height);
+  g.fillRect(layout.cx - w / 2, layout.cy - h / 2, w, h);
   return g;
 }
 
@@ -140,19 +161,25 @@ export function addStatsPill(
   cx: number,
   y: number,
   text: string,
-  cfg: { statsW: number; statsH: number; statsColor: number; statsTextSize: number },
+  cfg: {
+    statsW: number;
+    statsH: number;
+    statsBg: number;
+    statsTextColor: string;
+    statsTextSize: number;
+  },
 ): { bg: Phaser.GameObjects.Graphics; label: Phaser.GameObjects.Text } {
-  const { statsW, statsH, statsColor, statsTextSize } = cfg;
+  const { statsW, statsH, statsBg, statsTextColor, statsTextSize } = cfg;
   const radius = statsH / 2;
   const bg = scene.add.graphics().setScrollFactor(0).setDepth(20);
-  bg.fillStyle(statsColor, 1);
+  bg.fillStyle(statsBg, 1);
   bg.fillRoundedRect(cx - statsW / 2, y - statsH / 2, statsW, statsH, radius);
 
   const label = scene.add
     .text(cx, y, text, {
       fontSize: `${statsTextSize}px`,
       fontFamily: FONT_BODY,
-      color: '#ffffff',
+      color: statsTextColor,
     })
     .setOrigin(0.5)
     .setScrollFactor(0)
@@ -178,17 +205,17 @@ export function addCtaButton(
     ctaColor: number;
     ctaHover: number;
     ctaTextSize: number;
+    ctaRadius: number;
   },
   onPress: () => void,
 ): EndScreenCta {
-  const { ctaW, ctaH, ctaColor, ctaHover, ctaTextSize } = cfg;
-  const radius = 14;
+  const { ctaW, ctaH, ctaColor, ctaHover, ctaTextSize, ctaRadius } = cfg;
 
   const bg = scene.add.graphics().setScrollFactor(0).setDepth(30);
   const draw = (color: number) => {
     bg.clear();
     bg.fillStyle(color, 1);
-    bg.fillRoundedRect(cx - ctaW / 2, y - ctaH / 2, ctaW, ctaH, radius);
+    bg.fillRoundedRect(cx - ctaW / 2, y - ctaH / 2, ctaW, ctaH, ctaRadius);
   };
   draw(ctaColor);
 
@@ -233,7 +260,6 @@ export function bindRestartInput(scene: Phaser.Scene, restart: () => void, ctaY:
   });
 }
 
-/** Multiply Figma pixel values by the visible layout scale. */
 export function scalePx(layout: ScreenLayout, designPx: number): number {
   return designPx * layout.scale;
 }

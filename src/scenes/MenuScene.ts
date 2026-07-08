@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
-import { coverFitImage, getFullScreenRect } from '../ui/endScreenLayout';
+import { GAME_CONFIG } from '../config/gameConfig';
+import { coverFitImage, getScreenLayout } from '../ui/endScreenLayout';
+import { PortraitGate } from '../ui/PortraitGate';
 
 /**
- * MenuScene — Figma M01 start screen (TEPUY / LEVEL 1).
+ * MenuScene — Figma M01 start screen; hidden in portrait until user rotates.
  */
 export class MenuScene extends Phaser.Scene {
   private canStart = false;
+  private portraitGate?: PortraitGate;
+  private content?: Phaser.GameObjects.Container;
   private onWindowKeydown?: (event: KeyboardEvent) => void;
 
   constructor() {
@@ -14,6 +18,8 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.setBackgroundColor('#ffffff');
+    this.content = this.add.container(0, 0).setDepth(0);
+    this.portraitGate = new PortraitGate(this, () => this.layoutScreen());
     this.layoutScreen();
     this.canStart = true;
     this.setupKeyboard();
@@ -25,11 +31,20 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private layoutScreen = (): void => {
-    this.children.removeAll(true);
+    this.content?.removeAll(true);
 
-    const { width, height, cx, cy } = getFullScreenRect();
-    const bg = this.add.image(cx, cy, 'screen-menu-start').setScrollFactor(0).setDepth(0);
-    coverFitImage(bg, width, height);
+    const allowed = this.portraitGate?.isContentAllowed() ?? true;
+    this.content?.setVisible(allowed);
+    if (!allowed) return;
+
+    const layout = getScreenLayout(this);
+    const w = GAME_CONFIG.width * layout.scale;
+    const h = GAME_CONFIG.height * layout.scale;
+    const bg = this.add
+      .image(layout.cx, layout.cy, 'screen-menu-start')
+      .setScrollFactor(0);
+    coverFitImage(bg, w, h);
+    this.content?.add(bg);
   };
 
   private setupKeyboard(): void {
@@ -53,6 +68,7 @@ export class MenuScene extends Phaser.Scene {
 
   private cleanup = (): void => {
     this.scale.off(Phaser.Scale.Events.RESIZE, this.layoutScreen, this);
+    this.portraitGate?.destroy();
     if (this.onWindowKeydown) {
       window.removeEventListener('keydown', this.onWindowKeydown);
       this.onWindowKeydown = undefined;
@@ -60,7 +76,7 @@ export class MenuScene extends Phaser.Scene {
   };
 
   private startGame(): void {
-    if (!this.canStart) return;
+    if (!this.canStart || !this.portraitGate?.isContentAllowed()) return;
     this.canStart = false;
     this.scene.start('GameScene');
   }
