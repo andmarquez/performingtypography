@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
+import { GAME_CONFIG } from '../config/gameConfig';
 import { shouldShowMobileControls } from './mobileControlUtils';
 import { isLandscapeViewport, onViewportChange } from './viewportMetrics';
-import { getUiViewport } from './viewportLayout';
 
 const GATE_DEPTH = 2000;
 const FONT = 'Inter, Nunito, system-ui, sans-serif';
@@ -51,18 +51,20 @@ export class PortraitGate {
   }
 
   private layout = (): void => {
-    const vp = getUiViewport(this.scene.scale);
-    const cx = vp.x + vp.width / 2;
-    const cy = vp.y + vp.height / 2;
+    const w = this.scene.scale.width || GAME_CONFIG.width;
+    const h = this.scene.scale.height || GAME_CONFIG.height;
+    const cx = w / 2;
+    const cy = h / 2;
     const showGate = shouldShowMobileControls(this.scene.game) && !isLandscapeViewport();
+    const fontScale = Math.min(w / GAME_CONFIG.width, h / GAME_CONFIG.height);
 
     this.container.setVisible(showGate);
     this.bg.setPosition(cx, cy);
-    this.bg.setSize(vp.width, vp.height);
-    this.icon.setPosition(cx, cy - 48);
-    this.message.setPosition(cx, cy + 36);
-    this.message.setFontSize(`${Math.round(Math.min(28, vp.width * 0.06))}px`);
-    this.icon.setFontSize(`${Math.round(Math.min(72, vp.width * 0.14))}px`);
+    this.bg.setSize(w, h);
+    this.icon.setPosition(cx, cy - 52 * fontScale);
+    this.message.setPosition(cx, cy + 40 * fontScale);
+    this.message.setFontSize(`${Math.round(28 * fontScale)}px`);
+    this.icon.setFontSize(`${Math.round(72 * fontScale)}px`);
 
     const allowed = this.isContentAllowed();
     if (allowed !== this.wasAllowed) {

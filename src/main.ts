@@ -11,7 +11,7 @@ import {
   isLandscapeViewport,
   isMobileViewport,
   onViewportChange,
-  resolveScaleMode,
+  resolveActiveScaleMode,
 } from './ui/viewportMetrics';
 
 const applyViewportClasses = () => {
@@ -27,14 +27,14 @@ const applyViewportClasses = () => {
   document.documentElement.dataset.orientation = landscape ? 'landscape' : 'portrait';
   document.documentElement.classList.toggle('is-iphone16-class', isIphone16Class());
 
-  const theme = mobile && !landscape ? '#f8c8dc' : '#b8e0f5';
+  const theme = mobile && !landscape ? '#fce4ec' : '#b8e0f5';
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme);
 };
 
 const applyScaleMode = () => {
   applyViewportClasses();
   if (!game.isBooted) return;
-  const next = resolveScaleMode();
+  const next = resolveActiveScaleMode(game);
   if (game.scale.scaleMode !== next) {
     game.scale.scaleMode = next;
   }
@@ -48,7 +48,7 @@ const game = new Phaser.Game({
   height: GAME_CONFIG.height,
   backgroundColor: '#b8e0f5',
   scale: {
-    mode: resolveScaleMode(),
+    mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     expandParent: true,
     width: GAME_CONFIG.width,
@@ -80,6 +80,10 @@ game.events.once('ready', () => {
   if (game.input.touch) {
     game.input.touch.capture = false;
   }
+});
+
+game.events.on(Phaser.Scenes.Events.CREATE, () => {
+  applyScaleMode();
 });
 
 document.addEventListener(
