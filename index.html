@@ -104,7 +104,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #b8e0f5;
+        padding: 1.5rem;
+        background: linear-gradient(165deg, #b8e0f5 0%, #d6eaf8 48%, #fff5dc 100%);
         pointer-events: auto;
         touch-action: none;
       }
@@ -117,27 +118,50 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.75rem;
-        max-width: 22rem;
-        padding: 1.5rem;
+        gap: 1.25rem;
+        width: min(100%, 26rem);
+        padding: 2rem 1.75rem;
         text-align: center;
-        color: #01579b;
-        font-family: 'Inter', 'Nunito', system-ui, sans-serif;
-        font-weight: 700;
-        font-size: clamp(1.15rem, 4vw, 1.6rem);
-        line-height: 1.4;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 1.5rem;
+        box-shadow:
+          0 1rem 2.5rem rgba(1, 104, 240, 0.12),
+          0 0.25rem 0.75rem rgba(55, 68, 164, 0.08);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
 
       .desktop-prompt__icon {
-        font-size: clamp(3rem, 14vw, 4.5rem);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4.5rem;
+        height: 4.5rem;
+        font-size: 2.25rem;
         line-height: 1;
+        background: linear-gradient(145deg, #e3f2fd 0%, #ffffff 100%);
+        border-radius: 50%;
+        box-shadow: 0 0.35rem 1rem rgba(1, 104, 240, 0.15);
+      }
+
+      .desktop-prompt__title {
+        margin: 0;
+        color: #01579b;
+        font-family: 'Nunito', system-ui, sans-serif;
+        font-size: clamp(1.35rem, 3.2vw, 1.65rem);
+        font-weight: 800;
+        line-height: 1.3;
+        letter-spacing: -0.02em;
       }
 
       .desktop-prompt__hint {
+        margin: 0;
+        color: #3744a4;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: clamp(1rem, 2.4vw, 1.125rem);
         font-weight: 500;
-        font-size: clamp(0.95rem, 3.5vw, 1.1rem);
-        color: #0277bd;
-        opacity: 0.9;
+        line-height: 1.5;
       }
     </style>
   </head>
@@ -152,7 +176,8 @@
     <div id="desktop-prompt" hidden>
       <div class="desktop-prompt__inner">
         <span class="desktop-prompt__icon" aria-hidden="true">📱</span>
-        <p>At the moment, this game is only available on mobile.<br />Open the link on your phone to play.</p>
+        <h1 class="desktop-prompt__title">At the moment, this game is only available on mobile.</h1>
+        <p class="desktop-prompt__hint">Open the link on your phone to play.</p>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
