@@ -70,22 +70,6 @@ export function resolveScaleMode(): number {
   return isMobileViewport() ? Phaser.Scale.ENVELOP : Phaser.Scale.FIT;
 }
 
-const STATIC_SCREENS = new Set(['MenuScene', 'GameOverScene', 'WinScene']);
-
-/**
- * Portrait on menu/end screens uses FIT so the rotate prompt is centered.
- * Gameplay stays ENVELOP in landscape; GameScene keeps ENVELOP in portrait.
- */
-export function resolveActiveScaleMode(game?: Phaser.Game): number {
-  if (!isMobileViewport()) return Phaser.Scale.FIT;
-  if (isLandscapeViewport()) return Phaser.Scale.ENVELOP;
-
-  const onStaticScreen = game?.scene
-    .getScenes(true)
-    .some((scene) => STATIC_SCREENS.has(scene.scene.key));
-  return onStaticScreen ? Phaser.Scale.FIT : Phaser.Scale.ENVELOP;
-}
-
 /** Re-run after orientation/viewport settles (iOS needs delayed refresh). */
 export function onViewportChange(onChange: () => void): () => void {
   const schedule = () => {
