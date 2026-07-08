@@ -8,7 +8,6 @@ import {
   getScreenLayout,
   scalePx,
 } from '../ui/endScreenLayout';
-import { PortraitGate } from '../ui/PortraitGate';
 
 export type GameOverReason = 'time' | 'lives' | 'fall';
 
@@ -19,14 +18,12 @@ const REASON_COPY: Record<GameOverReason, string> = {
 };
 
 /**
- * GameOverScene — Figma M03; portrait gate + responsive layout.
+ * GameOverScene — Figma M03 layout with dynamic stats + reason.
  */
 export class GameOverScene extends Phaser.Scene {
   private reason: GameOverReason = 'lives';
   private score = 0;
   private kisses = 0;
-  private portraitGate?: PortraitGate;
-  private content?: Phaser.GameObjects.Container;
 
   constructor() {
     super({ key: 'GameOverScene' });
@@ -39,23 +36,16 @@ export class GameOverScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.content = this.add.container(0, 0).setDepth(0);
-    this.portraitGate = new PortraitGate(this, () => this.buildUi());
     this.buildUi();
     this.setupRestart();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.buildUi, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.buildUi, this);
-      this.portraitGate?.destroy();
     });
   }
 
   private buildUi = (): void => {
-    this.content?.removeAll(true);
-
-    const allowed = this.portraitGate?.isContentAllowed() ?? true;
-    this.content?.setVisible(allowed);
-    if (!allowed) return;
+    this.children.removeAll(true);
 
     const base = END_SCREEN.gameOver;
     const layout = getScreenLayout(this);
@@ -63,9 +53,9 @@ export class GameOverScene extends Phaser.Scene {
     const px = (n: number) => scalePx(layout, n);
 
     this.cameras.main.setBackgroundColor('#fce4ec');
-    this.content?.add(addEndScreenBackground(this, base.bg, layout));
+    addEndScreenBackground(this, base.bg, layout);
 
-    const reason = this.add
+    this.add
       .text(cx, mapY(base.reasonY), REASON_COPY[this.reason], {
         fontSize: `${px(base.reasonSize)}px`,
         fontFamily: 'Inter, Nunito, system-ui, sans-serif',
@@ -74,16 +64,14 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setDepth(10);
-    this.content?.add(reason);
 
     const title = this.add
       .image(cx, mapY(base.titleY), 'screen-game-over-title')
       .setScrollFactor(0)
       .setDepth(11);
     fitImageToSize(title, px(base.titleMaxW), px(338));
-    this.content?.add(title);
 
-    const stats = addStatsPill(
+    addStatsPill(
       this,
       cx,
       mapY(base.statsY),
@@ -96,28 +84,22 @@ export class GameOverScene extends Phaser.Scene {
         statsTextSize: px(base.statsTextSize),
       },
     );
-    this.content?.add([stats.bg, stats.label]);
 
     const character = this.add
       .image(cx, mapY(base.characterY), 'screen-game-over-character')
       .setScrollFactor(0)
       .setDepth(12);
     fitImageToSize(character, px(base.characterW), px(base.characterH));
-    this.content?.add(character);
 
     const platform = this.add
       .image(mapX(627), mapY(base.platformY), 'screen-game-over-platform')
       .setScrollFactor(0)
       .setDepth(11);
     fitImageToSize(platform, px(base.platformW), px(base.platformH));
-    this.content?.add(platform);
 
     const ctaY = mapY(base.ctaY);
-    const restart = () => {
-      if (!this.portraitGate?.isContentAllowed()) return;
-      this.scene.start('GameScene');
-    };
-    const cta = addCtaButton(this, cx, ctaY, base.ctaLabel, {
+    const restart = () => this.scene.start('GameScene');
+    addCtaButton(this, cx, ctaY, base.ctaLabel, {
       ctaW: px(base.ctaW),
       ctaH: px(base.ctaH),
       ctaColor: base.ctaColor,
@@ -125,14 +107,10 @@ export class GameOverScene extends Phaser.Scene {
       ctaTextSize: px(base.ctaTextSize),
       ctaRadius: px(base.ctaRadius),
     }, restart);
-    this.content?.add([cta.bg, cta.label, cta.hit]);
   };
 
   private setupRestart(): void {
-    const restart = () => {
-      if (!this.portraitGate?.isContentAllowed()) return;
-      this.scene.start('GameScene');
-    };
+    const restart = () => this.scene.start('GameScene');
     this.input.keyboard?.on('keydown-ENTER', restart);
     this.input.keyboard?.on('keydown-SPACE', restart);
   }

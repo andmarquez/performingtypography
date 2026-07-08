@@ -1,15 +1,12 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 import { coverFitImage, getScreenLayout } from '../ui/endScreenLayout';
-import { PortraitGate } from '../ui/PortraitGate';
 
 /**
- * MenuScene — Figma M01 start screen; hidden in portrait until user rotates.
+ * MenuScene — Figma M01 start screen (TEPUY / LEVEL 1).
  */
 export class MenuScene extends Phaser.Scene {
   private canStart = false;
-  private portraitGate?: PortraitGate;
-  private content?: Phaser.GameObjects.Container;
   private onWindowKeydown?: (event: KeyboardEvent) => void;
 
   constructor() {
@@ -18,8 +15,6 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.setBackgroundColor('#ffffff');
-    this.content = this.add.container(0, 0).setDepth(0);
-    this.portraitGate = new PortraitGate(this, () => this.layoutScreen());
     this.layoutScreen();
     this.canStart = true;
     this.setupKeyboard();
@@ -31,11 +26,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private layoutScreen = (): void => {
-    this.content?.removeAll(true);
-
-    const allowed = this.portraitGate?.isContentAllowed() ?? true;
-    this.content?.setVisible(allowed);
-    if (!allowed) return;
+    this.children.removeAll(true);
 
     const layout = getScreenLayout(this);
     const w = GAME_CONFIG.width * layout.scale;
@@ -44,7 +35,6 @@ export class MenuScene extends Phaser.Scene {
       .image(layout.cx, layout.cy, 'screen-menu-start')
       .setScrollFactor(0);
     coverFitImage(bg, w, h);
-    this.content?.add(bg);
   };
 
   private setupKeyboard(): void {
@@ -68,7 +58,6 @@ export class MenuScene extends Phaser.Scene {
 
   private cleanup = (): void => {
     this.scale.off(Phaser.Scale.Events.RESIZE, this.layoutScreen, this);
-    this.portraitGate?.destroy();
     if (this.onWindowKeydown) {
       window.removeEventListener('keydown', this.onWindowKeydown);
       this.onWindowKeydown = undefined;
@@ -76,7 +65,7 @@ export class MenuScene extends Phaser.Scene {
   };
 
   private startGame(): void {
-    if (!this.canStart || !this.portraitGate?.isContentAllowed()) return;
+    if (!this.canStart) return;
     this.canStart = false;
     this.scene.start('GameScene');
   }

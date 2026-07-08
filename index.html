@@ -61,10 +61,51 @@
         display: block;
         touch-action: none;
       }
+
+      #rotate-prompt {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fce4ec;
+        pointer-events: auto;
+        touch-action: none;
+      }
+
+      #rotate-prompt[hidden] {
+        display: none !important;
+      }
+
+      .rotate-prompt__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+        color: #880e4f;
+        font-family: 'Inter', 'Nunito', system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.25rem, 5vw, 1.75rem);
+        line-height: 1.35;
+      }
+
+      .rotate-prompt__icon {
+        font-size: clamp(3rem, 14vw, 4.5rem);
+        line-height: 1;
+      }
     </style>
   </head>
   <body>
     <div id="game-container"></div>
+    <div id="rotate-prompt" hidden>
+      <div class="rotate-prompt__inner">
+        <span class="rotate-prompt__icon" aria-hidden="true">↻</span>
+        <p>Rotate your phone<br />to play</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

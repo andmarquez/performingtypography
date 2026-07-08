@@ -5,6 +5,7 @@ import { GameScene } from './scenes/GameScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { WinScene } from './scenes/WinScene';
 import { GAME_CONFIG } from './config/gameConfig';
+import { mountRotatePrompt } from './ui/rotatePrompt';
 import {
   getViewportSize,
   isIphone16Class,
@@ -77,6 +78,7 @@ onViewportChange(applyScaleMode);
 
 game.events.once('ready', () => {
   applyScaleMode();
+  mountRotatePrompt(game);
   if (game.input.touch) {
     game.input.touch.capture = false;
   }
