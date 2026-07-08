@@ -1,7 +1,13 @@
 import Phaser from 'phaser';
 import { isLandscapeViewport, isMobileViewport, onViewportChange } from './viewportMetrics';
 
-const STATIC_SCENES = new Set(['BootScene', 'MenuScene', 'GameOverScene', 'WinScene']);
+const ROTATE_PROMPT_SCENES = new Set([
+  'BootScene',
+  'MenuScene',
+  'GameScene',
+  'GameOverScene',
+  'WinScene',
+]);
 
 /** Centered HTML overlay — does not touch Phaser scale or screen layouts. */
 export function mountRotatePrompt(game: Phaser.Game): void {
@@ -10,10 +16,10 @@ export function mountRotatePrompt(game: Phaser.Game): void {
 
   const update = (): void => {
     const portrait = isMobileViewport() && !isLandscapeViewport();
-    const onStaticScreen = game.scene
+    const onRotatePromptScene = game.scene
       .getScenes(true)
-      .some((scene) => STATIC_SCENES.has(scene.scene.key));
-    el.hidden = !(portrait && onStaticScreen);
+      .some((scene) => ROTATE_PROMPT_SCENES.has(scene.scene.key));
+    el.hidden = !(portrait && onRotatePromptScene);
   };
 
   onViewportChange(update);

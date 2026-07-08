@@ -50,7 +50,6 @@ export class GameScene extends Phaser.Scene {
     lives: Phaser.GameObjects.Text;
     score: Phaser.GameObjects.Text;
   };
-  private portraitOverlay?: Phaser.GameObjects.Container;
   private portalMessage?: Phaser.GameObjects.Text;
   private gameEnded = false;
   private levelLayout!: LevelLayout;
@@ -89,7 +88,6 @@ export class GameScene extends Phaser.Scene {
     this.settlePlayerOnSpawn();
     this.createHUD();
     this.setupInput();
-    this.createPortraitOverlay();
 
     const isMobile = shouldShowMobileControls(this.game);
     const deadzone = isMobile
@@ -630,38 +628,6 @@ export class GameScene extends Phaser.Scene {
     if (showTouch) {
       this.mobileControls = new MobileControls(this);
     }
-  }
-
-  private createPortraitOverlay(): void {
-    this.portraitOverlay = this.add.container(0, 0).setScrollFactor(0).setDepth(150).setVisible(false);
-
-    const bg = this.add
-      .rectangle(0, 0, GAME_CONFIG.width, GAME_CONFIG.height, 0x000000, 0.55)
-      .setScrollFactor(0);
-    const msg = this.add
-      .text(0, 0, 'Turn your phone sideways\nfor the best experience.', {
-        fontSize: '24px',
-        fontFamily: 'Nunito, sans-serif',
-        color: '#ffffff',
-        align: 'center',
-        backgroundColor: '#e91e63cc',
-        padding: { x: 24, y: 16 },
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0);
-
-    this.portraitOverlay.add([bg, msg]);
-
-    const update = () => {
-      const vp = getUiViewport(this.scale);
-      const portrait = !isLandscapeViewport();
-      this.portraitOverlay?.setVisible(portrait && shouldShowMobileControls(this.game));
-      bg.setPosition(vp.x + vp.width / 2, vp.y + vp.height / 2);
-      bg.setSize(vp.width, vp.height);
-      msg.setPosition(vp.x + vp.width / 2, vp.y + vp.height / 2);
-    };
-    update();
-    this.scale.on(Phaser.Scale.Events.RESIZE, update);
   }
 
   update(_time: number, delta: number): void {
