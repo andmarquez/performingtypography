@@ -2,10 +2,10 @@ import Phaser from 'phaser';
 import {
   END_SCREEN,
   addCtaButton,
-  addEndScreenBackground,
+  addViewportBackground,
   addStatsPill,
   fitImageToSize,
-  getScreenLayout,
+  getCoverScreenLayout,
   scalePx,
 } from '../ui/endScreenLayout';
 
@@ -48,12 +48,12 @@ export class GameOverScene extends Phaser.Scene {
     this.children.removeAll(true);
 
     const base = END_SCREEN.gameOver;
-    const layout = getScreenLayout(this);
-    const { cx, mapY, mapX } = layout;
+    const layout = getCoverScreenLayout(this);
+    const { cx, mapY, mapX, vp } = layout;
     const px = (n: number) => scalePx(layout, n);
 
     this.cameras.main.setBackgroundColor('#fce4ec');
-    addEndScreenBackground(this, base.bg, layout);
+    addViewportBackground(this, base.bg, vp);
 
     this.add
       .text(cx, mapY(base.reasonY), REASON_COPY[this.reason], {

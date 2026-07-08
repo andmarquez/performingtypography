@@ -80,24 +80,32 @@ export function onViewportChange(onChange: () => void): () => void {
     window.setTimeout(onChange, 450);
   };
 
-  window.addEventListener('resize', schedule);
-  window.addEventListener('orientationchange', schedule);
-  window.visualViewport?.addEventListener('resize', schedule);
-  window.visualViewport?.addEventListener('scroll', schedule);
+  const onResize = () => schedule();
+  const onOrientationChange = () => schedule();
+  const onVisualViewportResize = () => schedule();
+  const onVisualViewportScroll = () => schedule();
+  const onPortraitChange = () => schedule();
+  const onLandscapeChange = () => schedule();
+  const onScreenOrientationChange = () => schedule();
+
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', onOrientationChange);
+  window.visualViewport?.addEventListener('resize', onVisualViewportResize);
+  window.visualViewport?.addEventListener('scroll', onVisualViewportScroll);
 
   const portraitMql = window.matchMedia?.('(orientation: portrait)');
   const landscapeMql = window.matchMedia?.('(orientation: landscape)');
-  portraitMql?.addEventListener('change', schedule);
-  landscapeMql?.addEventListener('change', schedule);
-  screen.orientation?.addEventListener('change', schedule);
+  portraitMql?.addEventListener('change', onPortraitChange);
+  landscapeMql?.addEventListener('change', onLandscapeChange);
+  screen.orientation?.addEventListener('change', onScreenOrientationChange);
 
   return () => {
-    window.removeEventListener('resize', schedule);
-    window.removeEventListener('orientationchange', schedule);
-    window.visualViewport?.removeEventListener('resize', schedule);
-    window.visualViewport?.removeEventListener('scroll', schedule);
-    portraitMql?.removeEventListener('change', schedule);
-    landscapeMql?.removeEventListener('change', schedule);
-    screen.orientation?.removeEventListener('change', schedule);
+    window.removeEventListener('resize', onResize);
+    window.removeEventListener('orientationchange', onOrientationChange);
+    window.visualViewport?.removeEventListener('resize', onVisualViewportResize);
+    window.visualViewport?.removeEventListener('scroll', onVisualViewportScroll);
+    portraitMql?.removeEventListener('change', onPortraitChange);
+    landscapeMql?.removeEventListener('change', onLandscapeChange);
+    screen.orientation?.removeEventListener('change', onScreenOrientationChange);
   };
 }

@@ -74,6 +74,30 @@ export type ScreenLayout = {
   mapX: (designX: number) => number;
 };
 
+/** Cover-fit layout — fills viewport like MenuScene splash (no letterbox bars). */
+export function getCoverScreenLayout(scene: Phaser.Scene): ScreenLayout {
+  const vp = getUiViewport(scene.scale);
+  const landscape = isLandscapeViewport();
+  const scaleX = vp.width / GAME_CONFIG.width;
+  const scaleY = vp.height / GAME_CONFIG.height;
+  const scale = Math.max(scaleX, scaleY);
+
+  const contentW = GAME_CONFIG.width * scale;
+  const contentH = GAME_CONFIG.height * scale;
+  const offsetX = vp.x + (vp.width - contentW) / 2;
+  const offsetY = vp.y + (vp.height - contentH) / 2;
+
+  return {
+    vp,
+    cx: offsetX + contentW / 2,
+    cy: offsetY + contentH / 2,
+    scale,
+    landscape,
+    mapY: (designY: number) => offsetY + designY * scale,
+    mapX: (designX: number) => offsetX + designX * scale,
+  };
+}
+
 /** Responsive layout for static screens (portrait gate hides content until landscape). */
 export function getScreenLayout(scene: Phaser.Scene): ScreenLayout {
   const vp = getUiViewport(scene.scale);
@@ -125,6 +149,17 @@ export function fitImageToSize(
   image.setScale(Math.min(maxW / frame.width, maxH / frame.height));
 }
 
+export function addViewportBackground(
+  scene: Phaser.Scene,
+  color: number,
+  vp: UiViewport,
+): Phaser.GameObjects.Rectangle {
+  return scene.add
+    .rectangle(vp.x + vp.width / 2, vp.y + vp.height / 2, vp.width, vp.height, color)
+    .setScrollFactor(0)
+    .setDepth(0);
+}
+
 export function addEndScreenBackground(
   scene: Phaser.Scene,
   color: number,
@@ -136,6 +171,22 @@ export function addEndScreenBackground(
     .rectangle(layout.cx, layout.cy, w, h, color)
     .setScrollFactor(0)
     .setDepth(0);
+}
+
+export function addViewportWinGradient(
+  scene: Phaser.Scene,
+  vp: UiViewport,
+): Phaser.GameObjects.Graphics {
+  const g = scene.add.graphics().setScrollFactor(0).setDepth(0);
+  g.fillGradientStyle(
+    END_SCREEN.win.gradientTop,
+    END_SCREEN.win.gradientTop,
+    END_SCREEN.win.gradientBottom,
+    END_SCREEN.win.gradientBottom,
+    1,
+  );
+  g.fillRect(vp.x, vp.y, vp.width, vp.height);
+  return g;
 }
 
 export function addWinGradientBackground(

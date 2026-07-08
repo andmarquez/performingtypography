@@ -23,7 +23,15 @@ export function mountRotatePrompt(game: Phaser.Game): void {
   };
 
   onViewportChange(update);
-  game.events.on(Phaser.Scenes.Events.CREATE, update);
+  const bindScene = (scene: Phaser.Scene): void => {
+    scene.events.on(Phaser.Scenes.Events.START, update);
+    scene.events.on(Phaser.Scenes.Events.WAKE, update);
+  };
+  game.scene.getScenes(false).forEach(bindScene);
+  game.events.on(Phaser.Scenes.Events.CREATE, (scene: Phaser.Scene) => {
+    bindScene(scene);
+    update();
+  });
   game.events.on(Phaser.Scenes.Events.START, update);
   game.events.once('ready', update);
   update();

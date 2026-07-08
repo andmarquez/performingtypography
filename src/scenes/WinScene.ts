@@ -3,9 +3,9 @@ import {
   END_SCREEN,
   addCtaButton,
   addStatsPill,
-  addWinGradientBackground,
+  addViewportWinGradient,
   fitImageToSize,
-  getScreenLayout,
+  getCoverScreenLayout,
   scalePx,
 } from '../ui/endScreenLayout';
 
@@ -38,12 +38,12 @@ export class WinScene extends Phaser.Scene {
     this.children.removeAll(true);
 
     const base = END_SCREEN.win;
-    const layout = getScreenLayout(this);
-    const { cx, mapY, mapX } = layout;
+    const layout = getCoverScreenLayout(this);
+    const { cx, mapY, mapX, vp } = layout;
     const px = (n: number) => scalePx(layout, n);
 
     this.cameras.main.setBackgroundColor('#fff5dc');
-    addWinGradientBackground(this, layout);
+    addViewportWinGradient(this, vp);
 
     const emitter = this.add.particles(cx, layout.vp.y, 'particle', {
       x: { min: -layout.vp.width / 2, max: layout.vp.width / 2 },
