@@ -13,8 +13,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const MANIFEST_PATH = path.join(ROOT, 'figma/export-collectible-manifest.json');
 const GRID_COLS = 10;
-/** Remove Figma GIF black matte — no square padding (avoids side bars on portrait art). */
-const TRANSPARENT_FILTER = 'format=rgba,colorkey=black:0.12:0.06';
+/** Preserve GIF alpha — do NOT colorkey (breaks matte → opaque white squares). */
+const TRANSPARENT_FILTER = 'format=rgba';
 
 async function fetchBuffer(url) {
   const res = await fetch(url, {
@@ -53,7 +53,7 @@ function buildStaticFrame(gifPath, staticPath, displaySize) {
   return probeImageSize(staticPath);
 }
 
-function buildSpritesheet(gifPath, sheetPath, displaySize) {
+function buildSpritesheet(gifPath, sheetPath, displaySize, frameWidth) {
   const frameCount = countGifFrames(gifPath);
   const cols = GRID_COLS;
   const rows = Math.ceil(frameCount / cols);
@@ -61,7 +61,7 @@ function buildSpritesheet(gifPath, sheetPath, displaySize) {
     'fps=12',
     `scale=-1:${displaySize}`,
     TRANSPARENT_FILTER,
-    `pad=${displaySize}:${displaySize}:(ow-iw)/2:(oh-ih)/2:color=0x00000000`,
+    `pad=${frameWidth}:${displaySize}:(ow-iw)/2:(oh-ih)/2:color=0x00000000`,
     `tile=${cols}x${rows}`,
   ].join(',');
   execSync(`ffmpeg -y -i "${gifPath}" -vf "${vf}" -frames:v 1 "${sheetPath}"`, {
@@ -89,7 +89,7 @@ async function main() {
     fs.mkdirSync(path.dirname(sheetPath), { recursive: true });
 
     const { width, height } = buildStaticFrame(dest, staticPath, displaySize);
-    const { frameCount, cols, rows } = buildSpritesheet(dest, sheetPath, displaySize);
+    const { frameCount, cols, rows } = buildSpritesheet(dest, sheetPath, displaySize, width);
 
     entry.sheet = sheetRel;
     entry.static = staticRel;
@@ -101,7 +101,7 @@ async function main() {
     entry.sheetRows = rows;
     entry.frameRate = 12;
     console.log(
-      `static ${key} → ${staticRel} (${width}x${height}), sheet ${frameCount} frames (${cols}x${rows})`,
+      `static ${key} → ${staticRel} (${width}x${height}, transparent), sheet ${frameCount} frames (${cols}x${rows})`,
     );
     ok += 1;
   }
