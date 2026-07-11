@@ -60,7 +60,7 @@ export class WinScene extends Phaser.Scene {
       this,
       cx,
       mapY(base.statsY),
-      `Hearts: ${this.kisses}  |  Score: ${this.score}`,
+      `Empanadas: ${this.kisses}  |  Score: ${this.score}`,
       {
         statsW: px(base.statsW),
         statsH: px(base.statsH),
