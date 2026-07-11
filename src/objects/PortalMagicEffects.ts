@@ -121,7 +121,6 @@ export class PortalMagicEffects {
     this.zone = scene.add.zone(x, y, this.size * 0.82, this.size * 0.82);
     this.zone.setOrigin(0.5, 0.5);
     scene.physics.add.existing(this.zone, true);
-    (this.zone.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     this.zone.setDepth(depth);
 
     this.tweens.push(
