@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import {
   END_SCREEN,
-  addCtaButton,
+  addCtaHitZone,
   addStatsPill,
   layoutCoverScreenBackground,
   scalePx,
@@ -16,7 +16,7 @@ const REASON_COPY: Record<GameOverReason, string> = {
 };
 
 /**
- * GameOverScene — full-frame Figma M03 art + dynamic reason, stats, and CTA.
+ * GameOverScene — full-frame Figma M03 art + dynamic reason and stats; CTA baked in.
  */
 export class GameOverScene extends Phaser.Scene {
   private reason: GameOverReason = 'lives';
@@ -76,16 +76,8 @@ export class GameOverScene extends Phaser.Scene {
       },
     );
 
-    const ctaY = mapY(base.ctaY);
     const restart = () => this.scene.start('GameScene');
-    addCtaButton(this, cx, ctaY, base.ctaLabel, {
-      ctaW: px(base.ctaW),
-      ctaH: px(base.ctaH),
-      ctaColor: base.ctaColor,
-      ctaHover: base.ctaHover,
-      ctaTextSize: px(base.ctaTextSize),
-      ctaRadius: px(base.ctaRadius),
-    }, restart);
+    addCtaHitZone(this, cx, mapY(base.ctaY), px(base.ctaW), px(base.ctaH), restart);
   };
 
   private setupRestart(): void {
