@@ -64,6 +64,15 @@ export function getGameOverTextureKey(): string {
     : 'screen-game-over-screen';
 }
 
+export function getGameOverLottieCacheKey(): string {
+  return 'game-over-lottie-playful';
+}
+
+/** Test mode uses the playful Jitter Lottie export instead of a static PNG. */
+export function usesGameOverLottieTest(): boolean {
+  return isGameOverTestMode();
+}
+
 function parseColor(value: string | number | undefined, fallback: number): number {
   if (typeof value === 'number') return value;
   if (typeof value !== 'string') return fallback;

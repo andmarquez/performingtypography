@@ -92,6 +92,7 @@ if (!isMobileViewport()) {
       pixelArt: false,
       antialias: true,
       roundPixels: true,
+      transparent: true,
     },
   });
 

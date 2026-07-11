@@ -2,20 +2,27 @@ import Phaser from 'phaser';
 import { getSoundManager } from '../audio/SoundManager';
 import {
   getCachedGameOverLayout,
+  getGameOverLottieCacheKey,
   getGameOverTextureKey,
+  usesGameOverLottieTest,
 } from '../ui/gameOverScreenConfig';
 import {
   addCtaHitZone,
   addStatsPill,
+  getCoverScreenLayout,
   layoutCoverScreenBackground,
   scalePx,
 } from '../ui/endScreenLayout';
+import {
+  mountGameOverLottieOverlay,
+  unmountGameOverLottieOverlay,
+} from '../ui/gameOverLottieOverlay';
 
 export type GameOverReason = 'time' | 'lives' | 'fall';
 
 /**
  * GameOverScene — full-frame Figma M03 art + dynamic stats; CTA baked in.
- * Test layout: ?gameOverTest=1  |  Preview screen: ?gameOver=1
+ * Test layout: ?gameOverTest=1 (playful Lottie)  |  Preview: ?gameOver=1
  */
 export class GameOverScene extends Phaser.Scene {
   private score = 0;
@@ -37,6 +44,7 @@ export class GameOverScene extends Phaser.Scene {
     this.scale.on(Phaser.Scale.Events.RESIZE, this.buildUi, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.buildUi, this);
+      unmountGameOverLottieOverlay();
     });
   }
 
@@ -44,11 +52,25 @@ export class GameOverScene extends Phaser.Scene {
     this.children.removeAll(true);
 
     const base = getCachedGameOverLayout(this.game);
-    const layout = layoutCoverScreenBackground(this, getGameOverTextureKey());
+    const useLottie = usesGameOverLottieTest();
+    const layout = useLottie
+      ? getCoverScreenLayout(this)
+      : layoutCoverScreenBackground(this, getGameOverTextureKey());
     const { cx, mapY } = layout;
     const px = (n: number) => scalePx(layout, n);
 
-    this.cameras.main.setBackgroundColor(base.bg);
+    this.cameras.main.setBackgroundColor(useLottie ? 'rgba(0,0,0,0)' : base.bg);
+
+    if (useLottie) {
+      const lottieData = this.cache.json.get(getGameOverLottieCacheKey()) as object | null;
+      if (lottieData) {
+        mountGameOverLottieOverlay(layout, lottieData, `#${base.bg.toString(16).padStart(6, '0')}`);
+      } else {
+        unmountGameOverLottieOverlay();
+      }
+    } else {
+      unmountGameOverLottieOverlay();
+    }
 
     addStatsPill(
       this,
@@ -65,6 +87,7 @@ export class GameOverScene extends Phaser.Scene {
     );
 
     const restart = () => {
+      unmountGameOverLottieOverlay();
       const sound = getSoundManager(this.game);
       sound?.unlock(this);
       sound?.playMusic('music-game', this);
@@ -75,6 +98,7 @@ export class GameOverScene extends Phaser.Scene {
 
   private setupRestart(): void {
     const restart = () => {
+      unmountGameOverLottieOverlay();
       const sound = getSoundManager(this.game);
       sound?.unlock(this);
       sound?.playMusic('music-game', this);

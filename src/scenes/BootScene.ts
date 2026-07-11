@@ -5,6 +5,7 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import {
   cacheGameOverLayout,
   getGameOverLayoutCacheKey,
+  getGameOverLottieCacheKey,
   isGameOverTestMode,
   resolveGameOverLayout,
   shouldPreviewGameOver,
@@ -64,6 +65,12 @@ export class BootScene extends Phaser.Scene {
       'game-over-layout-test',
       assetUrl('assets/ui/screens/game-over-screen-layout.test.json', sv),
     );
+    if (isGameOverTestMode()) {
+      this.load.json(
+        getGameOverLottieCacheKey(),
+        assetUrl('assets/ui/screens/game-over-screen-playful.json', sv),
+      );
+    }
 
     const colv = GAME_CONFIG.collectibleAssetVersion;
     const collectibleImages = [

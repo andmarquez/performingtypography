@@ -22,6 +22,7 @@
     "assets:collectibles": "node scripts/sync-figma-collectible-art.mjs"
   },
   "dependencies": {
+    "lottie-web": "^5.13.0",
     "phaser": "^3.90.0"
   },
   "devDependencies": {
