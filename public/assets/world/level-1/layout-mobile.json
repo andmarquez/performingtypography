@@ -61,7 +61,7 @@
     },
     {
       "name": "floating_platform_01",
-      "x": 206,
+      "x": 346,
       "y": 443,
       "width": 123,
       "height": 35,
@@ -221,7 +221,7 @@
       "name": "floating_platform_01",
       "key": "platform-art:floating_platform_01",
       "path": "/assets/world/platforms/floating_platform_01.png",
-      "x": 206,
+      "x": 346,
       "y": 443,
       "width": 123,
       "height": 35
