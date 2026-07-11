@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { SoundManager } from '../audio/SoundManager';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { LevelLayout, WorldManifest } from '../world/worldTypes';
 import { assetUrl } from '../utils/assetUrl';
@@ -52,6 +53,24 @@ export class BootScene extends Phaser.Scene {
     collectibleImages.forEach(({ key, path }) => {
       this.load.image(key, assetUrl(path, colv));
     });
+
+    const av = GAME_CONFIG.audioAssetVersion;
+    const audioAssets = [
+      { key: 'sfx-jump', path: 'assets/audio/sfx_jump.mp3' },
+      { key: 'sfx-collect', path: 'assets/audio/sfx_coin.mp3' },
+      { key: 'sfx-timer', path: 'assets/audio/sfx_gem.mp3' },
+      { key: 'sfx-spark', path: 'assets/audio/sfx_magic.mp3' },
+      { key: 'sfx-stomp', path: 'assets/audio/sfx_bump.mp3' },
+      { key: 'sfx-hurt', path: 'assets/audio/sfx_hurt.mp3' },
+      { key: 'sfx-select', path: 'assets/audio/sfx_select.mp3' },
+      { key: 'sfx-win', path: 'assets/audio/sfx_magic.mp3' },
+      { key: 'sfx-game-over', path: 'assets/audio/sfx_disappear.mp3' },
+      { key: 'sfx-kiss', path: 'assets/audio/sfx_throw.mp3' },
+      { key: 'music-game', path: 'assets/audio/music-game.mp3' },
+    ] as const;
+    audioAssets.forEach(({ key, path }) => {
+      this.load.audio(key, assetUrl(path, av));
+    });
   }
 
   create(): void {
@@ -63,6 +82,9 @@ export class BootScene extends Phaser.Scene {
     this.loadWorldAssets(() => {
       this.generatePlaceholderTextures();
       this.registry.set('worldManifest', this.worldManifest);
+      if (!this.registry.get('soundManager')) {
+        this.registry.set('soundManager', new SoundManager(this.game));
+      }
       this.scene.start('MenuScene');
     });
   }

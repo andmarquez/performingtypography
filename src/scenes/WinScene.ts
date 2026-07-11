@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getSoundManager } from '../audio/SoundManager';
 import {
   END_SCREEN,
   addCtaHitZone,
@@ -24,6 +25,7 @@ export class WinScene extends Phaser.Scene {
   }
 
   create(): void {
+    getSoundManager(this.game)?.play('sfx-win');
     this.buildUi();
     this.setupRestart();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.buildUi, this);

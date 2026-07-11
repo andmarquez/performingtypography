@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getSoundManager } from '../audio/SoundManager';
 import { GAME_CONFIG } from '../config/gameConfig';
 
 export type PlayerAnimState =
@@ -158,6 +159,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityY(jumpPower);
       this.jumpsRemaining -= 1;
       this.setAnimState('jump');
+      getSoundManager(this.scene.game)?.play('sfx-jump', { volume: 0.45 });
 
       if (!onFloor) {
         const uniform = this.getUniformScale();

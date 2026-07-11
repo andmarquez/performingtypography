@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getSoundManager } from '../audio/SoundManager';
 import { coverFitImage } from '../ui/endScreenLayout';
 import { getUiViewport } from '../ui/viewportLayout';
 
@@ -67,6 +68,9 @@ export class MenuScene extends Phaser.Scene {
   private startGame(): void {
     if (!this.canStart) return;
     this.canStart = false;
+    const sound = getSoundManager(this.game);
+    sound?.unlock();
+    sound?.play('sfx-select');
     this.scene.start('GameScene');
   }
 }
