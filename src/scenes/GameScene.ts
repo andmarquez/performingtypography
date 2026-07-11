@@ -102,9 +102,13 @@ export class GameScene extends Phaser.Scene {
       this.cameras.main.setFollowOffset(0, GAME_CONFIG.mobileLandscapeCameraFollowOffsetY);
     }
 
+    this.input.once('pointerdown', () => {
+      getSoundManager(this.game)?.unlock(this);
+    });
+
     const sound = getSoundManager(this.game);
-    sound?.unlock();
-    sound?.playMusic('music-game');
+    sound?.unlock(this);
+    sound?.playMusic('music-game', this);
   }
 
   private createPlayer(): void {
@@ -296,7 +300,7 @@ export class GameScene extends Phaser.Scene {
 
     if (fromStomp) {
       this.player.stompBounce();
-      getSoundManager(this.game)?.play('sfx-stomp');
+      getSoundManager(this.game)?.play('sfx-stomp', this);
     }
 
     enemy.convertToHeart(() => {
@@ -320,7 +324,7 @@ export class GameScene extends Phaser.Scene {
     const now = this.time.now;
     if (now - this.lastKissBlowTime < GAME_CONFIG.kissBlowCooldownMs) return;
     this.lastKissBlowTime = now;
-    getSoundManager(this.game)?.play('sfx-kiss', { volume: 0.4 });
+    getSoundManager(this.game)?.play('sfx-kiss', this, { volume: 0.4 });
 
     const direction = this.player.getFacingRight() ? 1 : -1;
     const offsetX = direction === 1 ? 28 : -28;
@@ -360,17 +364,17 @@ export class GameScene extends Phaser.Scene {
     if (item.collectibleType === 'kiss') {
       this.stats.kisses += 1;
       this.stats.score += GAME_CONFIG.kissScore;
-      getSoundManager(this.game)?.play('sfx-collect');
+      getSoundManager(this.game)?.play('sfx-collect', this);
     } else if (item.collectibleType === 'spark') {
       if (!this.stats.hasBossSpark) {
         this.stats.hasBossSpark = true;
         this.stats.score += GAME_CONFIG.bossSparkScore;
-        getSoundManager(this.game)?.play('sfx-spark');
+        getSoundManager(this.game)?.play('sfx-spark', this);
         this.showFloatingMessage('Creative Spark acquired!');
       }
     } else {
       this.stats.timeRemaining += GAME_CONFIG.timerBonus;
-      getSoundManager(this.game)?.play('sfx-timer');
+      getSoundManager(this.game)?.play('sfx-timer', this);
       if (this.stats.projectsCompleted < getRequiredProjects(this.levelLayout)) {
         this.stats.projectsCompleted += 1;
       }
@@ -411,7 +415,7 @@ export class GameScene extends Phaser.Scene {
   private handleEnemyHit(): void {
     if (this.player.isInvulnerable() || this.gameEnded) return;
 
-    getSoundManager(this.game)?.play('sfx-hurt');
+    getSoundManager(this.game)?.play('sfx-hurt', this);
     this.stats.lives -= 1;
     this.updateHUD();
 
@@ -489,7 +493,7 @@ export class GameScene extends Phaser.Scene {
   private winGame(): void {
     if (this.gameEnded) return;
     this.gameEnded = true;
-    getSoundManager(this.game)?.stopMusic();
+    getSoundManager(this.game)?.stopMusic(this);
     this.player.celebrate();
     this.cameras.main.stopFollow();
 
@@ -505,7 +509,7 @@ export class GameScene extends Phaser.Scene {
   private endGame(reason: 'time' | 'lives' | 'fall'): void {
     if (this.gameEnded) return;
     this.gameEnded = true;
-    getSoundManager(this.game)?.stopMusic();
+    getSoundManager(this.game)?.stopMusic(this);
     this.scene.start('GameOverScene', {
       reason,
       score: this.stats.score,

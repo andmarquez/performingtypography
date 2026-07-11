@@ -10,7 +10,6 @@ export type SfxKey =
   | 'sfx-stomp'
   | 'sfx-hurt'
   | 'sfx-select'
-  | 'sfx-win'
   | 'sfx-game-over'
   | 'sfx-kiss';
 
@@ -18,11 +17,10 @@ export type MusicKey = 'music-game';
 
 /**
  * Central audio helper — Kenney CC0 platformer SFX + looped gameplay music.
- * Call unlock() on the first user tap (required on iOS).
+ * Always pass the active scene; each Phaser scene has its own sound manager.
  */
 export class SoundManager {
   private muted = false;
-  private unlocked = false;
   private activeMusic?: MusicKey;
 
   constructor(private readonly game: Phaser.Game) {
@@ -33,11 +31,9 @@ export class SoundManager {
     }
   }
 
-  unlock(): void {
-    if (this.unlocked) return;
-    this.unlocked = true;
-    const scene = this.game.scene.getScene('BootScene');
-    if (scene?.sound.locked) {
+  /** Unlock audio on the scene that received the user tap (required on iOS). */
+  unlock(scene: Phaser.Scene): void {
+    if (scene.sound.locked) {
       scene.sound.unlock();
     }
   }
@@ -54,7 +50,7 @@ export class SoundManager {
       /* ignore */
     }
     if (muted) {
-      this.stopMusic();
+      this.stopMusic(this.activeScene());
     }
   }
 
@@ -63,31 +59,41 @@ export class SoundManager {
     return this.muted;
   }
 
-  play(key: SfxKey, config?: Phaser.Types.Sound.SoundConfig): void {
+  play(
+    key: SfxKey,
+    scene?: Phaser.Scene,
+    config?: Phaser.Types.Sound.SoundConfig,
+  ): void {
     if (this.muted) return;
-    const scene = this.activeScene();
-    if (!scene || !scene.sound.get(key)) return;
-    scene.sound.play(key, { volume: 0.55, ...config });
+    const s = scene ?? this.activeScene();
+    if (!s || !this.hasAudio(s, key)) return;
+    this.unlock(s);
+    s.sound.play(key, { volume: 0.55, ...config });
   }
 
-  playMusic(key: MusicKey, volume = 0.28): void {
+  playMusic(key: MusicKey, scene?: Phaser.Scene, volume = 0.28): void {
     if (this.muted) return;
-    const scene = this.activeScene();
-    if (!scene) return;
-    if (this.activeMusic === key) {
-      const current = scene.sound.get(key) as Phaser.Sound.WebAudioSound | undefined;
-      if (current?.isPlaying) return;
-    }
-    this.stopMusic();
-    scene.sound.play(key, { loop: true, volume });
+    const s = scene ?? this.activeScene();
+    if (!s || !this.hasAudio(s, key)) return;
+
+    const current = s.sound.get(key) as Phaser.Sound.WebAudioSound | undefined;
+    if (this.activeMusic === key && current?.isPlaying) return;
+
+    this.stopMusic(s);
+    this.unlock(s);
+    s.sound.play(key, { loop: true, volume });
     this.activeMusic = key;
   }
 
-  stopMusic(): void {
-    const scene = this.activeScene();
-    if (!scene) return;
-    scene.sound.stopByKey('music-game');
+  stopMusic(scene?: Phaser.Scene): void {
+    const s = scene ?? this.activeScene();
+    if (!s) return;
+    s.sound.stopByKey('music-game');
     this.activeMusic = undefined;
+  }
+
+  private hasAudio(scene: Phaser.Scene, key: string): boolean {
+    return scene.cache.audio.exists(key);
   }
 
   private activeScene(): Phaser.Scene | undefined {

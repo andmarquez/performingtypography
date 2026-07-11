@@ -24,6 +24,10 @@ export class MenuScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
     this.game.canvas.setAttribute('tabindex', '0');
     this.game.canvas.focus({ preventScroll: true });
+
+    this.input.once('pointerdown', () => {
+      getSoundManager(this.game)?.unlock(this);
+    });
   }
 
   private layoutScreen = (): void => {
@@ -69,8 +73,8 @@ export class MenuScene extends Phaser.Scene {
     if (!this.canStart) return;
     this.canStart = false;
     const sound = getSoundManager(this.game);
-    sound?.unlock();
-    sound?.play('sfx-select');
+    sound?.unlock(this);
+    sound?.play('sfx-select', this);
     this.scene.start('GameScene');
   }
 }

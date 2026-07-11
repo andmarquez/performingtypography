@@ -35,7 +35,7 @@ export class GameOverScene extends Phaser.Scene {
   }
 
   create(): void {
-    getSoundManager(this.game)?.play('sfx-game-over');
+    getSoundManager(this.game)?.play('sfx-game-over', this);
     this.buildUi();
     this.setupRestart();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.buildUi, this);
@@ -78,12 +78,22 @@ export class GameOverScene extends Phaser.Scene {
       },
     );
 
-    const restart = () => this.scene.start('GameScene');
+    const restart = () => {
+      const sound = getSoundManager(this.game);
+      sound?.unlock(this);
+      sound?.playMusic('music-game', this);
+      this.scene.start('GameScene');
+    };
     addCtaHitZone(this, cx, mapY(base.ctaY), px(base.ctaW), px(base.ctaH), restart);
   };
 
   private setupRestart(): void {
-    const restart = () => this.scene.start('GameScene');
+    const restart = () => {
+      const sound = getSoundManager(this.game);
+      sound?.unlock(this);
+      sound?.playMusic('music-game', this);
+      this.scene.start('GameScene');
+    };
     this.input.keyboard?.on('keydown-ENTER', restart);
     this.input.keyboard?.on('keydown-SPACE', restart);
   }

@@ -63,7 +63,6 @@ export class BootScene extends Phaser.Scene {
       { key: 'sfx-stomp', path: 'assets/audio/sfx_bump.mp3' },
       { key: 'sfx-hurt', path: 'assets/audio/sfx_hurt.mp3' },
       { key: 'sfx-select', path: 'assets/audio/sfx_select.mp3' },
-      { key: 'sfx-win', path: 'assets/audio/sfx_magic.mp3' },
       { key: 'sfx-game-over', path: 'assets/audio/sfx_disappear.mp3' },
       { key: 'sfx-kiss', path: 'assets/audio/sfx_throw.mp3' },
       { key: 'music-game', path: 'assets/audio/music-game.mp3' },
