@@ -1,60 +1,45 @@
 import Phaser from 'phaser';
+import {
+  initNativeAudio,
+  isNativeMusicPlaying,
+  playNativeMusic,
+  playNativeSfx,
+  stopNativeMusic,
+  unlockNativeAudio,
+  type NativeAudioKey,
+} from './nativeAudio';
 import { resumeSharedAudioContext } from './sharedAudioContext';
 
 const MUTE_KEY = 'venezuelan-game.soundMuted';
 
-export type SfxKey =
-  | 'sfx-jump'
-  | 'sfx-collect'
-  | 'sfx-timer'
-  | 'sfx-spark'
-  | 'sfx-stomp'
-  | 'sfx-hurt'
-  | 'sfx-select'
-  | 'sfx-game-over'
-  | 'sfx-kiss';
-
+export type SfxKey = Exclude<NativeAudioKey, 'music-game'>;
 export type MusicKey = 'music-game';
 
-type WebAudioManager = Phaser.Sound.WebAudioSoundManager & {
-  context?: AudioContext;
-  locked: boolean;
-  unlocked?: boolean;
-};
-
 /**
- * Central audio helper — Kenney CC0 platformer SFX + looped gameplay music.
- * Pass the active scene; unlock during the same user tap that starts gameplay.
+ * Audio via native HTMLAudioElement (reliable on iOS Safari) with Phaser fallback.
  */
 export class SoundManager {
   private muted = false;
-  private activeMusic?: MusicKey;
+  private activeMusic = false;
 
-  constructor(private readonly game: Phaser.Game) {
+  constructor(_game: Phaser.Game) {
     try {
       this.muted = localStorage.getItem(MUTE_KEY) === '1';
     } catch {
       this.muted = false;
     }
+    initNativeAudio();
   }
 
-  /** Resume Web Audio during a user gesture (required on iOS / Safari). */
-  unlock(scene: Phaser.Scene): void {
+  unlock(scene?: Phaser.Scene): void {
+    unlockNativeAudio();
     resumeSharedAudioContext();
 
-    const sm = scene.sound as WebAudioManager;
-    const ctx = sm.context ?? this.game.config.audio.context;
-    if (ctx && ctx.state === 'suspended') {
-      void ctx.resume();
+    if (scene) {
+      scene.sound.pauseOnBlur = false;
+      const sm = scene.sound as Phaser.Sound.WebAudioSoundManager & { locked?: boolean };
+      if (sm.locked) sm.unlock();
     }
-
-    if (sm.locked) {
-      sm.unlock();
-    }
-
-    // Phaser flips `locked` on the next update after context resumes — nudge it now.
-    sm.unlocked = true;
-    sm.locked = false;
   }
 
   isMuted(): boolean {
@@ -68,9 +53,7 @@ export class SoundManager {
     } catch {
       /* ignore */
     }
-    if (muted) {
-      this.stopMusic(this.activeScene());
-    }
+    if (muted) this.stopMusic();
   }
 
   toggleMuted(): boolean {
@@ -78,43 +61,34 @@ export class SoundManager {
     return this.muted;
   }
 
-  play(
-    key: SfxKey,
-    scene?: Phaser.Scene,
-    config?: Phaser.Types.Sound.SoundConfig,
-  ): void {
+  play(key: SfxKey, scene?: Phaser.Scene, config?: { volume?: number }): void {
     if (this.muted) return;
-    const s = scene ?? this.activeScene();
-    if (!s || !s.cache.audio.exists(key)) return;
+    this.unlock(scene);
+    playNativeSfx(key, config?.volume ?? 0.75);
 
-    this.unlock(s);
-    s.sound.play(key, { volume: 0.7, ...config });
+    if (scene?.cache.audio.exists(key)) {
+      scene.sound.play(key, { volume: config?.volume ?? 0.75 });
+    }
   }
 
-  playMusic(key: MusicKey, scene?: Phaser.Scene, volume = 0.42): void {
+  playMusic(_key: MusicKey, scene?: Phaser.Scene, volume = 0.45): void {
     if (this.muted) return;
-    const s = scene ?? this.activeScene();
-    if (!s || !s.cache.audio.exists(key)) return;
+    if (this.activeMusic && isNativeMusicPlaying()) return;
 
-    const current = s.sound.get(key) as Phaser.Sound.WebAudioSound | undefined;
-    if (this.activeMusic === key && current?.isPlaying) return;
+    this.unlock(scene);
+    this.stopMusic();
+    playNativeMusic(volume);
+    this.activeMusic = true;
 
-    this.stopMusic(s);
-    this.unlock(s);
-    s.sound.play(key, { loop: true, volume });
-    this.activeMusic = key;
+    if (scene?.cache.audio.exists('music-game')) {
+      scene.sound.play('music-game', { loop: true, volume });
+    }
   }
 
   stopMusic(scene?: Phaser.Scene): void {
-    const s = scene ?? this.activeScene();
-    if (!s) return;
-    s.sound.stopByKey('music-game');
-    this.activeMusic = undefined;
-  }
-
-  private activeScene(): Phaser.Scene | undefined {
-    const scenes = this.game.scene.getScenes(true);
-    return scenes.find((s) => s.sys.isActive()) ?? scenes[0];
+    stopNativeMusic();
+    this.activeMusic = false;
+    scene?.sound.stopByKey('music-game');
   }
 }
 
@@ -122,9 +96,9 @@ export function getSoundManager(game: Phaser.Game): SoundManager | undefined {
   return game.registry.get('soundManager') as SoundManager | undefined;
 }
 
-/** Call from scene create so the first tap on that scene unlocks audio. */
+/** Unlock audio on first tap in each scene. */
 export function bindSceneAudioUnlock(scene: Phaser.Scene): void {
-  scene.input.once('pointerdown', () => {
-    getSoundManager(scene.game)?.unlock(scene);
-  });
+  scene.sound.pauseOnBlur = false;
+  const unlock = () => getSoundManager(scene.game)?.unlock(scene);
+  scene.input.on('pointerdown', unlock);
 }

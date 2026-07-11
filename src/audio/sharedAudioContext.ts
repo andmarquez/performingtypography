@@ -1,3 +1,5 @@
+import { initNativeAudio, unlockNativeAudio } from './nativeAudio';
+
 /** One AudioContext for the whole game — Phaser scenes share it via `game.config.audio.context`. */
 let sharedContext: AudioContext | null = null;
 
@@ -21,7 +23,11 @@ export function resumeSharedAudioContext(): void {
 }
 
 export function bindGlobalAudioUnlock(): void {
-  const unlock = () => resumeSharedAudioContext();
+  const unlock = () => {
+    initNativeAudio();
+    unlockNativeAudio();
+    resumeSharedAudioContext();
+  };
   document.addEventListener('touchstart', unlock, { capture: true, passive: true });
   document.addEventListener('pointerdown', unlock, { capture: true, passive: true });
   document.addEventListener('keydown', unlock, { capture: true, passive: true });

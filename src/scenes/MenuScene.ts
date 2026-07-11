@@ -54,9 +54,12 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private setupPointer(): void {
-    const tryStart = () => this.startGame();
-    this.input.on('pointerdown', tryStart);
-    this.input.on('pointerup', tryStart);
+    const tryStart = () => {
+      getSoundManager(this.game)?.unlock(this);
+      this.startGame();
+    };
+    this.input.once('pointerup', tryStart);
+    this.input.once('pointerdown', tryStart);
   }
 
   private cleanup = (): void => {
@@ -73,6 +76,7 @@ export class MenuScene extends Phaser.Scene {
     const sound = getSoundManager(this.game);
     sound?.unlock(this);
     sound?.play('sfx-select', this);
+    sound?.playMusic('music-game', this);
     this.scene.start('GameScene');
   }
 }

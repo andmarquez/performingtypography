@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { initNativeAudio } from '../audio/nativeAudio';
 import { SoundManager } from '../audio/SoundManager';
 import { GAME_CONFIG } from '../config/gameConfig';
 import type { LevelLayout, WorldManifest } from '../world/worldTypes';
@@ -82,6 +83,7 @@ export class BootScene extends Phaser.Scene {
       this.generatePlaceholderTextures();
       this.registry.set('worldManifest', this.worldManifest);
       if (!this.registry.get('soundManager')) {
+        initNativeAudio();
         this.registry.set('soundManager', new SoundManager(this.game));
       }
       this.scene.start('MenuScene');
