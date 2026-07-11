@@ -4,7 +4,7 @@
  */
 export const GAME_CONFIG = {
   /** Bump after Figma asset sync so phones bypass CDN/browser cache */
-  worldAssetVersion: '20260711a',
+  worldAssetVersion: '20260711b',
   characterAssetVersion: '20260705l',
   enemyAssetVersion: '20260705l',
   /** Bump after Figma M01/M03/M04 screen art sync */
@@ -53,6 +53,9 @@ export const GAME_CONFIG = {
   /** Countdown timer in seconds */
   startingTime: 90,
   timerBonus: 15,
+
+  /** Foot Y past this = fell off the level (no ground floor — game over) */
+  fallDeathY: 700,
 
   /** Projects needed to win — fallback; actual count follows timer markers in layout JSON */
   requiredProjects: 2,

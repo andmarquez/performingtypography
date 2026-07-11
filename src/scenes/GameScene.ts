@@ -72,7 +72,7 @@ export class GameScene extends Phaser.Scene {
     const debug = shouldShowPlatformZones();
     const cloudZones = shouldShowCloudZones();
 
-    this.physics.world.setBounds(0, 0, worldW, GAME_CONFIG.worldHeight);
+    this.physics.world.setBounds(0, 0, worldW, GAME_CONFIG.worldHeight, true, true, true, false);
     this.cameras.main.setBounds(0, 0, worldW, GAME_CONFIG.worldHeight);
     this.cameras.main.setBackgroundColor('#b8e0f5');
 
@@ -691,7 +691,7 @@ export class GameScene extends Phaser.Scene {
 
     this.player.setDepth(depthFromFootY(this.player.y, WORLD_LAYERS.player));
 
-    if (this.player.y > GAME_CONFIG.worldHeight + 50) {
+    if (this.player.y > GAME_CONFIG.fallDeathY) {
       this.endGame('fall');
     }
   }
