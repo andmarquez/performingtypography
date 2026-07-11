@@ -9,7 +9,6 @@ import {
 import {
   addCtaHitZone,
   addStatsPill,
-  getCoverScreenLayout,
   layoutCoverScreenBackground,
   scalePx,
 } from '../ui/endScreenLayout';
@@ -53,24 +52,35 @@ export class GameOverScene extends Phaser.Scene {
 
     const base = getCachedGameOverLayout(this.game);
     const useLottie = usesGameOverLottieTest();
-    const layout = useLottie
-      ? getCoverScreenLayout(this)
-      : layoutCoverScreenBackground(this, getGameOverTextureKey());
+    const restart = () => {
+      unmountGameOverLottieOverlay();
+      const sound = getSoundManager(this.game);
+      sound?.unlock(this);
+      sound?.playMusic('music-game', this);
+      this.scene.start('GameScene');
+    };
+
+    if (useLottie) {
+      unmountGameOverLottieOverlay();
+      this.cameras.main.setBackgroundColor(base.bg);
+      const lottieData = this.cache.json.get(getGameOverLottieCacheKey()) as object | null;
+      if (lottieData) {
+        mountGameOverLottieOverlay(
+          lottieData,
+          base,
+          `Empanadas: ${this.kisses}  |  Score: ${this.score}`,
+          restart,
+        );
+      }
+      return;
+    }
+
+    unmountGameOverLottieOverlay();
+    const layout = layoutCoverScreenBackground(this, getGameOverTextureKey());
     const { cx, mapY } = layout;
     const px = (n: number) => scalePx(layout, n);
 
-    this.cameras.main.setBackgroundColor(useLottie ? 'rgba(0,0,0,0)' : base.bg);
-
-    if (useLottie) {
-      const lottieData = this.cache.json.get(getGameOverLottieCacheKey()) as object | null;
-      if (lottieData) {
-        mountGameOverLottieOverlay(layout, lottieData, `#${base.bg.toString(16).padStart(6, '0')}`);
-      } else {
-        unmountGameOverLottieOverlay();
-      }
-    } else {
-      unmountGameOverLottieOverlay();
-    }
+    this.cameras.main.setBackgroundColor(base.bg);
 
     addStatsPill(
       this,
@@ -86,13 +96,6 @@ export class GameOverScene extends Phaser.Scene {
       },
     );
 
-    const restart = () => {
-      unmountGameOverLottieOverlay();
-      const sound = getSoundManager(this.game);
-      sound?.unlock(this);
-      sound?.playMusic('music-game', this);
-      this.scene.start('GameScene');
-    };
     addCtaHitZone(this, cx, mapY(base.ctaY), px(base.ctaW), px(base.ctaH), restart);
   };
 
