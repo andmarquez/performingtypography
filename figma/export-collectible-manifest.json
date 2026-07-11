@@ -1,7 +1,7 @@
 {
   "figmaFileKey": "1zlB4dA4ktyuuBXzseo1ix",
   "figmaFileUrl": "https://www.figma.com/design/1zlB4dA4ktyuuBXzseo1ix",
-  "syncedAt": "2026-07-11T05:22:00.000Z",
+  "syncedAt": "2026-07-11T12:55:00.000Z",
   "collectibles": {
     "kiss": {
       "figmaNodeId": "162:17",
@@ -9,10 +9,13 @@
       "gif": "https://www.figma.com/api/mcp/asset/55774dd7-dcd2-4587-8b72-c4239c076a8b",
       "dest": "public/assets/collectibles/kiss.gif",
       "sheet": "public/assets/collectibles/sheets/kiss-sheet.png",
+      "static": "public/assets/collectibles/sheets/kiss-static.png",
       "displaySize": 48,
       "frameWidth": 48,
       "frameHeight": 48,
       "frameCount": 101,
+      "sheetCols": 10,
+      "sheetRows": 11,
       "frameRate": 12
     },
     "timer": {
@@ -21,10 +24,13 @@
       "gif": "https://www.figma.com/api/mcp/asset/beac9753-76b5-4eb8-aa59-81fbbd5be873",
       "dest": "public/assets/collectibles/timer.gif",
       "sheet": "public/assets/collectibles/sheets/timer-sheet.png",
+      "static": "public/assets/collectibles/sheets/timer-static.png",
       "displaySize": 48,
       "frameWidth": 48,
       "frameHeight": 48,
       "frameCount": 99,
+      "sheetCols": 10,
+      "sheetRows": 10,
       "frameRate": 12
     },
     "magic-power": {
@@ -33,10 +39,13 @@
       "gif": "https://www.figma.com/api/mcp/asset/3fe11499-3d18-4e79-aeb9-509e82eeba02",
       "dest": "public/assets/collectibles/magic-power.gif",
       "sheet": "public/assets/collectibles/sheets/magic-power-sheet.png",
+      "static": "public/assets/collectibles/sheets/magic-power-static.png",
       "displaySize": 48,
       "frameWidth": 48,
       "frameHeight": 48,
       "frameCount": 101,
+      "sheetCols": 10,
+      "sheetRows": 11,
       "frameRate": 12
     }
   },

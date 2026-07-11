@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Sync collectible GIFs from Figma → public/assets/collectibles/
- * Also builds horizontal PNG spritesheets for Phaser world-space rendering.
+ * Builds grid PNG spritesheets (max 4096px) for Phaser world-space rendering.
  * Manifest: figma/export-collectible-manifest.json
  */
 import { execSync } from 'node:child_process';
@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const MANIFEST_PATH = path.join(ROOT, 'figma/export-collectible-manifest.json');
+const GRID_COLS = 10;
 
 async function fetchBuffer(url) {
   const res = await fetch(url, {
@@ -34,17 +35,30 @@ function countGifFrames(gifPath) {
 }
 
 function buildSpritesheet(gifPath, sheetPath, displaySize) {
-  const frames = countGifFrames(gifPath);
+  const frameCount = countGifFrames(gifPath);
+  const cols = GRID_COLS;
+  const rows = Math.ceil(frameCount / cols);
   const vf = [
     'fps=12',
     `scale=${displaySize}:${displaySize}:force_original_aspect_ratio=decrease`,
     `pad=${displaySize}:${displaySize}:(ow-iw)/2:(oh-ih)/2`,
-    `tile=${frames}x1`,
+    `tile=${cols}x${rows}`,
   ].join(',');
   execSync(`ffmpeg -y -i "${gifPath}" -vf "${vf}" -frames:v 1 "${sheetPath}"`, {
     stdio: 'pipe',
   });
-  return frames;
+  return { frameCount, cols, rows };
+}
+
+function buildStaticFrame(gifPath, staticPath, displaySize) {
+  const vf = [
+    'fps=12',
+    `scale=${displaySize}:${displaySize}:force_original_aspect_ratio=decrease`,
+    `pad=${displaySize}:${displaySize}:(ow-iw)/2:(oh-ih)/2`,
+  ].join(',');
+  execSync(`ffmpeg -y -i "${gifPath}" -vf "${vf}" -frames:v 1 -update 1 "${staticPath}"`, {
+    stdio: 'pipe',
+  });
 }
 
 async function main() {
@@ -60,15 +74,25 @@ async function main() {
 
     const displaySize = entry.displaySize ?? 48;
     const sheetRel = `public/assets/collectibles/sheets/${key}-sheet.png`;
+    const staticRel = `public/assets/collectibles/sheets/${key}-static.png`;
     const sheetPath = path.join(ROOT, sheetRel);
+    const staticPath = path.join(ROOT, staticRel);
     fs.mkdirSync(path.dirname(sheetPath), { recursive: true });
-    const frameCount = buildSpritesheet(dest, sheetPath, displaySize);
+
+    const { frameCount, cols, rows } = buildSpritesheet(dest, sheetPath, displaySize);
+    buildStaticFrame(dest, staticPath, displaySize);
+
     entry.sheet = sheetRel;
+    entry.static = staticRel;
     entry.frameCount = frameCount;
     entry.frameWidth = displaySize;
     entry.frameHeight = displaySize;
+    entry.sheetCols = cols;
+    entry.sheetRows = rows;
     entry.frameRate = 12;
-    console.log(`spritesheet ${key} → ${sheetRel} (${frameCount} frames @ ${displaySize}px)`);
+    console.log(
+      `spritesheet ${key} → ${sheetRel} (${frameCount} frames, ${cols}x${rows} grid @ ${displaySize}px)`,
+    );
     ok += 1;
   }
 
