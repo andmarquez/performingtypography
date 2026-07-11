@@ -42,12 +42,28 @@ export class BootScene extends Phaser.Scene {
     screenAssets.forEach((key) => {
       this.load.image(`screen-${key}`, assetUrl(`assets/ui/screens/${key}.png`, sv));
     });
+
+    const colv = GAME_CONFIG.collectibleAssetVersion;
+    const collectibleSheets = [
+      { key: 'collectible-kiss', path: 'assets/collectibles/sheets/kiss-sheet.png', frames: 101 },
+      { key: 'collectible-timer', path: 'assets/collectibles/sheets/timer-sheet.png', frames: 99 },
+      { key: 'collectible-spark', path: 'assets/collectibles/sheets/magic-power-sheet.png', frames: 101 },
+    ] as const;
+    collectibleSheets.forEach(({ key, path, frames }) => {
+      this.load.spritesheet(key, assetUrl(path, colv), {
+        frameWidth: 48,
+        frameHeight: 48,
+      });
+      this.registry.set(`collectible-frame-count:${key}`, frames);
+    });
   }
 
   create(): void {
     this.applyCharacterTextureFilters();
     this.applyEnemyTextureFilters();
     this.applyScreenTextureFilters();
+    this.applyCollectibleTextureFilters();
+    this.createCollectibleAnimations();
     this.worldManifest = this.cache.json.get('world-manifest') as WorldManifest | null;
     this.loadWorldAssets(() => {
       this.generatePlaceholderTextures();
@@ -85,6 +101,36 @@ export class BootScene extends Phaser.Scene {
       if (this.textures.exists(key)) {
         this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
       }
+    }
+  }
+
+  /** Smooth scaling for Figma collectible spritesheets on high-DPI phones. */
+  private applyCollectibleTextureFilters(): void {
+    for (const key of ['collectible-kiss', 'collectible-timer', 'collectible-spark']) {
+      if (this.textures.exists(key)) {
+        this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
+      }
+    }
+  }
+
+  /** Looping idle animations for map collectibles (GIF → horizontal spritesheet). */
+  private createCollectibleAnimations(): void {
+    const defs = [
+      { texture: 'collectible-kiss', anim: 'collectible-kiss-idle' },
+      { texture: 'collectible-timer', anim: 'collectible-timer-idle' },
+      { texture: 'collectible-spark', anim: 'collectible-spark-idle' },
+    ] as const;
+
+    for (const { texture, anim } of defs) {
+      if (!this.textures.exists(texture) || this.anims.exists(anim)) continue;
+      const frameTotal = (this.registry.get(`collectible-frame-count:${texture}`) as number) ?? 0;
+      const end = Math.max(0, frameTotal - 1);
+      this.anims.create({
+        key: anim,
+        frames: this.anims.generateFrameNumbers(texture, { start: 0, end }),
+        frameRate: 12,
+        repeat: -1,
+      });
     }
   }
 
