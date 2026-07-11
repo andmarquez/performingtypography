@@ -19,7 +19,10 @@ type PortalMagicOptions = {
  * Layered magic light FX around the level-end portal (Figma portal_goal).
  */
 export class PortalMagicEffects {
-  readonly sprite: Phaser.Physics.Arcade.Sprite;
+  /** Visual portal — no physics (won't block kiss projectiles). */
+  readonly sprite: Phaser.GameObjects.Image;
+  /** Player-only overlap trigger for entering the level end. */
+  readonly zone: Phaser.GameObjects.Zone;
   private readonly scene: Phaser.Scene;
   private readonly root: Phaser.GameObjects.Container;
   private readonly size: number;
@@ -110,12 +113,16 @@ export class PortalMagicEffects {
       }),
     );
 
-    this.sprite = scene.physics.add.sprite(x, y, 'portal');
-    this.sprite.setImmovable(true);
-    (this.sprite.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    this.sprite = scene.add.image(x, y, 'portal');
     this.sprite.setDepth(depth);
     this.sprite.setDisplaySize(this.size, this.size);
     this.sprite.setAlpha(0.72);
+
+    this.zone = scene.add.zone(x, y, this.size * 0.82, this.size * 0.82);
+    this.zone.setOrigin(0.5, 0.5);
+    scene.physics.add.existing(this.zone, true);
+    (this.zone.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    this.zone.setDepth(depth);
 
     this.tweens.push(
       scene.tweens.add({
@@ -218,6 +225,7 @@ export class PortalMagicEffects {
     this.tweens.forEach((tween) => tween.destroy());
     this.emitters.forEach((emitter) => emitter.destroy());
     this.root.destroy(true);
+    this.zone.destroy();
     this.sprite.destroy();
   }
 

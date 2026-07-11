@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { WORLD_LAYERS } from '../world/layerConfig';
 import type { Enemy } from './Enemy';
-import type { FinalBoss } from './FinalBoss';
 
 /**
  * KissProjectile — a blown kiss that converts deadline bugs into hearts.
@@ -11,6 +11,7 @@ import type { FinalBoss } from './FinalBoss';
  */
 export class KissProjectile extends Phaser.Physics.Arcade.Sprite {
   private onHitEnemy?: (enemy: Enemy, projectile: KissProjectile) => void;
+  private bossHit = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -27,7 +28,7 @@ export class KissProjectile extends Phaser.Physics.Arcade.Sprite {
 
     this.setScale(0.9);
     this.setFlipX(direction === -1);
-    this.setDepth(8);
+    this.setDepth(WORLD_LAYERS.player + 2);
     (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     this.body!.setSize(20, 20);
     this.body!.setOffset(6, 6);
@@ -56,13 +57,11 @@ export class KissProjectile extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  registerBossOverlap(
-    boss: FinalBoss,
-    onHit: (boss: FinalBoss, projectile: KissProjectile) => void,
-  ): void {
-    this.scene.physics.add.overlap(this, boss, () => {
-      if (!this.active || boss.isDefeated()) return;
-      onHit(boss, this);
-    });
+  wasBossHit(): boolean {
+    return this.bossHit;
+  }
+
+  markBossHit(): void {
+    this.bossHit = true;
   }
 }

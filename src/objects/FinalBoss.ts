@@ -55,6 +55,26 @@ export class FinalBoss extends Phaser.Physics.Arcade.Sprite {
     return this.defeated;
   }
 
+  /** World-space center used for kiss / stomp hit tests (matches the visible sprite). */
+  getHitCenter(): { x: number; y: number } {
+    return { x: this.x, y: this.y - this.displayHeight * 0.42 };
+  }
+
+  getHitRadius(): number {
+    return Math.max(this.displayWidth, this.displayHeight) * 0.48;
+  }
+
+  isKissHit(x: number, y: number): boolean {
+    const { x: cx, y: cy } = this.getHitCenter();
+    return Phaser.Math.Distance.Between(x, y, cx, cy) <= this.getHitRadius();
+  }
+
+  isStompHit(playerX: number, playerY: number, falling: boolean): boolean {
+    if (!falling) return false;
+    const { x: cx, y: cy } = this.getHitCenter();
+    return playerY < cy + 8 && Math.abs(playerX - cx) <= this.displayWidth * 0.55;
+  }
+
   takeDamage(onDefeated?: () => void): boolean {
     if (this.defeated) return false;
 
@@ -127,6 +147,7 @@ export class FinalBoss extends Phaser.Physics.Arcade.Sprite {
 
   update(): void {
     if (this.defeated) return;
+    (this.body as Phaser.Physics.Arcade.Body)?.updateFromGameObject();
     this.setVelocityX(this.direction * GAME_CONFIG.finalBossSpeed);
     this.drawHpBar();
 

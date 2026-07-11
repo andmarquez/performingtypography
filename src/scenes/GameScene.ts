@@ -42,6 +42,7 @@ export class GameScene extends Phaser.Scene {
   private keySpace!: Phaser.Input.Keyboard.Key;
   private kissProjectiles: KissProjectile[] = [];
   private lastKissBlowTime = 0;
+  private lastBossDamageAt = 0;
 
   private stats: GameStats = createInitialStats();
   private hud!: Phaser.GameObjects.Container;
@@ -192,7 +193,7 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    this.physics.add.overlap(this.player, this.portalFx!.sprite, () => {
+    this.physics.add.overlap(this.player, this.portalFx!.zone, () => {
       this.tryEnterPortal();
     });
 
@@ -215,7 +216,7 @@ export class GameScene extends Phaser.Scene {
 
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
     const falling = playerBody.velocity.y > 0;
-    const stomping = falling && this.player.y < this.finalBoss.y - 20;
+    const stomping = this.finalBoss.isStompHit(this.player.x, this.player.y, falling);
 
     if (stomping && this.stats.hasBossSpark) {
       this.damageBoss(true);
@@ -232,6 +233,8 @@ export class GameScene extends Phaser.Scene {
 
   private damageBoss(fromStomp = false): void {
     if (!this.finalBoss || this.finalBoss.isDefeated()) return;
+    if (this.time.now - this.lastBossDamageAt < 280) return;
+    this.lastBossDamageAt = this.time.now;
 
     if (fromStomp) {
       this.player.stompBounce();
@@ -318,21 +321,32 @@ export class GameScene extends Phaser.Scene {
     );
 
     projectile.registerEnemyOverlap(this.enemies);
-    if (this.finalBoss && !this.finalBoss.isDefeated()) {
-      projectile.registerBossOverlap(this.finalBoss, (_boss, proj) => {
-        if (!this.stats.hasBossSpark) {
-          this.showFloatingMessage('Find the Creative Spark!');
-          proj.destroy();
-          this.kissProjectiles = this.kissProjectiles.filter((p) => p !== proj);
-          return;
-        }
-        this.damageBoss(false);
-        proj.destroy();
-        this.kissProjectiles = this.kissProjectiles.filter((p) => p !== proj);
-      });
-    }
     this.kissProjectiles.push(projectile);
     this.player.playKissBlow();
+  }
+
+  private checkKissBossHits(): void {
+    if (!this.finalBoss || this.finalBoss.isDefeated()) return;
+
+    for (const proj of this.kissProjectiles) {
+      if (!proj.active || proj.wasBossHit()) continue;
+      if (!this.finalBoss.isKissHit(proj.x, proj.y)) continue;
+      this.handleKissBossHit(proj);
+    }
+  }
+
+  private handleKissBossHit(proj: KissProjectile): void {
+    proj.markBossHit();
+    if (!this.stats.hasBossSpark) {
+      this.showFloatingMessage('Find the Creative Spark!');
+      proj.destroy();
+      this.kissProjectiles = this.kissProjectiles.filter((p) => p !== proj);
+      return;
+    }
+
+    this.damageBoss(false);
+    proj.destroy();
+    this.kissProjectiles = this.kissProjectiles.filter((p) => p !== proj);
   }
 
   private handleCollectible(item: Collectible): void {
@@ -682,6 +696,7 @@ export class GameScene extends Phaser.Scene {
 
     this.enemies.forEach((e) => e.update());
     this.finalBoss?.update();
+    this.checkKissBossHits();
 
     this.player.setDepth(depthFromFootY(this.player.y, WORLD_LAYERS.player));
 
