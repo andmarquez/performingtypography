@@ -1,0 +1,12 @@
+{
+  "screen": "M03 — Game Over",
+  "format": "lottie",
+  "lottie": "game-over-screen-playful.json",
+  "designW": 1280,
+  "designH": 720,
+  "bg": "#fce4ec",
+  "ctaY": 369,
+  "ctaW": 177,
+  "ctaH": 47,
+  "ctaLabel": "Try Again"
+}

@@ -65,7 +65,7 @@ function mapDesignY(rect: CoverRect, designY: number): number {
   return rect.top + designY * rect.scale;
 }
 
-/** Lottie test game-over: animation only + invisible CTA tap target. */
+/** Official game-over Lottie overlay + invisible CTA tap target. */
 export function mountGameOverLottieOverlay(
   animationData: object,
   layout: ResolvedGameOverLayout,

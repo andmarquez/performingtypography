@@ -1,17 +1,10 @@
 import Phaser from 'phaser';
 import { getSoundManager } from '../audio/SoundManager';
 import {
+  GAME_OVER_LOTTIE_CACHE_KEY,
   getCachedGameOverLayout,
-  getGameOverLottieCacheKey,
-  getGameOverTextureKey,
-  usesGameOverLottieTest,
 } from '../ui/gameOverScreenConfig';
-import {
-  addCtaHitZone,
-  addStatsPill,
-  layoutCoverScreenBackground,
-  scalePx,
-} from '../ui/endScreenLayout';
+import { addCtaHitZone, layoutCoverScreenBackground, scalePx } from '../ui/endScreenLayout';
 import {
   mountGameOverLottieOverlay,
   unmountGameOverLottieOverlay,
@@ -19,21 +12,19 @@ import {
 
 export type GameOverReason = 'time' | 'lives' | 'fall';
 
+const PNG_FALLBACK_KEY = 'screen-game-over-screen';
+
 /**
- * GameOverScene — full-frame Figma M03 art + dynamic stats; CTA baked in.
- * Test layout: ?gameOverTest=1 (playful Lottie, static art only)  |  Preview: ?gameOver=1
+ * GameOverScene — playful Lottie M03 art + invisible Try Again tap zone.
+ * Preview: ?gameOver=1
  */
 export class GameOverScene extends Phaser.Scene {
-  private score = 0;
-  private kisses = 0;
-
   constructor() {
     super({ key: 'GameOverScene' });
   }
 
-  init(data: { reason?: GameOverReason; score?: number; kisses?: number }): void {
-    this.score = data.score ?? 0;
-    this.kisses = data.kisses ?? 0;
+  init(_data: { reason?: GameOverReason; score?: number; kisses?: number }): void {
+    /* score/kisses kept for scene API compat; art is static in Lottie */
   }
 
   create(): void {
@@ -50,8 +41,7 @@ export class GameOverScene extends Phaser.Scene {
   private buildUi = (): void => {
     this.children.removeAll(true);
 
-    const base = getCachedGameOverLayout(this.game);
-    const useLottie = usesGameOverLottieTest();
+    const layout = getCachedGameOverLayout(this.game);
     const restart = () => {
       unmountGameOverLottieOverlay();
       const sound = getSoundManager(this.game);
@@ -60,40 +50,20 @@ export class GameOverScene extends Phaser.Scene {
       this.scene.start('GameScene');
     };
 
-    if (useLottie) {
+    const lottieData = this.cache.json.get(GAME_OVER_LOTTIE_CACHE_KEY) as object | null;
+    if (lottieData) {
       unmountGameOverLottieOverlay();
-      this.cameras.main.setBackgroundColor(base.bg);
-      const lottieData = this.cache.json.get(getGameOverLottieCacheKey()) as object | null;
-      if (lottieData) {
-        mountGameOverLottieOverlay(lottieData, base, restart);
-        return;
-      }
-
-      unmountGameOverLottieOverlay();
+      this.cameras.main.setBackgroundColor(layout.bg);
+      mountGameOverLottieOverlay(lottieData, layout, restart);
+      return;
     }
 
     unmountGameOverLottieOverlay();
-    const layout = layoutCoverScreenBackground(this, getGameOverTextureKey());
-    const { cx, mapY } = layout;
-    const px = (n: number) => scalePx(layout, n);
-
-    this.cameras.main.setBackgroundColor(base.bg);
-
-    addStatsPill(
-      this,
-      cx,
-      mapY(base.statsY),
-      `Empanadas: ${this.kisses}  |  Score: ${this.score}`,
-      {
-        statsW: px(base.statsW),
-        statsH: px(base.statsH),
-        statsBg: base.statsBg,
-        statsTextColor: base.statsTextColor,
-        statsTextSize: px(base.statsTextSize),
-      },
-    );
-
-    addCtaHitZone(this, cx, mapY(base.ctaY), px(base.ctaW), px(base.ctaH), restart);
+    const screen = layoutCoverScreenBackground(this, PNG_FALLBACK_KEY);
+    const { cx, mapY } = screen;
+    const px = (n: number) => scalePx(screen, n);
+    this.cameras.main.setBackgroundColor(layout.bg);
+    addCtaHitZone(this, cx, mapY(layout.ctaY), px(layout.ctaW), px(layout.ctaH), restart);
   };
 
   private setupRestart(): void {

@@ -4,9 +4,8 @@ import { SoundManager } from '../audio/SoundManager';
 import { GAME_CONFIG } from '../config/gameConfig';
 import {
   cacheGameOverLayout,
-  getGameOverLayoutCacheKey,
-  getGameOverLottieCacheKey,
-  isGameOverTestMode,
+  GAME_OVER_LAYOUT_CACHE_KEY,
+  GAME_OVER_LOTTIE_CACHE_KEY,
   resolveGameOverLayout,
   shouldPreviewGameOver,
   type GameOverLayoutJson,
@@ -53,20 +52,12 @@ export class BootScene extends Phaser.Scene {
     screenAssets.forEach((key) => {
       this.load.image(`screen-${key}`, assetUrl(`assets/ui/screens/${key}.png`, sv));
     });
-    this.load.image(
-      'screen-game-over-screen-test',
-      assetUrl('assets/ui/screens/game-over-screen.test.png', sv),
+    this.load.json(
+      GAME_OVER_LAYOUT_CACHE_KEY,
+      assetUrl('assets/ui/screens/game-over-screen-layout.json', sv),
     );
     this.load.json(
-      'game-over-layout-production',
-      assetUrl('assets/ui/screens/game-over-screen-layout.production.json', sv),
-    );
-    this.load.json(
-      'game-over-layout-test',
-      assetUrl('assets/ui/screens/game-over-screen-layout.test.json', sv),
-    );
-    this.load.json(
-      getGameOverLottieCacheKey(),
+      GAME_OVER_LOTTIE_CACHE_KEY,
       assetUrl('assets/ui/screens/game-over-screen-playful.json', sv),
     );
 
@@ -141,9 +132,8 @@ export class BootScene extends Phaser.Scene {
 
   /** Smooth scaling for Figma screen art on high-DPI phones. */
   private applyGameOverLayoutConfig(): void {
-    const variant = isGameOverTestMode() ? 'test' : 'production';
-    const raw = this.cache.json.get(getGameOverLayoutCacheKey()) as GameOverLayoutJson | null;
-    cacheGameOverLayout(this.game, resolveGameOverLayout(raw, variant));
+    const raw = this.cache.json.get(GAME_OVER_LAYOUT_CACHE_KEY) as GameOverLayoutJson | null;
+    cacheGameOverLayout(this.game, resolveGameOverLayout(raw));
   }
 
   /** Smooth scaling for Figma screen art on high-DPI phones. */
@@ -151,7 +141,6 @@ export class BootScene extends Phaser.Scene {
     for (const key of [
       'screen-menu-start',
       'screen-game-over-screen',
-      'screen-game-over-screen-test',
       'screen-win-screen',
     ]) {
       if (this.textures.exists(key)) {
