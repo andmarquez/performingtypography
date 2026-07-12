@@ -4,7 +4,6 @@ import { GAME_CONFIG } from '../config/gameConfig';
 import type { ResolvedGameOverLayout } from './gameOverScreenConfig';
 
 const HOST_ID = 'game-over-lottie-host';
-const FONT_BODY = 'Inter, Nunito, system-ui, sans-serif';
 
 type CoverRect = {
   left: number;
@@ -66,11 +65,10 @@ function mapDesignY(rect: CoverRect, designY: number): number {
   return rect.top + designY * rect.scale;
 }
 
-/** Full test game-over stack: Lottie art + HTML stats pill + CTA tap target. */
+/** Lottie test game-over: animation only + invisible CTA tap target. */
 export function mountGameOverLottieOverlay(
   animationData: object,
   layout: ResolvedGameOverLayout,
-  statsText: string,
   onRestart: () => void,
 ): void {
   removeOverlay();
@@ -108,31 +106,6 @@ export function mountGameOverLottieOverlay(
   stage.style.height = `${rect.height}px`;
   stage.style.overflow = 'hidden';
   root.appendChild(stage);
-
-  const statsW = layout.statsW * rect.scale;
-  const statsH = layout.statsH * rect.scale;
-  const statsY = mapDesignY(rect, layout.statsY);
-  const statsLeft = rect.left + rect.width / 2 - statsW / 2;
-
-  const stats = document.createElement('div');
-  stats.textContent = statsText;
-  stats.style.position = 'absolute';
-  stats.style.left = `${statsLeft}px`;
-  stats.style.top = `${statsY - statsH / 2}px`;
-  stats.style.width = `${statsW}px`;
-  stats.style.height = `${statsH}px`;
-  stats.style.display = 'flex';
-  stats.style.alignItems = 'center';
-  stats.style.justifyContent = 'center';
-  stats.style.borderRadius = `${statsH / 2}px`;
-  stats.style.backgroundColor = colorHex(layout.statsBg);
-  stats.style.color = layout.statsTextColor;
-  stats.style.fontFamily = FONT_BODY;
-  stats.style.fontSize = `${layout.statsTextSize * rect.scale}px`;
-  stats.style.fontWeight = '600';
-  stats.style.pointerEvents = 'none';
-  stats.style.zIndex = '6';
-  root.appendChild(stats);
 
   const ctaW = layout.ctaW * rect.scale;
   const ctaH = layout.ctaH * rect.scale;

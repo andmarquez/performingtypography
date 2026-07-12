@@ -21,7 +21,7 @@ export type GameOverReason = 'time' | 'lives' | 'fall';
 
 /**
  * GameOverScene — full-frame Figma M03 art + dynamic stats; CTA baked in.
- * Test layout: ?gameOverTest=1 (playful Lottie)  |  Preview: ?gameOver=1
+ * Test layout: ?gameOverTest=1 (playful Lottie, static art only)  |  Preview: ?gameOver=1
  */
 export class GameOverScene extends Phaser.Scene {
   private score = 0;
@@ -65,12 +65,7 @@ export class GameOverScene extends Phaser.Scene {
       this.cameras.main.setBackgroundColor(base.bg);
       const lottieData = this.cache.json.get(getGameOverLottieCacheKey()) as object | null;
       if (lottieData) {
-        mountGameOverLottieOverlay(
-          lottieData,
-          base,
-          `Empanadas: ${this.kisses}  |  Score: ${this.score}`,
-          restart,
-        );
+        mountGameOverLottieOverlay(lottieData, base, restart);
         return;
       }
 
