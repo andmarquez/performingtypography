@@ -17,6 +17,7 @@ const COLLECTIBLE_TEXTURE: Record<CollectibleType, string> = {
 export class Collectible extends Phaser.Physics.Arcade.Sprite {
   readonly collectibleType: CollectibleType;
   private collected = false;
+  private glowFx?: Phaser.GameObjects.Ellipse;
 
   constructor(
     scene: Phaser.Scene,
@@ -44,24 +45,49 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
       ease: 'Sine.easeInOut',
     });
 
-    if (type === 'timer' || type === 'virgen') {
+    if (type === 'timer') {
       scene.tweens.add({
         targets: this,
         angle: 360,
-        duration: type === 'virgen' ? 3200 : 4000,
+        duration: 4000,
         repeat: -1,
       });
     }
     if (type === 'virgen') {
       this.setDisplaySize(56, 56);
-      scene.tweens.add({
-        targets: this,
-        scale: 1.1,
-        duration: 800,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
+      this.addVirgenGlow();
+    }
+  }
+
+  private addVirgenGlow(): void {
+    this.glowFx = this.scene.add.ellipse(
+      this.x,
+      this.y,
+      72,
+      72,
+      GAME_CONFIG.colors.virgenBlessingGlow,
+      0.35,
+    );
+    this.glowFx.setDepth(this.depth - 1);
+    this.glowFx.setBlendMode(Phaser.BlendModes.ADD);
+
+    this.scene.tweens.add({
+      targets: this.glowFx,
+      alpha: { from: 0.25, to: 0.55 },
+      scaleX: { from: 0.92, to: 1.12 },
+      scaleY: { from: 0.92, to: 1.12 },
+      duration: 900,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+  }
+
+  override preUpdate(): void {
+    super.preUpdate();
+    if (this.glowFx) {
+      this.glowFx.setPosition(this.x, this.y);
+      this.glowFx.setDepth(this.depth - 1);
     }
   }
 
@@ -72,6 +98,11 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
   override destroy(fromScene?: boolean): void {
     if (this.scene) {
       this.scene.tweens.killTweensOf(this);
+      if (this.glowFx) {
+        this.scene.tweens.killTweensOf(this.glowFx);
+        this.glowFx.destroy();
+        this.glowFx = undefined;
+      }
     }
     super.destroy(fromScene);
   }
@@ -82,6 +113,11 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
 
     if (this.scene) {
       this.scene.tweens.killTweensOf(this);
+      if (this.glowFx) {
+        this.scene.tweens.killTweensOf(this.glowFx);
+        this.glowFx.destroy();
+        this.glowFx = undefined;
+      }
     }
     this.disableBody(true, true);
 

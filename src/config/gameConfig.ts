@@ -159,7 +159,7 @@ export const GAME_CONFIG = {
   },
 
   /** Bump after true-transparent GIF alpha export */
-  collectibleAssetVersion: '20260712e',
+  collectibleAssetVersion: '20260712f',
 
   /** Colors — Andsiosa red & white identity */
   colors: {
