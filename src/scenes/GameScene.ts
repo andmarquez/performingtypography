@@ -721,17 +721,44 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  /** Blessed players are lifted back to the start platform instead of dying from a fall. */
+  /** Blessed players are lifted to the nearest platform instead of dying from a fall. */
   private rescuePlayerFromFall(): void {
-    const start = this.levelLayout.platforms.find((p) => p.name === 'platform_start');
-    const spawn = this.levelLayout.markers.player_spawn;
-    const x = start ? start.x + Math.round(start.width / 2) : spawn.x;
-    const y = start ? platformStandY(start) + 1 : spawn.y;
-
-    this.player.setPosition(x, y);
+    const point = this.findClosestPlatformRescuePoint();
+    this.player.setPosition(point.x, point.y);
     this.player.setVelocity(0, 0);
     (this.player.body as Phaser.Physics.Arcade.Body).updateFromGameObject();
     getSoundManager(this.game)?.play('sfx-spark', this);
+  }
+
+  private findClosestPlatformRescuePoint(): { x: number; y: number } {
+    const px = this.player.x;
+    const py = this.player.y;
+    const spawn = this.levelLayout.markers.player_spawn;
+    let best: { x: number; y: number } | null = null;
+    let bestDistSq = Infinity;
+
+    for (const platform of this.levelLayout.platforms) {
+      const standY = platformStandY(platform) + 1;
+      const minX = platform.x + 12;
+      const maxX = platform.x + platform.width - 12;
+      const standX = Phaser.Math.Clamp(px, minX, maxX);
+      const dx = standX - px;
+      const dy = standY - py;
+      const distSq = dx * dx + dy * dy;
+
+      if (distSq < bestDistSq) {
+        bestDistSq = distSq;
+        best = { x: standX, y: standY };
+      }
+    }
+
+    if (best) return best;
+
+    const start = this.levelLayout.platforms.find((p) => p.name === 'platform_start');
+    return {
+      x: start ? start.x + Math.round(start.width / 2) : spawn.x,
+      y: start ? platformStandY(start) + 1 : spawn.y,
+    };
   }
 
   shutdown(): void {
