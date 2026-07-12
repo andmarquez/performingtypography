@@ -362,6 +362,7 @@ export class GameScene extends Phaser.Scene {
         this.stats.score += GAME_CONFIG.virgenBlessingScore;
         getSoundManager(this.game)?.play('sfx-spark', this);
         this.showFloatingMessage(GAME_CONFIG.blessingMessages.blessed);
+        this.player.setBlessedGlow(true);
       }
     } else {
       this.stats.timeRemaining += GAME_CONFIG.timerBonus;

@@ -53,6 +53,7 @@ export class Collectible extends Phaser.Physics.Arcade.Sprite {
       });
     }
     if (type === 'virgen') {
+      this.setDisplaySize(56, 56);
       scene.tweens.add({
         targets: this,
         scale: 1.1,

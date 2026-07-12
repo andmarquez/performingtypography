@@ -159,7 +159,7 @@ export const GAME_CONFIG = {
   },
 
   /** Bump after true-transparent GIF alpha export */
-  collectibleAssetVersion: '20260712d',
+  collectibleAssetVersion: '20260712e',
 
   /** Colors — Andsiosa red & white identity */
   colors: {
@@ -188,6 +188,7 @@ export const GAME_CONFIG = {
     bossSparkGlow: 0xfff176,
     virgen: 0xf5f5f5,
     virgenGlow: 0xffffff,
+    virgenBlessingGlow: 0xffd54f,
     playerRed: 0xe53935,
     playerWhite: 0xffffff,
     playerHair: 0xc62828,

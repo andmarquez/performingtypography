@@ -25,6 +25,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private facingRight = true;
   private maxJumpsAllowed: number = GAME_CONFIG.maxJumps;
   private jumpsRemaining: number = GAME_CONFIG.maxJumps;
+  private blessingGlow?: Phaser.GameObjects.Container;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'andsiosa-idle');
@@ -252,6 +253,54 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   hasTripleJump(): boolean {
     return this.maxJumpsAllowed >= GAME_CONFIG.maxJumpsWithPrize;
+  }
+
+  /** Soft golden halo while the Virgen blessing is active. */
+  setBlessedGlow(active: boolean): void {
+    this.clearBlessedGlow();
+    if (!active) return;
+
+    const liftY = -44 * GAME_CONFIG.playerDisplayScale;
+    const outer = this.scene.add.ellipse(0, liftY, 104, 124, GAME_CONFIG.colors.virgenBlessingGlow, 0.28);
+    const inner = this.scene.add.ellipse(0, liftY, 76, 92, 0xffffff, 0.38);
+    outer.setBlendMode(Phaser.BlendModes.ADD);
+    inner.setBlendMode(Phaser.BlendModes.ADD);
+
+    this.blessingGlow = this.scene.add.container(this.x, this.y, [outer, inner]);
+    this.blessingGlow.setDepth(this.depth - 1);
+
+    this.scene.tweens.add({
+      targets: [outer, inner],
+      alpha: { from: 0.22, to: 0.58 },
+      scaleX: { from: 0.94, to: 1.08 },
+      scaleY: { from: 0.94, to: 1.08 },
+      duration: 900,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+  }
+
+  override preUpdate(time: number, delta: number): void {
+    super.preUpdate(time, delta);
+    if (this.blessingGlow) {
+      this.blessingGlow.setPosition(this.x, this.y);
+      this.blessingGlow.setDepth(this.depth - 1);
+    }
+  }
+
+  override destroy(fromScene?: boolean): void {
+    this.clearBlessedGlow();
+    super.destroy(fromScene);
+  }
+
+  private clearBlessedGlow(): void {
+    if (!this.blessingGlow) return;
+    this.blessingGlow.each((child: Phaser.GameObjects.GameObject) => {
+      this.scene.tweens.killTweensOf(child);
+    });
+    this.blessingGlow.destroy();
+    this.blessingGlow = undefined;
   }
 
   /** Soles are bottom-aligned in export cells — fixed anchor keeps run frames stable. */
