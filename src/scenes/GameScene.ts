@@ -43,6 +43,7 @@ export class GameScene extends Phaser.Scene {
   private kissProjectiles: KissProjectile[] = [];
   private lastKissBlowTime = 0;
   private lastBossDamageAt = 0;
+  private lastFallRescueAt = 0;
 
   private stats: GameStats = createInitialStats();
   private hud!: Phaser.GameObjects.Container;
@@ -269,6 +270,13 @@ export class GameScene extends Phaser.Scene {
 
     if (stomping) {
       this.convertEnemyToHeart(enemy, true);
+      return;
+    }
+
+    if (this.stats.hasVirgenBlessing) {
+      getSoundManager(this.game)?.play('sfx-spark', this);
+      this.convertEnemyToHeart(enemy, false);
+      this.showFloatingMessage(GAME_CONFIG.blessingMessages.smiteBug);
       return;
     }
 
@@ -702,8 +710,28 @@ export class GameScene extends Phaser.Scene {
     this.player.setDepth(depthFromFootY(this.player.y, WORLD_LAYERS.player));
 
     if (this.player.y > GAME_CONFIG.fallDeathY) {
+      if (this.stats.hasVirgenBlessing) {
+        if (this.time.now - this.lastFallRescueAt > 800) {
+          this.lastFallRescueAt = this.time.now;
+          this.rescuePlayerFromFall();
+        }
+        return;
+      }
       this.endGame('fall');
     }
+  }
+
+  /** Blessed players are lifted back to the start platform instead of dying from a fall. */
+  private rescuePlayerFromFall(): void {
+    const start = this.levelLayout.platforms.find((p) => p.name === 'platform_start');
+    const spawn = this.levelLayout.markers.player_spawn;
+    const x = start ? start.x + Math.round(start.width / 2) : spawn.x;
+    const y = start ? platformStandY(start) + 1 : spawn.y;
+
+    this.player.setPosition(x, y);
+    this.player.setVelocity(0, 0);
+    (this.player.body as Phaser.Physics.Arcade.Body).updateFromGameObject();
+    getSoundManager(this.game)?.play('sfx-spark', this);
   }
 
   shutdown(): void {

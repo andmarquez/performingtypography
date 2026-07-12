@@ -152,6 +152,7 @@ export const GAME_CONFIG = {
     blessed: 'You are blessed',
     defeatBoss: 'Defeat the final boss to open the portal!',
     needBlessingForBoss: 'Go get the blessing and defeat the boss!',
+    smiteBug: 'Blessed touch!',
   },
 
   unlockMessages: {
