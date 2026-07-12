@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { GAME_CONFIG } from '../config/gameConfig';
 import {
   initNativeAudio,
   isNativeMusicPlaying,
@@ -64,10 +65,10 @@ export class SoundManager {
 
   play(key: SfxKey, _scene?: Phaser.Scene, config?: { volume?: number }): void {
     if (this.muted) return;
-    playNativeSfx(key, config?.volume ?? 0.75);
+    playNativeSfx(key, config?.volume ?? GAME_CONFIG.sfxVolume);
   }
 
-  playMusic(_key: MusicKey, scene?: Phaser.Scene, volume = 0.45): void {
+  playMusic(_key: MusicKey, scene?: Phaser.Scene, volume = GAME_CONFIG.musicVolume): void {
     if (this.muted) return;
     if (this.activeMusic && isNativeMusicPlaying()) return;
 

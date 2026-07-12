@@ -10,7 +10,12 @@ export const GAME_CONFIG = {
   /** Bump after Figma M01/M03/M04 screen art sync */
   screenAssetVersion: '20260712c',
   /** Bump after audio asset sync */
-  audioAssetVersion: '20260711g',
+  audioAssetVersion: '20260712a',
+
+  /** Background music — kept below SFX so gameplay sounds stay clear */
+  musicVolume: 0.3,
+  /** Default one-shot SFX level (see per-call overrides in scenes) */
+  sfxVolume: 0.75,
 
   /** Portal goal display diameter (Figma portal_goal marker) */
   portalDisplaySize: 118,

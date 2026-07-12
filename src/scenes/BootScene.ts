@@ -82,7 +82,7 @@ export class BootScene extends Phaser.Scene {
       { key: 'sfx-select', path: 'assets/audio/sfx_select.mp3' },
       { key: 'sfx-game-over', path: 'assets/audio/sfx_disappear.mp3' },
       { key: 'sfx-kiss', path: 'assets/audio/sfx_throw.mp3' },
-      { key: 'music-game', path: 'assets/audio/music-game.mp3' },
+      { key: 'music-game', path: 'assets/audio/gaita-de-furro.mp3' },
     ] as const;
     audioAssets.forEach(({ key, path }) => {
       this.load.audio(key, assetUrl(path, av));

@@ -23,7 +23,7 @@ const FILES: Record<NativeAudioKey, string> = {
   'sfx-select': 'assets/audio/sfx_select.mp3',
   'sfx-game-over': 'assets/audio/sfx_disappear.mp3',
   'sfx-kiss': 'assets/audio/sfx_throw.mp3',
-  'music-game': 'assets/audio/music-game.mp3',
+  'music-game': 'assets/audio/gaita-de-furro.mp3',
 };
 
 const SFX_POOL_SIZE = 3;
@@ -96,7 +96,10 @@ export function unlockNativeAudio(): void {
     });
 }
 
-export function playNativeSfx(key: Exclude<NativeAudioKey, 'music-game'>, volume = 0.75): void {
+export function playNativeSfx(
+  key: Exclude<NativeAudioKey, 'music-game'>,
+  volume = GAME_CONFIG.sfxVolume,
+): void {
   initNativeAudio();
   const pool = sfxPools.get(key);
   if (!pool?.length) return;
@@ -111,7 +114,7 @@ export function playNativeSfx(key: Exclude<NativeAudioKey, 'music-game'>, volume
   void el.play().catch(() => {});
 }
 
-export function playNativeMusic(volume = 0.45): void {
+export function playNativeMusic(volume = GAME_CONFIG.musicVolume): void {
   initNativeAudio();
   if (!musicEl) return;
   if (!musicEl.paused && !musicEl.ended) return;
